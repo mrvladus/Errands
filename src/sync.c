@@ -253,6 +253,21 @@ static inline bool merge_tasks(icalcomponent *old, icalcomponent *new) {
 
 // ---------- IDLE CALLBACKS ---------- //
 
+// Merge a remote version of a task that already exists locally, if the remote one is newer
+static void apply_remote_change(ErrandsTaskListItem *list, _CBData *data) {
+  if (!list) return;
+  ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), data->uid);
+  if (!task) return;
+  icalcomponent *old_ical = errands_task_item_get_ical(task);
+  if (!merge_tasks(old_ical, data->ical)) return;
+  errands_task_item_set_ical(task, old_ical);
+  errands_data_set_synced(old_ical, true);
+  errands_task_list_item_save(list);
+  errands_task_list_item_update_count(list);
+  errands_sidebar_update_filter_rows();
+  g_message("Sync: Remote task modified: %s", data->uid);
+}
+
 static gboolean remote_event_idle_cb(gpointer user_data) {
   g_assert_nonnull(user_data);
 
@@ -305,7 +320,13 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
   case TASK_ADDED: {
     if (pushed_objs_is_stored(data->uid)) break;
     ErrandsTaskListItem *list = find_local_task_list(caldav_calendar_get_uid(data->calendar));
-    if (find_local_task(list, errands_data_get_uid(data->ical))) break;
+    if (!list) break;
+    // EDS reports every task it already has as "added" when the view starts. Tasks that changed on the
+    // server while Errands was closed arrive this way, so merge them instead of skipping them.
+    if (find_local_task(list, errands_data_get_uid(data->ical))) {
+      apply_remote_change(list, data);
+      break;
+    }
     icalcomponent_add_component(list->ical, data->ical);
     const char *parent = errands_data_get_parent(data->ical);
     errands_data_set_synced(data->ical, true);
@@ -334,15 +355,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
   case TASK_MODIFIED: {
     if (pushed_objs_is_stored(data->uid)) break;
     ErrandsTaskListItem *list = find_local_task_list(caldav_calendar_get_uid(data->calendar));
-    if (!list) break;
-    ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), data->uid);
-    if (!task) break;
-    icalcomponent *old_ical = errands_task_item_get_ical(task);
-    if (!merge_tasks(old_ical, data->ical)) break;
-    errands_task_item_set_ical(task, old_ical);
-    errands_data_set_synced(old_ical, true);
-    errands_task_list_item_save(list);
-    g_message("Sync: Remote task modified: %s", data->uid);
+    apply_remote_change(list, data);
   } break;
 
   case TASK_REMOVED: {
