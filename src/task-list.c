@@ -214,7 +214,7 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
     return icaltime_compare(due_a, due_b);
   }
   case SORT_TYPE_PRIORITY:
-    return errands_task_item_get_priority(asc_order ? a : b) - errands_task_item_get_priority(asc_order ? b : a);
+    return errands_task_item_get_priority(asc_order ? b : a) - errands_task_item_get_priority(asc_order ? a : b);
   case SORT_TYPE_START_DATE: {
     icaltimetype start_a = errands_task_item_get_dtstart(asc_order ? b : a);
     icaltimetype start_b = errands_task_item_get_dtstart(asc_order ? a : b);
