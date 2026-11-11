@@ -111,6 +111,14 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   }
 }
 
+// Save the list and queue the task for upload. Without the push, an edit made in the task list (e.g. ticking the
+// checkbox) stays local untl the next restart, because only the properties dialog queued a push.
+static void save_and_push(ErrandsTaskItem *self) {
+  errands_task_list_item_save(self->list);
+  if (!errands_data_get_synced(self->ical)) errands_sync_push_task(self);
+}
+
+
 static void set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
   ErrandsTaskItem *self = ERRANDS_TASK_ITEM(object);
   switch (prop_id) {
@@ -121,7 +129,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->title = g_strdup(new_title);
     errands_data_set_text(self->ical, self->title);
     update_search_blob(self);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
   } break;
 
   case PROP_COMPLETED: {
@@ -149,7 +157,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     }
     if (update_task_list_count > 0) update_task_list_count--;
     if (update_task_list_count > 0) break;
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
     errands_sidebar_update_filter_rows();
     errands_sidebar_task_list_update_counter(self->list->uid);
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
@@ -178,7 +186,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     }
     if (update_task_list_count > 0) update_task_list_count--;
     if (update_task_list_count > 0) break;
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
     errands_sidebar_update_filter_rows();
     errands_sidebar_task_list_update_counter(self->list->uid);
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
@@ -191,7 +199,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     g_clear_pointer(&self->color, g_free);
     self->color = g_strdup(new_color);
     errands_data_set_color(self->ical, self->color);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
   } break;
 
   case PROP_PRIORITY: {
@@ -199,7 +207,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (new_priority == self->priority) break;
     self->priority = new_priority;
     errands_data_set_priority(self->ical, self->priority);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
   } break;
 
   case PROP_NOTES: {
@@ -210,7 +218,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->notes = g_strdup(normalized);
     errands_data_set_notes(self->ical, self->notes);
     update_search_blob(self);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
   } break;
 
   case PROP_DTSTART: {
@@ -219,7 +227,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (icaltime_compare(new_time, self->dtstart) == 0) break;
     self->dtstart = new_time;
     errands_data_set_start(self->ical, self->dtstart);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
   } break;
 
   case PROP_DTEND: {
@@ -228,7 +236,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (icaltime_compare(new_time, self->dtend) == 0) break;
     self->dtend = new_time;
     errands_data_set_due(self->ical, self->dtend);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
     // Covers both edits in the UI and changes merged by sync
     if (state.main_window && state.main_window->task_list) errands_task_list_refilter_today(state.main_window->task_list);
   } break;
@@ -239,7 +247,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->tags && !new_tags) {
       g_clear_pointer(&self->tags, g_strfreev);
       errands_data_set_tags(self->ical, NULL);
-      if (!self->lock) errands_task_list_item_save(self->list);
+      if (!self->lock) save_and_push(self);
       break;
     }
     if (new_tags && self->tags && g_strv_equal((const gchar *const *)self->tags, (const gchar *const *)new_tags)) break;
@@ -247,7 +255,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->tags = g_strdupv(new_tags);
     errands_data_set_tags(self->ical, new_tags);
     update_search_blob(self);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
   } break;
 
   case PROP_ATTACHMENTS: {
@@ -256,7 +264,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->attachments && !new_attachments) {
       g_clear_pointer(&self->attachments, g_strfreev);
       errands_data_set_attachments(self->ical, NULL);
-      if (!self->lock) errands_task_list_item_save(self->list);
+      if (!self->lock) save_and_push(self);
       break;
     }
     if (new_attachments && self->attachments &&
@@ -265,7 +273,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     g_clear_pointer(&self->attachments, g_strfreev);
     self->attachments = g_strdupv(new_attachments);
     errands_data_set_attachments(self->ical, new_attachments);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
   } break;
 
   case PROP_RRULE: {
@@ -279,7 +287,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->rrule) icalrecurrencetype_unref(self->rrule);
     if (new_rrule->freq != ICAL_NO_RECURRENCE) self->rrule = icalrecurrencetype_clone((struct icalrecurrencetype *)new_rrule);
     errands_data_set_rrule(self->ical, self->rrule);
-    if (!self->lock) errands_task_list_item_save(self->list);
+    if (!self->lock) save_and_push(self);
   } break;
 
   case PROP_SEARCH_MATCHED: self->search_matched = g_value_get_boolean(value); break;
