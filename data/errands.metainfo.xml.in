@@ -61,6 +61,24 @@
   </requires>
 
   <releases>
+    <release version="51.0.6" date="2026-11-11">
+        <description translate="no">
+            <ul>
+                <li>Fixed bugs with Today page. Thanks to @amadeusp.</li>
+                <li>Fixed bugs with sync. Thanks to @amadeusp.</li>
+                <li>Fixed priority sort</li>
+            </ul>
+            <p>Added / Updated translations:</p>
+            <ul>
+                <li>Slovenian</li>
+                <li>Chinese</li>
+                <li>Ukrainian</li>
+                <li>Georgian</li>
+                <li>Persian</li>
+            </ul>
+            <p>Thanks to everyone on Damned Lies!</p>
+        </description>
+    </release>
     <release version="51.0.5" date="2026-11-07">
         <description translate="no">
             <ul>
