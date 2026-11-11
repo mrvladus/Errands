@@ -524,9 +524,10 @@ icaltimetype errands_data_get_changed(icalcomponent *ical) {
   if (property) result = icalproperty_get_lastmodified(property);
   else {
     property = icalcomponent_get_first_property(ical, ICAL_DTSTAMP_PROPERTY);
+    // Some clients (e.g. Tasks.org) don't write LAST-MODIFIED; fall back to DTSTAMP, then to now
     if (property) result = icalproperty_get_dtstamp(property);
-    icaltimetype now = result = icaltime_now();
-    errands_data_set_changed(ical, now);
+    else result = local_to_utc(icaltime_now());
+    errands_data_set_changed(ical, utc_to_local(result));
   }
   return utc_to_local(result);
 }
@@ -544,8 +545,8 @@ icaltimetype errands_data_get_created(icalcomponent *ical) {
   else {
     property = icalcomponent_get_first_property(ical, ICAL_DTSTAMP_PROPERTY);
     if (property) result = icalproperty_get_dtstamp(property);
-    icaltimetype now = result = icaltime_now();
-    errands_data_set_created(ical, now);
+    else result = local_to_utc(icaltime_now());
+    errands_data_set_created(ical, utc_to_local(result));
   }
   return utc_to_local(result);
 }

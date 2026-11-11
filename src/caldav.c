@@ -58,6 +58,16 @@ static inline ENamedParameters *caldav__make_credentials(const char *username, c
   return credentials;
 }
 
+// EDS stops talking to the server once a source needs credentials, and waits for an app to provide them.
+// Nothing else does that for our sources, so hand over the credentials we already have.
+static void caldav__ensure_authenticated(CalDAVClient *c, ESource *source) {
+  if (!c->credentials || e_source_get_connection_status(source) != E_SOURCE_CONNECTION_STATUS_AWAITING_CREDENTIALS) return;
+  g_message("CalDAV: Source '%s' is awaiting credentials, providing them", e_source_get_uid(source));
+  g_autoptr(GError) error = NULL;
+  if (!e_source_invoke_authenticate_sync(source, c->credentials, NULL, &error))
+    g_warning("CalDAV: Failed to authenticate source '%s': %s", e_source_get_uid(source), error->message);
+}
+
 // SOUP_HTTP_URI_FLAGS normalizes the scheme, so the default port (e.g. 443) is stored instead of 0, which EDS turns
 // into port 80 once the source is reloaded from the registry.
 static inline GUri *caldav__parse_webdav_uri(const gchar *url, GError **error) {
@@ -146,7 +156,8 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
   ESourceAuthentication *auth = e_source_get_extension(source, E_SOURCE_EXTENSION_AUTHENTICATION);
   e_source_authentication_set_method(auth, "Basic");
   e_source_authentication_set_user(auth, c->username);
-  if (!e_source_store_password_sync(source, c->password, FALSE, NULL, &error)) {
+  // Store permanently: a session-only password is gone after logout, and EDS then waits for credentials forever
+  if (!e_source_store_password_sync(source, c->password, TRUE, NULL, &error)) {
     g_warning("CalDAV: Failed to store password: %s", error->message);
     return NULL;
   }
@@ -175,6 +186,8 @@ static inline CalDAVCalendar *caldav__connect_discovered_source(CalDAVClient *c,
       g_clear_error(&error);
     }
   }
+
+  caldav__ensure_authenticated(c, registered_source);
 
   EClient *e_client = e_cal_client_connect_sync(registered_source, E_CAL_CLIENT_SOURCE_TYPE_TASKS, 1, NULL, &error);
   if (!e_client) {
@@ -252,6 +265,7 @@ static inline void caldav__calendar_poll(CalDAVCalendar *calendar) {
     }
   }
 
+  caldav__ensure_authenticated(calendar->client, calendar->registered_source);
   if (!e_client_refresh_sync(E_CLIENT(calendar->e_cal_client), NULL, &error))
     g_warning("CalDAV: CalDAV refresh failed: %s", error->message);
 

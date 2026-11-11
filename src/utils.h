@@ -383,9 +383,11 @@ static inline icaltimetype utc_to_local(icaltimetype value) {
   return value;
 }
 
+// Current local time, matching what the errands_data_get_*() getters return and the setters expect.
+// (icaltime_from_timet_with_zone(…, NULL) yields UTC fields, so they must be converted to lcoal, not from local.)
 static inline icaltimetype icaltime_now() {
   g_autoptr(GDateTime) dt = g_date_time_new_now_local();
-  return local_to_utc(icaltime_from_timet_with_zone(g_date_time_to_unix(dt), 0, NULL));
+  return utc_to_local(icaltime_from_timet_with_zone(g_date_time_to_unix(dt), 0, NULL));
 }
 
 static inline bool icalrecurrence_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {
