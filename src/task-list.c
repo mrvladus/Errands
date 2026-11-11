@@ -2,9 +2,13 @@
 // SPDX-License-Identifier: Zlib
 
 #include "task-list.h"
+#include "adwaita.h"
 #include "config.h"
 #include "data.h"
 #include "delete-list-dialog.h"
+#include "gio/gio.h"
+#include "glib.h"
+#include "gtk/gtk.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
@@ -169,6 +173,7 @@ static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
   // Match parent tasks
   for (ErrandsTaskItem *parent = errands_task_item_get_parent(item); parent; parent = errands_task_item_get_parent(parent))
     if (errands_task_item_is_due(parent)) return true;
+  // Match children tasks
   GListModel *children = errands_task_item_get_children_model(item);
   for (guint i = 0; i < g_list_model_get_n_items(children); i++) {
     g_autoptr(ErrandsTaskItem) child = g_list_model_get_item(children, i);
@@ -252,7 +257,7 @@ static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_i
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_tree_expander_new());
   gtk_tree_expander_set_child(expander, GTK_WIDGET(errands_task_new()));
   gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
-  gtk_list_item_set_focusable(list_item, true);
+  gtk_list_item_set_focusable(list_item, TRUE);
 }
 
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
@@ -478,9 +483,26 @@ void errands_task_list_refilter_today(ErrandsTaskList *self) {
 void errands_task_list_update(ErrandsTaskList *self) {
   const char *title = NULL;
   switch (self->page) {
-  case ERRANDS_TASK_LIST_PAGE_ALL: title = _("All Tasks"); break;
-  case ERRANDS_TASK_LIST_PAGE_TODAY: title = _("Tasks for Today"); break;
-  case ERRANDS_TASK_LIST_PAGE_TASK_LIST: title = self->item->title; break;
+  case ERRANDS_TASK_LIST_PAGE_ALL: {
+    title = _("All Tasks");
+    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), "");
+  } break;
+  case ERRANDS_TASK_LIST_PAGE_TODAY: {
+    title = _("Tasks for Today");
+    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), "");
+  } break;
+  case ERRANDS_TASK_LIST_PAGE_TASK_LIST: {
+    title = self->item->title;
+    g_autoptr(GPtrArray) tasks = vcalendar_to_array(self->item->ical);
+    guint completed = 0, total = 0;
+    for_range(i, 0, tasks->len) {
+      icalcomponent *task = g_ptr_array_index(tasks, i);
+      if (errands_data_get_deleted(task) || errands_data_get_cancelled(task)) continue;
+      if (errands_data_is_completed(task)) completed++;
+      total++;
+    }
+    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), tmp_str_printf("Completed: %d / %d", completed, total));
+  } break;
   }
   adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), title);
   GListModel *model = G_LIST_MODEL(gtk_list_view_get_model(GTK_LIST_VIEW(self->list_view)));

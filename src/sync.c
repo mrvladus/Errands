@@ -324,7 +324,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     // EDS reports every task it already has as "added" when the view starts. Tasks that changed on the
     // server while Errands was closed arrive this way, so merge them instead of skipping them.
     if (find_local_task(list, errands_data_get_uid(data->ical))) {
-      apply_remote_change(list, data);
+      apply_remote_change(list, (_CBData *)data);
       break;
     }
     icalcomponent_add_component(list->ical, data->ical);
@@ -355,7 +355,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
   case TASK_MODIFIED: {
     if (pushed_objs_is_stored(data->uid)) break;
     ErrandsTaskListItem *list = find_local_task_list(caldav_calendar_get_uid(data->calendar));
-    apply_remote_change(list, data);
+    apply_remote_change(list, (_CBData *)data);
   } break;
 
   case TASK_REMOVED: {

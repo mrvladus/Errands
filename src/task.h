@@ -36,6 +36,7 @@ struct _ErrandsTask {
   GtkWidget *attachments_btn;
   GtkWidget *attachments_btn_content;
   GtkWidget *sub_entry;
+  GtkWidget *progress_bar;
   GtkDropControllerMotion *drop_motion_ctrl;
 
   // GObject Properties

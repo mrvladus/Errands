@@ -17,6 +17,7 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <libical/ical.h>
+#include <math.h>
 
 static void update_search_blob(ErrandsTaskItem *self);
 static void on_global_tags_changed_cb(ErrandsTaskItem *self);
@@ -34,6 +35,7 @@ struct _ErrandsTaskItem {
   gboolean completed;
   gboolean cancelled;
   gint priority;
+  gfloat percent_complete;
   icaltimetype dtstart;
   icaltimetype dtend;
   GStrv tags;
@@ -65,6 +67,7 @@ enum {
   PROP_COMPLETED,
   PROP_CANCELLED,
   PROP_PRIORITY,
+  PROP_PERCENT_COMPLETE,
   PROP_DTSTART,
   PROP_DTEND,
   PROP_TAGS,
@@ -72,13 +75,12 @@ enum {
   PROP_RRULE,
   PROP_SEARCH_BLOB,
   PROP_SEARCH_MATCHED,
-
   PROP_UNCOMPLETED_COUNT,
   PROP_HAS_NO_CHILDREN,
-
   PROP_ICAL,
   PROP_CHILDREN_MODEL,
   PROP_TASK_WIDGET,
+
   N_PROPERTIES,
 };
 
@@ -94,6 +96,7 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   case PROP_CANCELLED: g_value_set_boolean(value, self->cancelled); break;
   case PROP_COLOR: g_value_set_string(value, self->color); break;
   case PROP_PRIORITY: g_value_set_int(value, self->priority); break;
+  case PROP_PERCENT_COMPLETE: g_value_set_float(value, self->percent_complete); break;
   case PROP_NOTES: g_value_set_string(value, self->notes); break;
   case PROP_DTSTART: g_value_set_pointer(value, &self->dtstart); break;
   case PROP_DTEND: g_value_set_pointer(value, &self->dtend); break;
@@ -113,11 +116,11 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
 
 // Save the list and queue the task for upload. Without the push, an edit made in the task list (e.g. ticking the
 // checkbox) stays local untl the next restart, because only the properties dialog queued a push.
-static void save_and_push(ErrandsTaskItem *self) {
+static inline void save_and_push(ErrandsTaskItem *self) {
+  if (self->lock) return;
   errands_task_list_item_save(self->list);
   if (!errands_data_get_synced(self->ical)) errands_sync_push_task(self);
 }
-
 
 static void set_property(GObject *object, guint prop_id, const GValue *value, GParamSpec *pspec) {
   ErrandsTaskItem *self = ERRANDS_TASK_ITEM(object);
@@ -129,7 +132,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->title = g_strdup(new_title);
     errands_data_set_text(self->ical, self->title);
     update_search_blob(self);
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
   } break;
 
   case PROP_COMPLETED: {
@@ -150,14 +153,12 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     }
     // Uncomplete all parents
     else {
-      if (self->parent && self->parent->completed) {
-        g_object_set(self->parent, "completed", false, NULL);
-        errands_task_item_update(self->parent);
-      }
+      if (self->parent && self->parent->completed) g_object_set(self->parent, "completed", false, NULL);
+      errands_task_item_update(self->parent);
     }
     if (update_task_list_count > 0) update_task_list_count--;
     if (update_task_list_count > 0) break;
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
     errands_sidebar_update_filter_rows();
     errands_sidebar_task_list_update_counter(self->list->uid);
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
@@ -186,7 +187,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     }
     if (update_task_list_count > 0) update_task_list_count--;
     if (update_task_list_count > 0) break;
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
     errands_sidebar_update_filter_rows();
     errands_sidebar_task_list_update_counter(self->list->uid);
     errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
@@ -199,7 +200,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     g_clear_pointer(&self->color, g_free);
     self->color = g_strdup(new_color);
     errands_data_set_color(self->ical, self->color);
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
   } break;
 
   case PROP_PRIORITY: {
@@ -207,7 +208,15 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (new_priority == self->priority) break;
     self->priority = new_priority;
     errands_data_set_priority(self->ical, self->priority);
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
+  } break;
+
+  case PROP_PERCENT_COMPLETE: {
+    gfloat new_value = CLAMP(g_value_get_float(value), 0.0, 1.0);
+    if (new_value == self->percent_complete) break;
+    self->percent_complete = new_value;
+    // errands_data_set_percent(self->ical, self->percent_complete);
+    // save_and_push(self);
   } break;
 
   case PROP_NOTES: {
@@ -218,7 +227,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->notes = g_strdup(normalized);
     errands_data_set_notes(self->ical, self->notes);
     update_search_blob(self);
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
   } break;
 
   case PROP_DTSTART: {
@@ -227,7 +236,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (icaltime_compare(new_time, self->dtstart) == 0) break;
     self->dtstart = new_time;
     errands_data_set_start(self->ical, self->dtstart);
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
   } break;
 
   case PROP_DTEND: {
@@ -236,7 +245,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (icaltime_compare(new_time, self->dtend) == 0) break;
     self->dtend = new_time;
     errands_data_set_due(self->ical, self->dtend);
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
     // Covers both edits in the UI and changes merged by sync
     if (state.main_window && state.main_window->task_list) errands_task_list_refilter_today(state.main_window->task_list);
   } break;
@@ -247,7 +256,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->tags && !new_tags) {
       g_clear_pointer(&self->tags, g_strfreev);
       errands_data_set_tags(self->ical, NULL);
-      if (!self->lock) save_and_push(self);
+      save_and_push(self);
       break;
     }
     if (new_tags && self->tags && g_strv_equal((const gchar *const *)self->tags, (const gchar *const *)new_tags)) break;
@@ -255,7 +264,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     self->tags = g_strdupv(new_tags);
     errands_data_set_tags(self->ical, new_tags);
     update_search_blob(self);
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
   } break;
 
   case PROP_ATTACHMENTS: {
@@ -264,7 +273,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->attachments && !new_attachments) {
       g_clear_pointer(&self->attachments, g_strfreev);
       errands_data_set_attachments(self->ical, NULL);
-      if (!self->lock) save_and_push(self);
+      save_and_push(self);
       break;
     }
     if (new_attachments && self->attachments &&
@@ -273,7 +282,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     g_clear_pointer(&self->attachments, g_strfreev);
     self->attachments = g_strdupv(new_attachments);
     errands_data_set_attachments(self->ical, new_attachments);
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
   } break;
 
   case PROP_RRULE: {
@@ -287,7 +296,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (self->rrule) icalrecurrencetype_unref(self->rrule);
     if (new_rrule->freq != ICAL_NO_RECURRENCE) self->rrule = icalrecurrencetype_clone((struct icalrecurrencetype *)new_rrule);
     errands_data_set_rrule(self->ical, self->rrule);
-    if (!self->lock) save_and_push(self);
+    save_and_push(self);
   } break;
 
   case PROP_SEARCH_MATCHED: self->search_matched = g_value_get_boolean(value); break;
@@ -367,6 +376,8 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
       g_param_spec_boolean("cancelled", "Cancelled", "Whether the task is cancelled", false, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Task Color", "Color of the task", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_PRIORITY] = g_param_spec_int("priority", "Priority", "Priority of the task", 0, 10, 0, G_PARAM_READWRITE);
+  obj_properties[PROP_PERCENT_COMPLETE] = g_param_spec_float("percent-complete", "Percent Complete",
+                                                             "Completion percent of the task", 0.0, 1.0, 0.0, G_PARAM_READWRITE);
   obj_properties[PROP_NOTES] = g_param_spec_string("notes", "Notes", "Notes of the task", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_DTSTART] = g_param_spec_pointer("dtstart", "DTStart", "Start time of the task", G_PARAM_READWRITE);
   obj_properties[PROP_DTEND] = g_param_spec_pointer("dtend", "DTEnd", "End time of the task", G_PARAM_READWRITE);
@@ -508,16 +519,19 @@ void errands_task_item_update(ErrandsTaskItem *self) {
   bool show_completed = errands_settings_get_show_completed(state.settings);
   bool show_cancelled = errands_settings_get_show_cancelled(state.settings);
   GListModel *children_model = G_LIST_MODEL(self->children_model);
-  gint visible = 0, uncompleted = 0;
+  gint visible = 0, uncompleted = 0, completed = 0, total = 0;
   for_range(i, 0, g_list_model_get_n_items(children_model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(children_model, i);
     if (errands_data_get_deleted(item->ical)) continue;
+    total++;
+    if (item->completed) completed++;
     if (!item->completed && !item->cancelled) uncompleted++;
     if ((!show_completed && item->completed) || (!show_cancelled && item->cancelled)) continue;
     visible++;
   }
+  gfloat percent = total > 0 ? (gfloat)completed / (gfloat)total : 0.0;
   g_object_set(self, "uncompleted-count", uncompleted > 0 ? tmp_str_printf("%d", uncompleted) : "", "has-no-children",
-               visible == 0, NULL);
+               visible == 0, "percent-complete", percent, NULL);
 }
 
 void errands_task_item_add_tag(ErrandsTaskItem *self, const char *tag) {
@@ -728,6 +742,8 @@ GListStore *errands_task_item_get_parent_model(ErrandsTaskItem *self) {
 
 gboolean errands_task_item_get_synced(ErrandsTaskItem *self) { return errands_data_get_synced(self->ical); }
 
+gfloat errands_task_item_get_percent_complete(ErrandsTaskItem *self) { return self->percent_complete; }
+
 int errands_task_item_get_indent_level(ErrandsTaskItem *self) {
   int level = 0;
   ErrandsTaskItem *parent = self->parent;
@@ -810,3 +826,6 @@ void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent
   errands_task_list_item_save(self->list);
 }
 void errands_task_item_set_list(ErrandsTaskItem *self, ErrandsTaskListItem *list) { self->list = list; }
+void errands_task_item_set_percent_complete(ErrandsTaskItem *self, gfloat value) {
+  g_object_set(self, "percent-complete", value, NULL);
+}

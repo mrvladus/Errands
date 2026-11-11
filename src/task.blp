@@ -18,6 +18,18 @@ template $ErrandsTask: Box {
     enter => $on_drop_motion_ctrl_enter_cb(template);
   }
 
+  DragSource {
+    actions: move;
+    prepare => $on_drag_prepare_cb(template) not-swapped;
+    drag-begin => $on_drag_begin_cb(template) not-swapped;
+  }
+
+  DropTarget {
+    formats: "ErrandsTaskItem";
+    actions: move;
+    drop => $on_drop_cb(template) not-swapped;
+  }
+
   // Title Box
   Box {
     spacing: 6;
@@ -37,6 +49,7 @@ template $ErrandsTask: Box {
 
       styles [
         "selection-mode",
+        "accent",
       ]
     }
 
@@ -286,6 +299,21 @@ template $ErrandsTask: Box {
     }
   }
 
+  ProgressBar progress_bar {
+    valign: end;
+    margin-start: 12;
+    margin-end: 12;
+    margin-bottom: 6;
+    opacity: 0.5;
+    notify::fraction => $on_progressbar_fraction_changed_cb(template);
+
+    styles [
+      "osd",
+      "accent",
+    ]
+  }
+
+  // Sub Entry
   Revealer sub_entry_revealer {
     reveal-child: bind sub_toggle_btn.active;
     // Sub-Tasks Entry
@@ -300,17 +328,5 @@ template $ErrandsTask: Box {
         "sub-entry",
       ]
     }
-  }
-
-  DragSource {
-    actions: move;
-    prepare => $on_drag_prepare_cb(template) not-swapped;
-    drag-begin => $on_drag_begin_cb(template) not-swapped;
-  }
-
-  DropTarget {
-    formats: "ErrandsTaskItem";
-    actions: move;
-    drop => $on_drop_cb(template) not-swapped;
   }
 }

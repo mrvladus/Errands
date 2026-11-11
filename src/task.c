@@ -15,6 +15,7 @@
 #include <glib-object.h>
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <gtk/gtk.h>
 #include <libical/ical.h>
 
 static void errands_task_update_toolbar(ErrandsTask *task);
@@ -34,6 +35,7 @@ static void on_priority_action_cb(GSimpleAction *action, GVariant *value, Errand
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
 static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self);
 static void on_drop_motion_ctrl_enter_cb(ErrandsTask *self);
+static void on_progressbar_fraction_changed_cb(ErrandsTask *self);
 
 static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *self);
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
@@ -221,9 +223,11 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, attachments_btn_content);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, sub_entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, drop_motion_ctrl);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, progress_bar);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_progressbar_fraction_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_motion_ctrl_enter_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_prepare_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_begin_cb);
@@ -296,6 +300,7 @@ void errands_task_set_item(ErrandsTask *self, ErrandsTaskItem *item) {
   g_object_bind_property(item, "attachments", self, "attachments", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "rrule", self, "rrule", G_BINDING_SYNC_CREATE);
   g_object_bind_property(item, "completed", self->complete_btn, "active", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(item, "percent-complete", self->progress_bar, "fraction", G_BINDING_SYNC_CREATE);
 }
 
 // ---------- ACTION CALLBACKS ---------- //
@@ -404,6 +409,11 @@ static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
   // Reset text
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_sidebar_update_filter_rows();
+}
+
+static void on_progressbar_fraction_changed_cb(ErrandsTask *self) {
+  gfloat curr = gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(self->progress_bar));
+  gtk_widget_set_visible(self->progress_bar, curr > 0.0);
 }
 
 // --- DND CALLBACKS --- //

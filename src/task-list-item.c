@@ -110,7 +110,7 @@ static gboolean save_timeout_cb(gpointer user_data) {
     g_message("Task List Item: Failed to save list '%s'", path);
     return G_SOURCE_REMOVE;
   }
-  g_message("Task List Item: Saved list '%s'", path);
+  g_message("Task List Item: Saved list '%s'", self->uid);
   return G_SOURCE_REMOVE;
 }
 

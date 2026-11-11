@@ -56,6 +56,7 @@ gboolean errands_task_item_get_search_matched(ErrandsTaskItem *self);
 int errands_task_item_get_indent_level(ErrandsTaskItem *self);
 GListStore *errands_task_item_get_parent_model(ErrandsTaskItem *self);
 gboolean errands_task_item_get_synced(ErrandsTaskItem *self);
+gfloat errands_task_item_get_percent_complete(ErrandsTaskItem *self);
 
 // --- SETTERS --- //
 
@@ -75,3 +76,4 @@ void errands_task_item_set_tags(ErrandsTaskItem *self, const GStrv tags);
 void errands_task_item_set_attachments(ErrandsTaskItem *self, const GStrv attachments);
 void errands_task_item_set_rrule(ErrandsTaskItem *self, const struct icalrecurrencetype *rrule);
 void errands_task_item_set_search_matched(ErrandsTaskItem *self, gboolean matched);
+void errands_task_item_set_percent_complete(ErrandsTaskItem *self, gfloat value);
