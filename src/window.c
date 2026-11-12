@@ -287,6 +287,7 @@ static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value,
   return false;
 }
 
+// Called when sidebar is closed
 static void on_show_properties_toggled_cb(ErrandsWindow *self) {
   gboolean show = adw_overlay_split_view_get_show_sidebar(self->overlay_split_view);
   if (show) return;
@@ -312,7 +313,11 @@ static void on_show_properties_toggled_cb(ErrandsWindow *self) {
       errands_task_item_set_dtstart(self->item, &now);
     }
   }
-  if (new_rrule) icalrecurrencetype_unref(new_rrule);
+  if (new_rrule && icaltime_is_null_date(new_sdt)) {
+    icaltimetype now = icaltime_now();
+    errands_task_item_set_dtstart(self->item, &now);
+    icalrecurrencetype_unref(new_rrule);
+  }
 
   // Notes
   GtkTextIter start, end;

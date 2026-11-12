@@ -579,6 +579,12 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
   }
   self->lock = FALSE;
 
+  // Set dtstart if rrule is set and no dtstart exists
+  if (!icaltime_is_null_time(self->dtstart) && self->rrule && self->rrule->freq != ICAL_NO_RECURRENCE) {
+    icaltimetype now = icaltime_now();
+    errands_task_item_set_dtstart(self, &now);
+  }
+
   update_search_blob(self);
   errands_task_item_update(self);
 
