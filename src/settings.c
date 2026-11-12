@@ -193,9 +193,9 @@ static void errands_settings_class_init(ErrandsSettingsClass *class) {
   obj_properties[PROP_MAXIMIZED] =
       g_param_spec_boolean("maximized", "Maximized", "Window is maximized", FALSE, G_PARAM_READWRITE);
   obj_properties[PROP_SHOW_COMPLETED] =
-      g_param_spec_boolean("show-completed", "Show Completed", "Show completed tasks", FALSE, G_PARAM_READWRITE);
+      g_param_spec_boolean("show-completed", "Show Completed", "Show completed tasks", TRUE, G_PARAM_READWRITE);
   obj_properties[PROP_SHOW_CANCELLED] =
-      g_param_spec_boolean("show-cancelled", "Show Cancelled", "Show cancelled tasks", FALSE, G_PARAM_READWRITE);
+      g_param_spec_boolean("show-cancelled", "Show Cancelled", "Show cancelled tasks", TRUE, G_PARAM_READWRITE);
   obj_properties[PROP_BACKGROUND] =
       g_param_spec_boolean("background", "Background", "Run in background", TRUE, G_PARAM_READWRITE);
   obj_properties[PROP_STARTUP] = g_param_spec_boolean("startup", "Startup", "Run on startup", TRUE, G_PARAM_READWRITE);
@@ -231,8 +231,8 @@ static void errands_settings_init(ErrandsSettings *self) {
 
   // Setup default values
   self->maximized = FALSE;
-  self->show_completed = FALSE;
-  self->show_cancelled = FALSE;
+  self->show_completed = TRUE;
+  self->show_cancelled = TRUE;
   self->background = TRUE;
   self->startup = TRUE;
   self->sync_enabled = FALSE;

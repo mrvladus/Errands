@@ -44,8 +44,6 @@ static void activate(GtkApplication *app) {
 int main(int argc, char **argv) {
   RANDOM_SEED();
   g_message("Starting version %s (%s) %sFlatpak", VERSION, VERSION_COMMIT, xdp_portal_running_under_flatpak() ? "" : "not ");
-  g_message("TZ: %s", g_getenv("TZ"));
-  g_message("Local timezone: %s", g_time_zone_get_identifier(g_time_zone_new_local()));
   // Setup locales
   bindtextdomain("errands", LOCALE_DIR);
   bind_textdomain_codeset("errands", "UTF-8");

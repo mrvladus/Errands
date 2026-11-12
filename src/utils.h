@@ -383,6 +383,28 @@ static inline icaltimetype utc_to_local(icaltimetype value) {
   return value;
 }
 
+static inline time_t ical_to_utc_timet(icaltimetype t) {
+  if (icaltime_is_null_time(t)) return 0;
+  if (icaltime_is_date(t)) {
+    icaltimetype midnight = t;
+    midnight.hour = 0;
+    midnight.minute = 0;
+    midnight.second = 0;
+    midnight.is_date = 0;
+    midnight.is_daylight = 0;
+    midnight.zone = NULL;
+    icaltimetype u = local_to_utc(midnight);
+    return icaltime_as_timet_with_zone(u, icaltimezone_get_utc_timezone());
+  }
+  if (t.zone == NULL) {
+    icaltimetype u = local_to_utc(t);
+    return icaltime_as_timet_with_zone(u, icaltimezone_get_utc_timezone());
+  }
+  // Explicit zone (including UTC): convert to UTC
+  icaltimetype u = icaltime_convert_to_zone(t, icaltimezone_get_utc_timezone());
+  return icaltime_as_timet_with_zone(u, icaltimezone_get_utc_timezone());
+}
+
 // Current local time, matching what the errands_data_get_*() getters return and the setters expect.
 // (icaltime_from_timet_with_zone(…, NULL) yields UTC fields, so they must be converted to lcoal, not from local.)
 static inline icaltimetype icaltime_now() {
