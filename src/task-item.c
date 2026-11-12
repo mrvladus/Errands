@@ -550,7 +550,7 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
   g_assert_nonnull(list);
 
   ErrandsTaskItem *self = g_object_new(ERRANDS_TYPE_TASK_ITEM, NULL);
-
+  self->lock = TRUE;
   self->ical = ical;
   self->parent = parent;
   self->list = list;
@@ -568,7 +568,6 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
   self->tags = errands_data_get_tags(ical);
   self->attachments = errands_data_get_attachments(ical);
   errands_task_item_set_rrule(self, errands_data_get_rrule(ical));
-
   self->children_model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
   g_autoptr(GPtrArray) vtodos = vcalendar_to_array(list->ical);
   for (guint i = 0; i < vtodos->len; ++i) {
@@ -578,6 +577,7 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
     g_autoptr(ErrandsTaskItem) item = errands_task_item_new(c, self->list, self);
     g_list_store_append(self->children_model, item);
   }
+  self->lock = FALSE;
 
   update_search_blob(self);
   errands_task_item_update(self);
