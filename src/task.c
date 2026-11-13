@@ -24,6 +24,7 @@ static GtkWidget *errands_task_tag_new(const char *tag);
 static void on_edit_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
@@ -241,6 +242,7 @@ static void errands_task_init(ErrandsTask *self) {
   errands_add_action(self->ag, "edit", on_edit_action_cb, self, NULL);
   errands_add_action(self->ag, "copy", on_copy_action_cb, self, NULL);
   errands_add_action(self->ag, "color", on_color_action_cb, self, NULL);
+  errands_add_action(self->ag, "clear-color", on_clear_color_action_cb, self, NULL);
   errands_add_action(self->ag, "properties", on_properties_action_cb, self, NULL);
   errands_add_action(self->ag, "notes", on_notes_action_cb, self, NULL);
   errands_add_action(self->ag, "cancel", on_cancel_action_cb, self, NULL);
@@ -374,6 +376,10 @@ static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTa
   GdkRGBA rgba = {1};
   if (color) gdk_rgba_parse(&rgba, color);
   gtk_color_dialog_choose_rgba(color_dialog, GTK_WINDOW(state.main_window), &rgba, NULL, on_finish_cb, g_object_ref(self->item));
+}
+
+static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_task_item_set_color(self->item, NULL);
 }
 
 // ---------- CALLBACKS ---------- //

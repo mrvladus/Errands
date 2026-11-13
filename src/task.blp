@@ -123,6 +123,7 @@ template $ErrandsTask: Box {
       // Properties menu
       MenuButton {
         icon-name: "errands-more-symbolic";
+        valign: center;
 
         popover: PopoverMenu popover_menu {
           has-arrow: false;
@@ -137,7 +138,11 @@ template $ErrandsTask: Box {
             section {
               item (_("Edit Text"), "task.edit")
               item (_("Copy Text"), "task.copy")
+            }
+
+            section {
               item (_("Task Color"), "task.color")
+              item (_("Clear Color"), "task.clear-color")
             }
 
             section {

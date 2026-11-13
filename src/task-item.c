@@ -195,6 +195,11 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     const char *new_color = g_value_get_string(value);
     if (g_strcmp0(self->color, new_color) == 0) break;
     g_clear_pointer(&self->color, g_free);
+    if (!new_color) {
+      errands_data_set_color(self->ical, NULL);
+      save_and_push(self);
+      break;
+    }
     self->color = g_strdup(new_color);
     errands_data_set_color(self->ical, self->color);
     save_and_push(self);

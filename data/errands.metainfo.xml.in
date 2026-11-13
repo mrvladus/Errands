@@ -67,6 +67,8 @@
                 <li>Added progress bar for tasks</li>
                 <li
                     >Recurrent tasks now being uncompleted automatically when their recurrence cycle is passed</li>
+                <li>Printing of Task Lists</li>
+                <li>Added option to clear task color</li>
             </ul>
         </description>
     </release>
