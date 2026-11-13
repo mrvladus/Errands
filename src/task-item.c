@@ -151,7 +151,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     // Uncomplete all parents
     else {
       if (self->parent && self->parent->completed) g_object_set(self->parent, "completed", FALSE, NULL);
-      errands_task_item_update(self->parent);
+      if (self->parent) errands_task_item_update(self->parent);
     }
     if (update_task_list_count > 0) update_task_list_count--;
     if (update_task_list_count > 0) break;
