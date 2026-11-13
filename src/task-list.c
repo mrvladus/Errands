@@ -2,13 +2,9 @@
 // SPDX-License-Identifier: Zlib
 
 #include "task-list.h"
-#include "adwaita.h"
 #include "config.h"
 #include "data.h"
 #include "delete-list-dialog.h"
-#include "gio/gio.h"
-#include "glib.h"
-#include "gtk/gtk.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
@@ -19,7 +15,11 @@
 #include "utils.h"
 #include "window.h"
 
+#include <adwaita.h>
+#include <gio/gio.h>
+#include <glib.h>
 #include <glib/gi18n.h>
+#include <gtk/gtk.h>
 #include <libical/ical.h>
 
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item);
@@ -380,14 +380,16 @@ static void on_action_sort_by_cb(GSimpleAction *action, GVariant *param, Errands
   errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_DIFFERENT);
 }
 
-// - PRINTING - //
+// ---------- PRINTING ---------- //
 
 #define FONT_SIZE      12
 #define LINE_HEIGHT    20
 #define LINES_PER_PAGE 40
 
 // Function to calculate number of pages and handle pagination
-static void begin_print(GtkPrintOperation *operation, GtkPrintContext *context, const char *text) {
+static void begin_print(GtkPrintOperation *operation, GtkPrintContext *context, gpointer user_data) {
+  GString *str = user_data;
+  const char *text = str->str;
   size_t num_lines = 0;
   char c;
   size_t len = 0;
@@ -411,7 +413,8 @@ static void begin_print(GtkPrintOperation *operation, GtkPrintContext *context, 
 // Function to draw the text, handling LINES_PER_PAGE
 static void print_draw_page(GtkPrintOperation *operation, GtkPrintContext *context, int page_nr, gpointer user_data) {
   cairo_t *cr = gtk_print_context_get_cairo_context(context);
-  const char *text = (const char *)user_data;
+  GString *str = user_data;
+  const char *text = str->str;
   // Set the font to monospace and size to 12
   cairo_select_font_face(cr, "Monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(cr, FONT_SIZE);
@@ -421,18 +424,15 @@ static void print_draw_page(GtkPrintOperation *operation, GtkPrintContext *conte
   // Calculate the start and end lines for the current page
   size_t start_line = page_nr * LINES_PER_PAGE;
   size_t end_line = start_line + LINES_PER_PAGE;
-
   const uint8_t x = 10; // Starting x position
   double y = 10;        // Starting y position for the first line
-
   // Iterate over each line and draw it if it belongs to the current page
   size_t current_line = 0;
   while (line) {
     if (current_line >= start_line && current_line < end_line) {
       cairo_move_to(cr, x, y);   // Move to the next line's position
       cairo_show_text(cr, line); // Draw the current line
-      y += LINE_HEIGHT;          // Move down for the next line (LINE_HEIGHT between
-                                 // lines)
+      y += LINE_HEIGHT;          // Move down for the next line (LINE_HEIGHT between lines)
     }
     current_line++;
     line = strtok(NULL, "\n"); // Get the next line
@@ -441,25 +441,24 @@ static void print_draw_page(GtkPrintOperation *operation, GtkPrintContext *conte
   cairo_stroke(cr);
 }
 
-void start_print(const char *str) {
-  // Create a new print operation
+void start_print(GString *str) {
   g_autoptr(GtkPrintOperation) print = gtk_print_operation_new();
-  // Connect signal to draw on page
   g_signal_connect(print, "draw-page", G_CALLBACK(print_draw_page), (gpointer)str);
   g_signal_connect(print, "begin-print", G_CALLBACK(begin_print), (gpointer)str);
-  // Set default print settings if needed
   GtkPrintOperationResult result =
       gtk_print_operation_run(print, GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG, GTK_WINDOW(state.main_window), NULL);
-  // Check the result (if user cancels or accepts the dialog)
-  if (result == GTK_PRINT_OPERATION_RESULT_ERROR) g_print("An error occurred during the print operation.\n");
-  else if (result == GTK_PRINT_OPERATION_RESULT_APPLY) g_print("Print operation successful.\n");
+  if (result == GTK_PRINT_OPERATION_RESULT_ERROR) g_message("An error occurred during the print operation");
+  else if (result == GTK_PRINT_OPERATION_RESULT_APPLY) g_message("Print operation successful");
 }
 
 static void on_action_print_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self) {
-  g_message("Start printing of the list '%s'", self->item->uid);
-  TODO("PRINT");
-  // g_autofree gchar *str = list_data_print(row->data);
-  // start_print(str);
+  if (!self->item) return;
+  g_autoptr(GString) str = g_string_new(tmp_str_printf("%s\n\n", self->item->title));
+  for_range(i, 0, g_list_model_get_n_items(G_LIST_MODEL(self->item->tasks))) {
+    g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(G_LIST_MODEL(self->item->tasks), i);
+    errands_task_item_print(item, str, 0, 73);
+  }
+  start_print(str);
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //

@@ -26,6 +26,7 @@ int errands_task_item_delete_cancelled(ErrandsTaskItem *self);
 int errands_task_item_remove_deleted_tasks(ErrandsTaskItem *self);
 bool errands_task_item_export(ErrandsTaskItem *self, const char *path);
 bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, ErrandsTaskListItem *list);
+void errands_task_item_print(ErrandsTaskItem *self, GString *s, guint indent, guint max_line_width);
 
 // --- GETTERS --- //
 

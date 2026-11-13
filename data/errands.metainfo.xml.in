@@ -61,6 +61,15 @@
   </requires>
 
   <releases>
+    <release version="51.1" date="2026-11-13">
+        <description translate="no">
+            <ul>
+                <li>Added progress bar for tasks</li>
+                <li
+                    >Recurrent tasks now being uncompleted automatically when their recurrence cycle is passed</li>
+            </ul>
+        </description>
+    </release>
     <release version="51.0.6" date="2026-11-11">
         <description translate="no">
             <ul>

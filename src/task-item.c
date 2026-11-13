@@ -776,6 +776,58 @@ bool errands_task_item_move(ErrandsTaskItem *self, ErrandsTaskItem *parent, Erra
   return TRUE;
 }
 
+void errands_task_item_print(ErrandsTaskItem *self, GString *s, guint indent, guint max_line_width) {
+  // Build the indent string
+  GString *indent_str = g_string_new(NULL);
+  for_range(i, 0, indent) g_string_append(indent_str, "  ");
+  // Build the prefix: "[x] " or "[ ] "
+  g_autofree gchar *prefix = g_strdup_printf("[%c] ", self->completed ? 'x' : ' ');
+  // Wrap the title text
+  const gchar *title = self->title ? self->title : "";
+  guint prefix_len = indent_str->len + strlen(prefix);
+  guint available_width = (max_line_width > prefix_len) ? (max_line_width - prefix_len) : 1;
+  // Continuation lines get indent + prefix-width of spaces so text stays aligned
+  GString *cont_indent = g_string_new(indent_str->str);
+  for_range(i, 0, strlen(prefix)) g_string_append_c(cont_indent, ' ');
+  const gchar *p = title;
+  gboolean first_line = TRUE;
+  do {
+    // Find how much of the remaining text fits on this line
+    guint remaining = strlen(p);
+    guint take = MIN(remaining, available_width);
+    // If we're truncating, try to break at a word boundary (space)
+    if (take < remaining) {
+      guint break_at = take;
+      while (break_at > 0 && p[break_at] != ' ') { break_at--; }
+      if (break_at > 0) { take = break_at; }
+      // If no space found, hard-break at available_width (take stays as-is)
+    }
+    if (first_line) {
+      g_string_append(s, indent_str->str);
+      g_string_append(s, prefix);
+      first_line = FALSE;
+    } else g_string_append(s, cont_indent->str);
+    g_string_append_len(s, p, take);
+    g_string_append_c(s, '\n');
+    p += take;
+    // Skip the space we broke on
+    while (*p == ' ') p++;
+  } while (*p != '\0');
+  // Handle empty title: still print the prefix line
+  if (title[0] == '\0') {
+    g_string_append(s, indent_str->str);
+    g_string_append(s, prefix);
+    g_string_append_c(s, '\n');
+  }
+  g_string_free(indent_str, TRUE);
+  g_string_free(cont_indent, TRUE);
+  // Recurse into children
+  for_range(i, 0, g_list_model_get_n_items(G_LIST_MODEL(self->children_model))) {
+    g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(G_LIST_MODEL(self->children_model), i);
+    errands_task_item_print(item, s, indent + 1, max_line_width);
+  }
+}
+
 // ---------- GETTERS ---------- //
 
 ErrandsTaskListItem *errands_task_item_get_list(ErrandsTaskItem *self) { return self->list; }
