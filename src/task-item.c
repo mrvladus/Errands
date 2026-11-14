@@ -652,6 +652,7 @@ void errands_task_item_delete(ErrandsTaskItem *self) {
   }
   if (!self->parent) g_list_store_remove_data(self->list->tasks, self);
   else g_list_store_remove_data(self->parent->children_model, self);
+  errands_task_list_item_save(self->list);
 }
 
 int errands_task_item_delete_completed(ErrandsTaskItem *self) {
