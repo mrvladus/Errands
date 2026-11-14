@@ -61,6 +61,23 @@
   </requires>
 
   <releases>
+    <release version="51.1.1" date="2026-11-14">
+        <description translate="no">
+            <ul>
+                <li
+                    >Added --sync command line option for running sync once and quit</li>
+                <li>Bugfixes for --gapplication-service</li>
+                <li>Added missing tooltips</li>
+                <li>Fixed tasks not deleting</li>
+            </ul>
+            <p>Added / Updated translations:</p>
+            <ul>
+                <li>Slovenian</li>
+                <li>Georgian</li>
+            </ul>
+            <p>Thanks to everyone on Damned Lies!</p>
+        </description>
+    </release>
     <release version="51.1" date="2026-11-13">
         <description translate="no">
             <ul>
