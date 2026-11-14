@@ -229,14 +229,16 @@ static void set_item(ErrandsWindow *self, ErrandsTaskItem *item) {
 // ---------- PUBLIC FUNCTIONS ---------- //
 
 ErrandsWindow *errands_window_new(GtkApplication *app) {
-  ErrandsWindow *win =
-      g_object_new(ERRANDS_TYPE_WINDOW, "application", app, "default-width", errands_settings_get_window_width(state.settings),
-                   "default-height", errands_settings_get_window_height(state.settings), "maximized",
-                   errands_settings_get_maximized(state.settings), NULL);
-  g_object_bind_property(state.settings, "maximized", win, "maximized", G_BINDING_DEFAULT | G_BINDING_BIDIRECTIONAL);
-  g_object_bind_property(state.settings, "window-width", win, "default-width", G_BINDING_DEFAULT | G_BINDING_BIDIRECTIONAL);
-  g_object_bind_property(state.settings, "window-height", win, "default-height", G_BINDING_DEFAULT | G_BINDING_BIDIRECTIONAL);
-  return win;
+  ErrandsWindow *self = g_object_new(
+      ERRANDS_TYPE_WINDOW, "application", app, "default-width", errands_settings_get_window_width(state.settings),
+      "default-height", errands_settings_get_window_height(state.settings), "maximized",
+      errands_settings_get_maximized(state.settings), "hide-on-close", errands_settings_get_background(state.settings), NULL);
+
+  g_object_bind_property(state.settings, "maximized", self, "maximized", G_BINDING_DEFAULT | G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(state.settings, "window-width", self, "default-width", G_BINDING_DEFAULT | G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(state.settings, "window-height", self, "default-height", G_BINDING_DEFAULT | G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(state.settings, "background", self, "hide-on-close", G_BINDING_DEFAULT);
+  return self;
 }
 
 void errands_window_add_toast(const char *msg, int timeout) {

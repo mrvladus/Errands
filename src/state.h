@@ -4,6 +4,7 @@
 #pragma once
 
 #include "delete-list-dialog.h"
+#include "glib.h"
 #include "rename-list-dialog.h"
 #include "settings-dialog.h"
 #include "settings.h"
@@ -16,6 +17,9 @@ typedef struct {
   ErrandsSettingsDialog *settings_dialog;
   ErrandsRenameListDialog *rename_list_dialog;
   ErrandsDeleteListDialog *delete_list_dialog;
+
+  // CLI flags
+  gboolean sync_and_quit;
 } State;
 
 // Global state object

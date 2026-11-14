@@ -22,7 +22,7 @@ struct _ErrandsSettingsDialog {
   GtkWidget *light;
   GtkWidget *dark;
   // GtkWidget *notifications;
-  // GtkWidget *background;
+  GtkWidget *background;
   // GtkWidget *startup;
   GtkWidget *sync_enabled;
   GtkWidget *sync_interval;
@@ -45,7 +45,7 @@ static void errands_settings_dialog_class_init(ErrandsSettingsDialogClass *class
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, light);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, dark);
   // gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, notifications);
-  // gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, background);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, background);
   // gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, startup);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_enabled);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsSettingsDialog, sync_interval);
@@ -66,8 +66,8 @@ static gboolean theme_transform_func(GBinding *binding, const GValue *from_value
 ErrandsSettingsDialog *errands_settings_dialog_new() {
   ErrandsSettingsDialog *dialog = g_object_ref_sink(g_object_new(ERRANDS_TYPE_SETTINGS_DIALOG, NULL));
 
-  // g_object_bind_property(state.settings, "background", dialog->background, "active",
-  //                        G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
+  g_object_bind_property(state.settings, "background", dialog->background, "active",
+                         G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
   // g_object_bind_property(state.settings, "startup", dialog->startup, "active", G_BINDING_SYNC_CREATE);
   g_object_bind_property(state.settings, "sync-enabled", dialog->sync_enabled, "active",
                          G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);

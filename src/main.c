@@ -1,10 +1,11 @@
 // Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
 // SPDX-License-Identifier: Zlib
 
-#include "glib-object.h"
+#include "gio/gio.h"
+#include "gtk/gtk.h"
 #if !(defined(__GNUC__) || defined(__clang__))
-#error "This code requires GCC or Clang compiler because it uses features not supported by other compilers.\
-e.g. GLib's g_autoptr, g_auto and g_autofree"
+#error                                                                                                                           \
+    "This code requires GCC or Clang compiler because it uses features not supported by other compilers e.g. GLib's g_autoptr, g_auto and g_autofree"
 #endif
 
 #include "config.h"
@@ -16,17 +17,26 @@ e.g. GLib's g_autoptr, g_auto and g_autofree"
 #include "utils.h"
 #include "window.h"
 
+#include <glib-object.h>
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <libportal-gtk4/portal-gtk4.h>
 
 extern GResource *errands_get_resource(void);
+
 State state = {0};
 
-static void activate(GtkApplication *app) {
-  state.main_window = errands_window_new(app);
-  gtk_window_present(GTK_WINDOW(state.main_window));
-  errands_sidebar_select_last_opened_page();
+static gint handle_local_options(GApplication *app, GVariantDict *options) {
+  if (g_variant_dict_contains(options, "sync")) state.sync_and_quit = TRUE;
+  return -1;
+}
+
+static void startup(GApplication *app) {
+  // Initialize systems
+  state.settings = errands_settings_new();
+  errands_sync_init();
+  errands_data_init();
+
   errands_sync();
 
   // Request background
@@ -39,24 +49,41 @@ static void activate(GtkApplication *app) {
   //   xdp_portal_request_background(portal, parent, "Errands needs to run in the background for sending notifications", cmdline,
   //                                 XDP_BACKGROUND_FLAG_AUTOSTART, NULL, NULL, NULL);
   // } else xdp_portal_request_background(portal, NULL, NULL, NULL, XDP_BACKGROUND_FLAG_NONE, NULL, NULL, NULL);
+
+  if (!state.main_window) {
+    state.main_window = errands_window_new(GTK_APPLICATION(app));
+    gtk_application_add_window(GTK_APPLICATION(app), GTK_WINDOW(state.main_window));
+  }
+
+  if (state.sync_and_quit) {
+    g_application_quit(app);
+    return;
+  }
+}
+
+static void activate(GtkApplication *app) {
+  gtk_window_present(GTK_WINDOW(state.main_window));
+  errands_sidebar_select_last_opened_page();
 }
 
 int main(int argc, char **argv) {
   RANDOM_SEED();
   g_message("Starting version %s (%s) %sFlatpak", VERSION, VERSION_COMMIT, xdp_portal_running_under_flatpak() ? "" : "not ");
+
   // Setup locales
   bindtextdomain("errands", LOCALE_DIR);
   bind_textdomain_codeset("errands", "UTF-8");
   textdomain("errands");
 
-  // Initialize systems
-  state.settings = errands_settings_new();
-  errands_sync_init();
-  errands_data_init();
-
-  // Run application
+  // Create application
   state.app = adw_application_new(APP_ID, G_APPLICATION_DEFAULT_FLAGS);
+  // Register CLI flags
+  g_application_add_main_option(G_APPLICATION(state.app), "sync", 's', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,
+                                "Perform sync on startup and quit", NULL);
+  // Connect signals
+  g_signal_connect(state.app, "startup", G_CALLBACK(startup), NULL);
   g_signal_connect(state.app, "activate", G_CALLBACK(activate), NULL);
+  g_signal_connect(state.app, "handle-local-options", G_CALLBACK(handle_local_options), NULL);
   g_resources_register(errands_get_resource());
   g_application_set_resource_base_path(G_APPLICATION(state.app), RESOURCE_PATH);
   const int status = g_application_run(G_APPLICATION(state.app), argc, argv);

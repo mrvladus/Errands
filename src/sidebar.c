@@ -144,6 +144,7 @@ ErrandsTaskListItem *errands_sidebar_find_list(const char *uid) {
 }
 
 void errands_sidebar_select_last_opened_page(void) {
+  if (!self) return;
   const char *last_uid = errands_settings_get_last_list_uid(state.settings);
   int idx = -1;
   GListModel *model = G_LIST_MODEL(task_lists_model);

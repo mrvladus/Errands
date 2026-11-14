@@ -240,8 +240,8 @@ static void errands_settings_init(ErrandsSettings *self) {
   self->sort_by = 0;
   self->sort_order = 0;
   self->sync_interval = 30;
-  self->window_width = 1280;
-  self->window_height = 720;
+  self->window_width = 1000;
+  self->window_height = 700;
   self->last_list_uid = g_strdup("");
   self->sync_url = g_strdup("");
   self->sync_username = g_strdup("");
