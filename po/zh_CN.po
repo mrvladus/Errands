@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-08 15:27+0000\n"
-"PO-Revision-Date: 2026-11-09 08:37+0800\n"
+"POT-Creation-Date: 2026-11-14 15:27+0000\n"
+"PO-Revision-Date: 2026-11-15 08:19+0800\n"
 "Last-Translator: lumingzh <lumingzh@qq.com>\n"
 "Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
@@ -84,141 +84,141 @@ msgstr "永远重复"
 msgid "Repeat %zu times"
 msgstr "重复 %zu 次"
 
-#: ../src/sidebar.c:289
+#: ../src/sidebar.c:290
 msgid "Only .ics files are supported"
 msgstr "仅支持 .ics 文件"
 
-#: ../src/sidebar.c:294
+#: ../src/sidebar.c:295
 msgid "Can't load list. It's incorrect or already exists"
 msgstr "无法加载列表。列表不正确或已经存在"
 
-#: ../src/sync.c:272
+#: ../src/sync.c:287
 #, c-format
 msgid "Added remote task list: %s"
 msgstr "已添加远程任务列表：%s"
 
-#: ../src/sync.c:507
+#: ../src/sync.c:520
 msgid "Sync Failed"
 msgstr "同步失败"
 
-#: ../src/task.c:117
+#: ../src/task.c:120
 msgctxt "Start date"
 msgid "Start"
 msgstr "开始"
 
-#: ../src/task.c:135
+#: ../src/task.c:138
 msgctxt "Due date"
 msgid "Due"
 msgstr "截止"
 
-#: ../src/task.c:313
+#: ../src/task.c:320
 msgid "Copied to Clipboard"
 msgstr "已复制到剪贴板"
 
-#: ../src/task.c:346
+#: ../src/task.c:353
 msgid "Failed to Export"
 msgstr "导出失败"
 
-#: ../src/task.c:349 ../src/task-list.c:294
+#: ../src/task.c:356 ../src/task-list.c:302
 msgid "Exported"
 msgstr "已导出"
 
-#: ../src/task-item.c:638
+#: ../src/task-item.c:748
 msgid "Can't make task a sub-task of itself."
 msgstr "无法使任务成为其自身的子任务。"
 
-#: ../src/task-item.c:707
+#: ../src/task-item.c:869
 msgctxt "Priority"
 msgid "High"
 msgstr "高"
 
-#: ../src/task-item.c:708
+#: ../src/task-item.c:870
 msgctxt "Priority"
 msgid "Medium"
 msgstr "中"
 
-#: ../src/task-item.c:709
+#: ../src/task-item.c:871
 msgctxt "Priority"
 msgid "Low"
 msgstr "低"
 
-#: ../src/task-item.c:710
+#: ../src/task-item.c:872
 msgctxt "Priority"
 msgid "None"
 msgstr "无"
 
-#: ../src/task-item.c:740
+#: ../src/task-item.c:904
 #, c-format
 msgid "Every second"
 msgid_plural "Every %d seconds"
 msgstr[0] "每 %d 秒"
 
-#: ../src/task-item.c:741
+#: ../src/task-item.c:905
 #, c-format
 msgid "Every minute"
 msgid_plural "Every %d minutes"
 msgstr[0] "每 %d 分钟"
 
-#: ../src/task-item.c:742
+#: ../src/task-item.c:906
 #, c-format
 msgid "Every hour"
 msgid_plural "Every %d hours"
 msgstr[0] "每 %d 小时"
 
-#: ../src/task-item.c:743
+#: ../src/task-item.c:907
 #, c-format
 msgid "Every day"
 msgid_plural "Every %d days"
 msgstr[0] "每 %d 天"
 
-#: ../src/task-item.c:744
+#: ../src/task-item.c:908
 #, c-format
 msgid "Every week"
 msgid_plural "Every %d weeks"
 msgstr[0] "每 %d 周"
 
-#: ../src/task-item.c:745
+#: ../src/task-item.c:909
 #, c-format
 msgid "Every month"
 msgid_plural "Every %d months"
 msgstr[0] "每 %d 个月"
 
-#: ../src/task-item.c:746
+#: ../src/task-item.c:910
 #, c-format
 msgid "Every year"
 msgid_plural "Every %d years"
 msgstr[0] "每 %d 年"
 
-#: ../src/task-item.c:757
+#: ../src/task-item.c:921
 #, c-format
 msgid " until %s"
 msgstr "直到 %s"
 
-#: ../src/task-item.c:758
+#: ../src/task-item.c:922
 #, c-format
 msgid " once"
 msgid_plural " %d times"
 msgstr[0] " %d 次"
 
-#: ../src/task-list.c:283 ../src/task-list.c:288
+#: ../src/task-list.c:291 ../src/task-list.c:296
 msgid "Export failed"
 msgstr "导出失败"
 
-#: ../src/task-list.c:314 ../src/task-list.c:326
+#: ../src/task-list.c:322 ../src/task-list.c:334
 msgid "No tasks to delete"
 msgstr "没有可删除的任务"
 
-#: ../src/task-list.c:319 ../src/task-list.c:331
+#: ../src/task-list.c:327 ../src/task-list.c:339
 #, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
 msgstr[0] "已删除 %d 个任务"
 
-#: ../src/task-list.c:462 ../src/sidebar.blp:110
+#: ../src/task-list.c:486 ../src/sidebar.blp:110
 msgid "All Tasks"
 msgstr "所有任务"
 
-#: ../src/task-list.c:463 ../src/sidebar.blp:123
+#: ../src/task-list.c:490 ../src/sidebar.blp:123
 msgid "Tasks for Today"
 msgstr "今日任务"
 
@@ -282,7 +282,7 @@ msgstr "您确定吗？"
 msgid "Cancel"
 msgstr "取消"
 
-#: ../src/delete-list-dialog.blp:13 ../src/task.blp:166
+#: ../src/delete-list-dialog.blp:13 ../src/task.blp:184
 msgid "Delete"
 msgstr "删除"
 
@@ -294,7 +294,7 @@ msgstr "重命名"
 msgid "New List Name"
 msgstr "新列表名称"
 
-#: ../src/rrule-row.blp:7 ../src/task.blp:249
+#: ../src/rrule-row.blp:7 ../src/task.blp:267
 msgid "Repeat"
 msgstr "重复"
 
@@ -438,32 +438,40 @@ msgstr "亮色"
 msgid "Dark"
 msgstr "暗色"
 
-#: ../src/settings-dialog.blp:59 ../src/shortcuts-dialog.blp:49
+#: ../src/settings-dialog.blp:43
+msgid "Miscellaneous"
+msgstr "杂项"
+
+#: ../src/settings-dialog.blp:48
+msgid "Run in the Background"
+msgstr "后台运行"
+
+#: ../src/settings-dialog.blp:58 ../src/shortcuts-dialog.blp:49
 #: ../src/sidebar.blp:64 ../src/sidebar.blp:95
 msgid "Sync"
 msgstr "同步"
 
-#: ../src/settings-dialog.blp:62
+#: ../src/settings-dialog.blp:61
 msgid "Enabled"
 msgstr "已启用"
 
-#: ../src/settings-dialog.blp:66
+#: ../src/settings-dialog.blp:65
 msgid "Sync Interval"
 msgstr "同步间隔"
 
-#: ../src/settings-dialog.blp:67
+#: ../src/settings-dialog.blp:66
 msgid "Seconds between pulling events from the server"
 msgstr "从服务器拉取事件的间隔秒数"
 
-#: ../src/settings-dialog.blp:79
+#: ../src/settings-dialog.blp:78
 msgid "CalDAV Server URL"
 msgstr "CalDAV 服务器 URL"
 
-#: ../src/settings-dialog.blp:85
+#: ../src/settings-dialog.blp:84
 msgid "Username"
 msgstr "用户名"
 
-#: ../src/settings-dialog.blp:91
+#: ../src/settings-dialog.blp:90
 msgid "Password"
 msgstr "密码"
 
@@ -553,159 +561,171 @@ msgstr "没有任务列表"
 msgid "Create new or import “.ics”"
 msgstr "新建或导入“.ics”"
 
-#: ../src/task.blp:35
+#: ../src/task.blp:47
 msgid "Toggle Completion"
 msgstr "切换完成状态"
 
-#: ../src/task.blp:46
+#: ../src/task.blp:59
 msgid "Restore"
 msgstr "恢复"
 
-#: ../src/task.blp:98
+#: ../src/task.blp:111
 msgid "Toggle Sub-Tasks Entry"
 msgstr "切换子任务条目"
 
-#: ../src/task.blp:120 ../src/window.blp:77
+#: ../src/task.blp:134 ../src/window.blp:77
 msgid "Properties"
 msgstr "属性"
 
-#: ../src/task.blp:121 ../src/task.blp:255 ../src/window.blp:131
+#: ../src/task.blp:135 ../src/task.blp:273 ../src/window.blp:131
 msgid "Notes"
 msgstr "备注"
 
-#: ../src/task.blp:125
+#: ../src/task.blp:139
 msgid "Edit Text"
 msgstr "编辑文本"
 
-#: ../src/task.blp:126
+#: ../src/task.blp:140
 msgid "Copy Text"
 msgstr "复制文本"
 
-#: ../src/task.blp:127
+#: ../src/task.blp:144
 msgid "Task Color"
 msgstr "任务颜色"
 
-#: ../src/task.blp:132 ../src/task.blp:191 ../src/task-list.blp:72
+#: ../src/task.blp:145
+msgid "Clear Color"
+msgstr "清除颜色"
+
+#: ../src/task.blp:150 ../src/task.blp:209 ../src/task-list.blp:73
 msgid "Priority"
 msgstr "优先级"
 
-#: ../src/task.blp:135
+#: ../src/task.blp:153
 msgid "None"
 msgstr "无"
 
-#: ../src/task.blp:141
+#: ../src/task.blp:159
 msgid "Low"
 msgstr "低"
 
-#: ../src/task.blp:147
+#: ../src/task.blp:165
 msgid "Medium"
 msgstr "中"
 
-#: ../src/task.blp:153
+#: ../src/task.blp:171
 msgid "High"
 msgstr "高"
 
-#: ../src/task.blp:161 ../src/task-list.blp:91
+#: ../src/task.blp:179 ../src/task-list.blp:92
 msgid "Export as \".ics\""
 msgstr "导出为“.ics”"
 
-#: ../src/task.blp:165
+#: ../src/task.blp:183
 msgid "Cancel / Restore"
 msgstr "取消/恢复"
 
-#: ../src/task.blp:217
+#: ../src/task.blp:235
 msgid "Start"
 msgstr "开始"
 
-#: ../src/task.blp:218 ../src/task-list.blp:60 ../src/window.blp:85
+#: ../src/task.blp:236 ../src/task-list.blp:61 ../src/window.blp:85
 msgid "Start Date"
 msgstr "开始日期"
 
-#: ../src/task.blp:233
+#: ../src/task.blp:251
 msgid "Due"
 msgstr "截止"
 
-#: ../src/task.blp:234 ../src/task-list.blp:66 ../src/window.blp:93
+#: ../src/task.blp:252 ../src/task-list.blp:67 ../src/window.blp:93
 msgid "Due Date"
 msgstr "截止日期"
 
-#: ../src/task.blp:265 ../src/task.blp:271 ../src/window.blp:105
+#: ../src/task.blp:283 ../src/task.blp:289 ../src/window.blp:105
 msgid "Attachments"
 msgstr "附件"
 
-#: ../src/task.blp:296
+#: ../src/task.blp:329
 msgid "Add Sub-Task"
 msgstr "添加子任务"
 
-#: ../src/task-list.blp:21
+#: ../src/task-list.blp:18
+msgid "Sort / Filter"
+msgstr "排序/筛选"
+
+#: ../src/task-list.blp:22
 msgid "Show Tasks"
 msgstr "显示任务"
 
-#: ../src/task-list.blp:24
+#: ../src/task-list.blp:25
 msgid "Completed"
 msgstr "已完成"
 
-#: ../src/task-list.blp:29
+#: ../src/task-list.blp:30
 msgid "Cancelled"
 msgstr "已取消"
 
-#: ../src/task-list.blp:35
+#: ../src/task-list.blp:36
 msgid "Sort Order"
 msgstr "排序"
 
-#: ../src/task-list.blp:38
+#: ../src/task-list.blp:39
 msgid "Descending"
 msgstr "降序"
 
-#: ../src/task-list.blp:44
+#: ../src/task-list.blp:45
 msgid "Ascending"
 msgstr "升序"
 
-#: ../src/task-list.blp:51
+#: ../src/task-list.blp:52
 msgid "Sort By"
 msgstr "排序方式"
 
-#: ../src/task-list.blp:54
+#: ../src/task-list.blp:55
 msgid "Created"
 msgstr "已创建"
 
-#: ../src/task-list.blp:87
+#: ../src/task-list.blp:88
 msgid "Rename List"
 msgstr "重命名列表"
 
-#: ../src/task-list.blp:96
+#: ../src/task-list.blp:93
+msgid "Print"
+msgstr "打印"
+
+#: ../src/task-list.blp:97
 msgid "Delete Completed"
 msgstr "删除已完成任务"
 
-#: ../src/task-list.blp:97
+#: ../src/task-list.blp:98
 msgid "Delete Cancelled"
 msgstr "删除已取消任务"
 
-#: ../src/task-list.blp:101
+#: ../src/task-list.blp:102
 msgid "Delete List"
 msgstr "删除列表"
 
-#: ../src/task-list.blp:109
+#: ../src/task-list.blp:110
 msgid "Search (Ctrl+F)"
 msgstr "搜索（Ctrl+F）"
 
-#: ../src/task-list.blp:142
+#: ../src/task-list.blp:143
 msgid "Add Task"
 msgstr "添加任务"
 
-#: ../src/task-list.blp:143
+#: ../src/task-list.blp:144
 msgid "Add Task (Ctrl+N)"
 msgstr "添加任务（Ctrl+N）"
 
-#: ../src/task-list.blp:161
+#: ../src/task-list.blp:162
 msgid "Add Task (Ctrl+Return)"
 msgstr "添加任务（Ctrl+Return）"
 
-#: ../src/task-list.blp:185
+#: ../src/task-list.blp:186
 msgid "No Tasks"
 msgstr "没有任务"
 
-#: ../src/task-list.blp:212
+#: ../src/task-list.blp:213
 msgid "Loading Tasks"
 msgstr "正在加载任务"
 
@@ -746,14 +766,8 @@ msgstr "新建标签"
 #~ msgid "Failed 3 attempts to sync. Disabling for now."
 #~ msgstr "尝试同步 3 次均失败，暂时禁用同步。"
 
-#~ msgid "Miscellaneous"
-#~ msgstr "杂项"
-
 #~ msgid "Show Notifications"
 #~ msgstr "显示通知"
-
-#~ msgid "Work in the Background"
-#~ msgstr "在后台运行"
 
 #~ msgid "Launch at Startup"
 #~ msgstr "登录时启动"
@@ -775,9 +789,6 @@ msgstr "新建标签"
 
 #~ msgid "Task Properties Dialog"
 #~ msgstr "任务属性对话框"
-
-#~ msgid "Print"
-#~ msgstr "打印"
 
 #~ msgid "Close Properties"
 #~ msgstr "关闭属性"

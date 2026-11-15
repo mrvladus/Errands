@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-09 03:27+0000\n"
-"PO-Revision-Date: 2026-11-09 17:34+0330\n"
+"POT-Creation-Date: 2026-11-14 15:27+0000\n"
+"PO-Revision-Date: 2026-11-14 20:22+0330\n"
 "Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>\n"
 "Language-Team: \n"
 "Language: fa_IR\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Poedit 3.6\n"
+"X-Generator: Poedit 3.10\n"
 
 #: ../src/about-dialog.h:15 ../src/sidebar.blp:13 ../src/window.blp:8
 msgid "Errands"
@@ -25,7 +25,9 @@ msgstr "مأموریت‌ها"
 
 #: ../src/about-dialog.h:18
 msgid "translator-credits"
-msgstr "دانیال بهزادی <dani.behzi@ubuntu.com>هادی فداکارثانی <hadi_f@live.com>"
+msgstr ""
+"دانیال بهزادی <dani.behzi@ubuntu.com>\n"
+"هادی فداکارثانی <hadi_f@live.com>"
 
 #: ../src/date-chooser.c:101 ../src/date-chooser.blp:7
 msgid "Not Set"
@@ -80,150 +82,150 @@ msgstr "تکرار همیشگی"
 msgid "Repeat %zu times"
 msgstr "تکرار %zu بار"
 
-#: ../src/sidebar.c:289
+#: ../src/sidebar.c:290
 msgid "Only .ics files are supported"
 msgstr "تنها پرونده‌های ‪.ics‬ پشتیبانی می‌شوند"
 
-#: ../src/sidebar.c:294
+#: ../src/sidebar.c:295
 msgid "Can't load list. It's incorrect or already exists"
 msgstr "نتوانست سیاهه را بار کند. نادرست یا از پیش موجود است"
 
-#: ../src/sync.c:272
+#: ../src/sync.c:287
 #, c-format
 msgid "Added remote task list: %s"
 msgstr "فهرست کارهای راه‌دور افزوده شد: %s"
 
-#: ../src/sync.c:507
+#: ../src/sync.c:520
 msgid "Sync Failed"
 msgstr "شکست در هم‌گام سازی"
 
-#: ../src/task.c:117
+#: ../src/task.c:120
 msgctxt "Start date"
 msgid "Start"
 msgstr "شروع"
 
-#: ../src/task.c:135
+#: ../src/task.c:138
 msgctxt "Due date"
 msgid "Due"
 msgstr "سررسید"
 
-#: ../src/task.c:313
+#: ../src/task.c:320
 msgid "Copied to Clipboard"
 msgstr "رونوشت شده در تخته‌گیره"
 
-#: ../src/task.c:346
+#: ../src/task.c:353
 msgid "Failed to Export"
 msgstr "صدور ناموفق بود"
 
-#: ../src/task.c:349 ../src/task-list.c:294
+#: ../src/task.c:356 ../src/task-list.c:302
 msgid "Exported"
 msgstr "برون‌ریخته"
 
-#: ../src/task-item.c:638
+#: ../src/task-item.c:748
 msgid "Can't make task a sub-task of itself."
 msgstr "نتوانست کاری را زیرکار خودش کند."
 
-#: ../src/task-item.c:707
+#: ../src/task-item.c:869
 msgctxt "Priority"
 msgid "High"
 msgstr "زیاد"
 
-#: ../src/task-item.c:708
+#: ../src/task-item.c:870
 msgctxt "Priority"
 msgid "Medium"
 msgstr "متوسّط"
 
-#: ../src/task-item.c:709
+#: ../src/task-item.c:871
 msgctxt "Priority"
 msgid "Low"
 msgstr "کم"
 
-#: ../src/task-item.c:710
+#: ../src/task-item.c:872
 msgctxt "Priority"
 msgid "None"
 msgstr "هیچ‌کدام"
 
-#: ../src/task-item.c:740
+#: ../src/task-item.c:904
 #, c-format
 msgid "Every second"
 msgid_plural "Every %d seconds"
 msgstr[0] "هر ثانیه"
 msgstr[1] "هر %Id ثانیه"
 
-#: ../src/task-item.c:741
+#: ../src/task-item.c:905
 #, c-format
 msgid "Every minute"
 msgid_plural "Every %d minutes"
 msgstr[0] "هر دقیقه"
 msgstr[1] "هر %Id دقیقه"
 
-#: ../src/task-item.c:742
+#: ../src/task-item.c:906
 #, c-format
 msgid "Every hour"
 msgid_plural "Every %d hours"
 msgstr[0] "هر ساعت"
 msgstr[1] "هر %Id ساعت"
 
-#: ../src/task-item.c:743
+#: ../src/task-item.c:907
 #, c-format
 msgid "Every day"
 msgid_plural "Every %d days"
 msgstr[0] "هر روز"
 msgstr[1] "هر %Id روز"
 
-#: ../src/task-item.c:744
+#: ../src/task-item.c:908
 #, c-format
 msgid "Every week"
 msgid_plural "Every %d weeks"
 msgstr[0] "هر هفته"
 msgstr[1] "هر %Id هفته"
 
-#: ../src/task-item.c:745
+#: ../src/task-item.c:909
 #, c-format
 msgid "Every month"
 msgid_plural "Every %d months"
 msgstr[0] "هر ماه"
 msgstr[1] "هر %Id ماه"
 
-#: ../src/task-item.c:746
+#: ../src/task-item.c:910
 #, c-format
 msgid "Every year"
 msgid_plural "Every %d years"
 msgstr[0] "هر سال"
 msgstr[1] "هر %Id سال"
 
-#: ../src/task-item.c:757
+#: ../src/task-item.c:921
 #, c-format
 msgid " until %s"
 msgstr " تا %s"
 
-#: ../src/task-item.c:758
+#: ../src/task-item.c:922
 #, c-format
 msgid " once"
 msgid_plural " %d times"
 msgstr[0] " یک بار"
 msgstr[1] "‏ %Id‬ بار"
 
-#: ../src/task-list.c:283 ../src/task-list.c:288
+#: ../src/task-list.c:291 ../src/task-list.c:296
 msgid "Export failed"
 msgstr "برون‌ریزی شکست خورد"
 
-#: ../src/task-list.c:314 ../src/task-list.c:326
+#: ../src/task-list.c:322 ../src/task-list.c:334
 msgid "No tasks to delete"
 msgstr "کاری برای حذف وجود ندارد"
 
-#: ../src/task-list.c:319 ../src/task-list.c:331
+#: ../src/task-list.c:327 ../src/task-list.c:339
 #, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
 msgstr[0] "%d کار حذف شد"
 msgstr[1] "%d کار حذف شد"
 
-#: ../src/task-list.c:462 ../src/sidebar.blp:110
+#: ../src/task-list.c:486 ../src/sidebar.blp:110
 msgid "All Tasks"
 msgstr "همهٔ کارها"
 
-#: ../src/task-list.c:463 ../src/sidebar.blp:123
+#: ../src/task-list.c:490 ../src/sidebar.blp:123
 msgid "Tasks for Today"
 msgstr "کارهای امروز"
 
@@ -287,7 +289,7 @@ msgstr "مطمئنید؟"
 msgid "Cancel"
 msgstr "انصراف"
 
-#: ../src/delete-list-dialog.blp:13 ../src/task.blp:166
+#: ../src/delete-list-dialog.blp:13 ../src/task.blp:184
 msgid "Delete"
 msgstr "حذف"
 
@@ -299,7 +301,7 @@ msgstr "تغییر نام"
 msgid "New List Name"
 msgstr "نام فهرست جدید"
 
-#: ../src/rrule-row.blp:7 ../src/task.blp:249
+#: ../src/rrule-row.blp:7 ../src/task.blp:267
 msgid "Repeat"
 msgstr "تکرار"
 
@@ -443,32 +445,40 @@ msgstr "روشن"
 msgid "Dark"
 msgstr "تیره"
 
-#: ../src/settings-dialog.blp:59 ../src/shortcuts-dialog.blp:49
+#: ../src/settings-dialog.blp:43
+msgid "Miscellaneous"
+msgstr "متفرقه"
+
+#: ../src/settings-dialog.blp:48
+msgid "Run in the Background"
+msgstr "اجرا در پس‌زمینه"
+
+#: ../src/settings-dialog.blp:58 ../src/shortcuts-dialog.blp:49
 #: ../src/sidebar.blp:64 ../src/sidebar.blp:95
 msgid "Sync"
 msgstr "هم‌گام‌سازی"
 
-#: ../src/settings-dialog.blp:62
+#: ../src/settings-dialog.blp:61
 msgid "Enabled"
 msgstr "فعال"
 
-#: ../src/settings-dialog.blp:66
+#: ../src/settings-dialog.blp:65
 msgid "Sync Interval"
 msgstr "فاصلهٔ همگام‌سازی"
 
-#: ../src/settings-dialog.blp:67
+#: ../src/settings-dialog.blp:66
 msgid "Seconds between pulling events from the server"
 msgstr "ثانیه بین دریافت رویدادها از کارساز"
 
-#: ../src/settings-dialog.blp:79
+#: ../src/settings-dialog.blp:78
 msgid "CalDAV Server URL"
 msgstr "نشانی کارساز CalDAV"
 
-#: ../src/settings-dialog.blp:85
+#: ../src/settings-dialog.blp:84
 msgid "Username"
 msgstr "نام‌کاربری"
 
-#: ../src/settings-dialog.blp:91
+#: ../src/settings-dialog.blp:90
 msgid "Password"
 msgstr "گذرواژه"
 
@@ -558,159 +568,171 @@ msgstr "فهرست کاری نیست"
 msgid "Create new or import “.ics”"
 msgstr "ساخت مورد جدید یا درون‌ریزی ‎.ics‎"
 
-#: ../src/task.blp:35
+#: ../src/task.blp:47
 msgid "Toggle Completion"
 msgstr "تغییر وضعیت انجام‌شدن"
 
-#: ../src/task.blp:46
+#: ../src/task.blp:59
 msgid "Restore"
 msgstr "بازآوری"
 
-#: ../src/task.blp:98
+#: ../src/task.blp:111
 msgid "Toggle Sub-Tasks Entry"
 msgstr "تغییر ورودی زیرکارها"
 
-#: ../src/task.blp:120 ../src/window.blp:77
+#: ../src/task.blp:134 ../src/window.blp:77
 msgid "Properties"
 msgstr "ویژگی‌ها"
 
-#: ../src/task.blp:121 ../src/task.blp:255 ../src/window.blp:131
+#: ../src/task.blp:135 ../src/task.blp:273 ../src/window.blp:131
 msgid "Notes"
 msgstr "یادداشت‌ها"
 
-#: ../src/task.blp:125
+#: ../src/task.blp:139
 msgid "Edit Text"
 msgstr "ویرایش متن"
 
-#: ../src/task.blp:126
+#: ../src/task.blp:140
 msgid "Copy Text"
 msgstr "رونوشت متن"
 
-#: ../src/task.blp:127
+#: ../src/task.blp:144
 msgid "Task Color"
 msgstr "رنگ کار"
 
-#: ../src/task.blp:132 ../src/task.blp:191 ../src/task-list.blp:72
+#: ../src/task.blp:145
+msgid "Clear Color"
+msgstr "پاک‌سازی رنگ"
+
+#: ../src/task.blp:150 ../src/task.blp:209 ../src/task-list.blp:73
 msgid "Priority"
 msgstr "اولویت"
 
-#: ../src/task.blp:135
+#: ../src/task.blp:153
 msgid "None"
 msgstr "هیچ‌کدام"
 
-#: ../src/task.blp:141
+#: ../src/task.blp:159
 msgid "Low"
 msgstr "کم"
 
-#: ../src/task.blp:147
+#: ../src/task.blp:165
 msgid "Medium"
 msgstr "متوسط"
 
-#: ../src/task.blp:153
+#: ../src/task.blp:171
 msgid "High"
 msgstr "زیاد"
 
-#: ../src/task.blp:161 ../src/task-list.blp:91
+#: ../src/task.blp:179 ../src/task-list.blp:92
 msgid "Export as \".ics\""
 msgstr "صدور به‌صورت ‎.ics‎"
 
-#: ../src/task.blp:165
+#: ../src/task.blp:183
 msgid "Cancel / Restore"
 msgstr "لغو / بازیابی"
 
-#: ../src/task.blp:217
+#: ../src/task.blp:235
 msgid "Start"
 msgstr "شروع"
 
-#: ../src/task.blp:218 ../src/task-list.blp:60 ../src/window.blp:85
+#: ../src/task.blp:236 ../src/task-list.blp:61 ../src/window.blp:85
 msgid "Start Date"
 msgstr "تاریخ شروع"
 
-#: ../src/task.blp:233
+#: ../src/task.blp:251
 msgid "Due"
 msgstr "سررسید"
 
-#: ../src/task.blp:234 ../src/task-list.blp:66 ../src/window.blp:93
+#: ../src/task.blp:252 ../src/task-list.blp:67 ../src/window.blp:93
 msgid "Due Date"
 msgstr "سررسید"
 
-#: ../src/task.blp:265 ../src/task.blp:271 ../src/window.blp:105
+#: ../src/task.blp:283 ../src/task.blp:289 ../src/window.blp:105
 msgid "Attachments"
 msgstr "پیوست‌ها"
 
-#: ../src/task.blp:296
+#: ../src/task.blp:329
 msgid "Add Sub-Task"
 msgstr "افزودن زیرتکلیف جدید"
 
-#: ../src/task-list.blp:21
+#: ../src/task-list.blp:18
+msgid "Sort / Filter"
+msgstr "چینش و پالایش"
+
+#: ../src/task-list.blp:22
 msgid "Show Tasks"
 msgstr "نمایش کارها"
 
-#: ../src/task-list.blp:24
+#: ../src/task-list.blp:25
 msgid "Completed"
 msgstr "انجام‌شده"
 
-#: ../src/task-list.blp:29
+#: ../src/task-list.blp:30
 msgid "Cancelled"
 msgstr "لغوشده‌ها"
 
-#: ../src/task-list.blp:35
+#: ../src/task-list.blp:36
 msgid "Sort Order"
 msgstr "ترتیب مرتب‌سازی"
 
-#: ../src/task-list.blp:38
+#: ../src/task-list.blp:39
 msgid "Descending"
 msgstr "نزولی"
 
-#: ../src/task-list.blp:44
+#: ../src/task-list.blp:45
 msgid "Ascending"
 msgstr "صعودی"
 
-#: ../src/task-list.blp:51
+#: ../src/task-list.blp:52
 msgid "Sort By"
 msgstr "مرتب‌سازی بر اساس"
 
-#: ../src/task-list.blp:54
+#: ../src/task-list.blp:55
 msgid "Created"
 msgstr "ایجادشده"
 
-#: ../src/task-list.blp:87
+#: ../src/task-list.blp:88
 msgid "Rename List"
 msgstr "تغییر نام فهرست"
 
-#: ../src/task-list.blp:96
+#: ../src/task-list.blp:93
+msgid "Print"
+msgstr "چاپ"
+
+#: ../src/task-list.blp:97
 msgid "Delete Completed"
 msgstr "حذف کارهای انجام‌شده"
 
-#: ../src/task-list.blp:97
+#: ../src/task-list.blp:98
 msgid "Delete Cancelled"
 msgstr "حذف کارهای لغوشده"
 
-#: ../src/task-list.blp:101
+#: ../src/task-list.blp:102
 msgid "Delete List"
 msgstr "حذف فهرست"
 
-#: ../src/task-list.blp:109
+#: ../src/task-list.blp:110
 msgid "Search (Ctrl+F)"
 msgstr "جست‌وجو (Ctrl+F)"
 
-#: ../src/task-list.blp:142
+#: ../src/task-list.blp:143
 msgid "Add Task"
 msgstr "افزودن تکلیف جدید"
 
-#: ../src/task-list.blp:143
+#: ../src/task-list.blp:144
 msgid "Add Task (Ctrl+N)"
 msgstr "افزودن تکلیف جدید (Ctrl+N)"
 
-#: ../src/task-list.blp:161
+#: ../src/task-list.blp:162
 msgid "Add Task (Ctrl+Return)"
 msgstr "افزودن تکلیف جدید (Ctrl+Return)"
 
-#: ../src/task-list.blp:185
+#: ../src/task-list.blp:186
 msgid "No Tasks"
 msgstr "کاری نیست"
 
-#: ../src/task-list.blp:212
+#: ../src/task-list.blp:213
 msgid "Loading Tasks"
 msgstr "در حال بارگیری کارها"
 
@@ -751,14 +773,8 @@ msgstr "برچسب جدید"
 #~ msgid "Failed 3 attempts to sync. Disabling for now."
 #~ msgstr "همگام‌سازی پس از ۳ تلاش شکست خورد. فعلاً غیرفعال می‌شود."
 
-#~ msgid "Miscellaneous"
-#~ msgstr "متفرقه"
-
 #~ msgid "Show Notifications"
 #~ msgstr "نمایش اعلان‌ها"
-
-#~ msgid "Work in the Background"
-#~ msgstr "اجرا در پس‌زمینه"
 
 #~ msgid "Launch at Startup"
 #~ msgstr "اجرا هنگام شروع"
@@ -780,9 +796,6 @@ msgstr "برچسب جدید"
 
 #~ msgid "Task Properties Dialog"
 #~ msgstr "گفت‌وگوی ویژگی‌های کار"
-
-#~ msgid "Print"
-#~ msgstr "چاپ"
 
 #~ msgid "Close Properties"
 #~ msgstr "بستن ویژگی‌ها"
