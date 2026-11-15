@@ -245,9 +245,9 @@ int errands_task_list_item_delete_completed(ErrandsTaskListItem *self) {
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
     icalcomponent *ical = errands_task_item_get_ical(item);
-    CONTINUE_IF(errands_data_is_completed(ical));
+    if (!errands_data_is_completed(ical)) continue;
     errands_data_set_deleted(ical, true);
-    errands_data_set_synced(ical, false);
+    deleted_n++;
     deleted_n += errands_task_item_delete_completed(item);
   }
   if (deleted_n > 0) {
@@ -267,9 +267,9 @@ int errands_task_list_item_delete_cancelled(ErrandsTaskListItem *self) {
   for_range(i, 0, g_list_model_get_n_items(model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(model, i);
     icalcomponent *ical = errands_task_item_get_ical(item);
-    CONTINUE_IF(errands_data_get_cancelled(ical));
+    if (!errands_data_get_cancelled(ical)) continue;
     errands_data_set_deleted(ical, true);
-    errands_data_set_synced(ical, false);
+    deleted_n++;
     deleted_n += errands_task_item_delete_cancelled(item);
   }
   if (deleted_n > 0) {
