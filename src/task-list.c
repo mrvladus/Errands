@@ -11,6 +11,7 @@
 #include "state.h"
 #include "task-item.h"
 #include "task-list-item.h"
+#include "task-parser.h"
 #include "task.h"
 #include "utils.h"
 #include "window.h"
@@ -601,7 +602,15 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self) {
   const char *stripped = g_strstrip(dup);
   const char *list_uid = self->item->uid;
   if (g_str_equal(stripped, "") || g_str_equal(list_uid, "")) return;
-  g_autoptr(ErrandsTaskItem) task = (ErrandsTaskItem *)errands_task_list_item_create_task(self->item, NULL, stripped);
+
+  g_autoptr(ErrandsTaskParser) p = errands_task_parser_parse(stripped);
+  g_autoptr(ErrandsTaskItem) task = (ErrandsTaskItem *)errands_task_list_item_create_task(self->item, NULL, p->text);
+  if (p->priority > 0) errands_task_item_set_priority(task, p->priority);
+  for_range(i, 0, p->tags->len) {
+    gchar *tag = g_ptr_array_index(p->tags, i);
+    errands_task_item_add_tag(task, tag);
+  }
+
   // Reset text
   g_object_set(self->entry, "text", "", NULL);
   // Update UI

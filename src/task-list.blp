@@ -139,20 +139,41 @@ template $ErrandsTaskList: Adw.Bin {
           "toolbar",
         ]
 
-        Entry entry {
-          placeholder-text: _("Add Task");
-          tooltip-text: _("Add Task (Ctrl+N)");
-          hexpand: true;
-          activate => $on_task_list_entry_activated_cb(template);
-          changed => $on_task_list_entry_text_changed_cb(template);
+        Box {
+          styles [
+            "linked",
+          ]
 
-          ShortcutController {
-            scope: global;
+          Entry entry {
+            placeholder-text: _("Add Task");
+            tooltip-text: _("Add Task (Ctrl+N)");
+            hexpand: true;
+            activate => $on_task_list_entry_activated_cb(template);
+            changed => $on_task_list_entry_text_changed_cb(template);
 
-            Shortcut {
-              trigger: "<Control>N";
-              action: "action(task-list.focus-entry)";
+            ShortcutController {
+              scope: global;
+
+              Shortcut {
+                trigger: "<Control>N";
+                action: "action(task-list.focus-entry)";
+              }
             }
+          }
+
+          MenuButton {
+            icon-name: "errands-question-symbolic";
+
+            popover: Popover {
+              Label {
+                use-markup: true;
+                wrap: true;
+                max-width-chars: 40;
+                label: _(
+                  "<b>Inline properties syntax:</b>\n\n<b>##tag</b>  Add tag.\n<b>#pN</b>     Set priority. <b>N</b> is number in range <b>0..9</b>."
+                );
+              }
+            };
           }
         }
 

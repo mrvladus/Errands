@@ -23,7 +23,7 @@
 # --- Project info --- #
 
 NAME    = errands
-VERSION = 51.1.2
+VERSION = 51.1.3
 CC 		= gcc
 
 # --- Project directories --- #
@@ -327,36 +327,57 @@ radicale-setup:
 sloc:
 	@find $(SRC_DIR) -type f \( -name '*.c' -o -name '*.h' -o -name '*.blp' \) -exec wc -l {} +
 
+
+# --- GIT --- #
+
 .PHONY: git-commit
 git-commit:
 	@bash -c '\
-		set -e; \
-		echo "Modifications:"; \
-		git status --short; \
-		echo "Select commit category:"; \
-		echo "  0) Fix"; \
-		echo "  1) UI"; \
-		echo "  2) Sync"; \
-		echo "  3) Build"; \
-		echo "  4) Translations"; \
-		echo "  5) Misc (default)"; \
-		read -r -p "Enter category number: " category; \
-		case "$$category" in \
-		    0) prefix="Fix" ;; \
-			1) prefix="UI" ;; \
-			2) prefix="Sync" ;; \
-			3) prefix="Build" ;; \
-			4) prefix="Translations" ;; \
-			*) prefix="Misc" ;; \
-		esac; \
-		echo "Selected category: $$prefix"; \
-		read -r -p "Commit message (default: 'Update'): " message; \
-		if [[ -z "$$message" ]]; then \
-			message="Update"; \
-		fi; \
-		git add -A; \
-		git commit -m "$$prefix: $$message"'
+	set -e; \
+	echo "Modifications:"; \
+	git status --short; \
+	echo "Select commit category:"; \
+	echo "  0) Fix"; \
+	echo "  1) UI"; \
+	echo "  2) Sync"; \
+	echo "  3) Build"; \
+	echo "  4) Translations"; \
+	echo "  5) Misc (default)"; \
+	read -r -p "Enter category number: " category; \
+	case "$$category" in \
+	    0) prefix="Fix" ;; \
+		1) prefix="UI" ;; \
+		2) prefix="Sync" ;; \
+		3) prefix="Build" ;; \
+		4) prefix="Translations" ;; \
+		*) prefix="Misc" ;; \
+	esac; \
+	echo "Selected category: $$prefix"; \
+	read -r -p "Commit message (default: 'Update'): " message; \
+	if [[ -z "$$message" ]]; then \
+		message="Update"; \
+	fi; \
+	git add -A; \
+	git commit -m "$$prefix: $$message"'
 
+# Read VERSION and create new release tag from it.
+.PHONY: git-tag
+git-tag:
+	@bash -c '\
+	set -e; \
+	tag="$(VERSION)"; \
+	echo "Current tag: $$tag"; \
+	if git rev-parse -q --verify "refs/tags/$$tag" >/dev/null; then \
+		echo "Error: tag $$tag already exists. Update VERSION."; \
+		exit 1; \
+	fi; \
+	git tag -a "$$tag"; \
+	echo "Created new tag: $$tag"; \
+	read -r -p "Push tag to origin? [Y/n] " push; \
+	case "$$push" in \
+		[nN]*) echo "Tag created locally only. Push with: git push origin $$tag" ;; \
+		*) git push origin "$$tag" ;; \
+	esac'
 
 # --- i18n --- #
 

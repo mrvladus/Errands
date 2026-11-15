@@ -623,9 +623,9 @@ void errands_task_item_add_tag(ErrandsTaskItem *self, const char *tag) {
   g_assert_nonnull(self);
   g_assert_nonnull(tag);
 
-  icalcomponent_add_property(self->ical, icalproperty_new_categories(tag));
-  errands_data_set_synced(self->ical, FALSE);
-  errands_data_set_changed(self->ical, icaltime_now());
+  errands_settings_add_tag(state.settings, tag);
+  gboolean added = errands_data_add_tag(self->ical, tag);
+  if (!added) return;
   g_auto(GStrv) tags = errands_data_get_tags(self->ical);
   errands_task_item_set_tags(self, tags);
 }
@@ -711,7 +711,7 @@ int errands_task_item_remove_deleted_tasks(ErrandsTaskItem *self) {
   return deleted_n;
 }
 
-void errands_task_item_create_task(ErrandsTaskItem *parent, const char *text) {
+ErrandsTaskItem *errands_task_item_create_task(ErrandsTaskItem *parent, const char *text) {
   icalcomponent *ical = icalcomponent_new(ICAL_VTODO_COMPONENT);
   errands_data_set_text(ical, text);
   g_autofree gchar *uid = g_uuid_string_random();
@@ -719,10 +719,12 @@ void errands_task_item_create_task(ErrandsTaskItem *parent, const char *text) {
   errands_data_set_created(ical, icaltime_now());
   errands_data_set_parent(ical, errands_data_get_uid(parent->ical));
   icalcomponent_add_component(parent->list->ical, ical);
-  g_autoptr(ErrandsTaskItem) task = errands_task_item_new(ical, parent->list, parent);
+  ErrandsTaskItem *task = errands_task_item_new(ical, parent->list, parent);
   g_list_store_append(parent->children_model, task);
   errands_task_list_item_save(parent->list);
   errands_task_item_update(parent);
+
+  return task;
 }
 
 bool errands_task_item_export(ErrandsTaskItem *self, const char *path) {

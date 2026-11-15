@@ -65,5 +65,5 @@ void errands_data_set_tags(icalcomponent *ical, GStrv value);
 
 bool errands_data_is_completed(icalcomponent *ical);
 bool errands_data_is_due(icalcomponent *ical);
-void errands_data_add_tag(icalcomponent *ical, const char *tag);
+gboolean errands_data_add_tag(icalcomponent *ical, const char *tag);
 bool errands_data_remove_tag(icalcomponent *ical, const char *tag);

@@ -7,6 +7,7 @@
 #include "state.h"
 #include "task-item.h"
 #include "task-list.h"
+#include "task-parser.h"
 #include "utils.h"
 #include "window.h"
 
@@ -402,14 +403,33 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
       gtk_widget_set_visible(self->title, true);
       return;
     }
-    g_object_set(self->item, "title", text, NULL);
+    g_autofree gchar *dup = g_strdup(text);
+    const char *stripped = g_strstrip(dup);
+    if (g_str_equal(stripped, "")) return;
+    g_autoptr(ErrandsTaskParser) p = errands_task_parser_parse(stripped);
+    if (p->priority > 0) errands_task_item_set_priority(self->item, p->priority);
+    for_range(i, 0, p->tags->len) {
+      gchar *tag = g_ptr_array_index(p->tags, i);
+      errands_task_item_add_tag(self->item, tag);
+    }
+    g_object_set(self->item, "title", p->text, NULL);
   }
 }
 
 static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
   const char *text = gtk_editable_get_text(GTK_EDITABLE(entry));
-  if (g_str_equal(text, "")) return;
-  errands_task_item_create_task(self->item, text);
+  g_autofree gchar *dup = g_strdup(text);
+  const char *stripped = g_strstrip(dup);
+  if (g_str_equal(stripped, "")) return;
+
+  g_autoptr(ErrandsTaskParser) p = errands_task_parser_parse(stripped);
+  g_autoptr(ErrandsTaskItem) task = errands_task_item_create_task(self->item, p->text);
+  if (p->priority > 0) errands_task_item_set_priority(task, p->priority);
+  for_range(i, 0, p->tags->len) {
+    gchar *tag = g_ptr_array_index(p->tags, i);
+    errands_task_item_add_tag(task, tag);
+  }
+
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
   gtk_tree_list_row_set_expanded(gtk_tree_expander_get_list_row(expander), true);
   // Reset text

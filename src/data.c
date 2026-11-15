@@ -489,10 +489,16 @@ void errands_data_set_tags(icalcomponent *ical, GStrv value) {
   errands_data_set_changed(ical, icaltime_now());
 }
 
-void errands_data_add_tag(icalcomponent *ical, const char *tag) {
+gboolean errands_data_add_tag(icalcomponent *ical, const char *tag) {
+  for (icalproperty *p = icalcomponent_get_first_property(ical, ICAL_CATEGORIES_PROPERTY); p;
+       p = icalcomponent_get_next_property(ical, ICAL_CATEGORIES_PROPERTY)) {
+    const char *t = icalproperty_get_categories(p);
+    if (g_strcmp0(tag, t) == 0) return FALSE;
+  }
   icalcomponent_add_property(ical, icalproperty_new_categories(tag));
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_now());
+  return TRUE;
 }
 
 bool errands_data_remove_tag(icalcomponent *ical, const char *tag) {
