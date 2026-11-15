@@ -131,7 +131,10 @@ static gint sort_func(gconstpointer a, gconstpointer b, gpointer data) {
 
 // ---------- PUBLIC ---------- //
 
-void errands_sidebar_toggle_sync_indicator(gboolean on) { gtk_revealer_set_reveal_child(self->sync_indicator, on); }
+void errands_sidebar_toggle_sync_indicator(gboolean on) {
+  if (!self) return;
+  gtk_revealer_set_reveal_child(self->sync_indicator, on);
+}
 
 ErrandsTaskListItem *errands_sidebar_find_list(const char *uid) {
   if (!uid) return NULL;
@@ -161,6 +164,7 @@ void errands_sidebar_select_last_opened_page(void) {
 }
 
 void errands_sidebar_update_filter_rows(void) {
+  if (!self) return;
   bool show_completed = errands_settings_get_show_completed(state.settings);
   bool show_cancelled = errands_settings_get_show_cancelled(state.settings);
   GListModel *model = G_LIST_MODEL(task_lists_model);
@@ -190,10 +194,12 @@ void errands_sidebar_update_filter_rows(void) {
 }
 
 void errands_sidebar_task_list_update_counter(const char *uid) {
+  if (!self) return;
   errands_task_list_item_update_count(errands_sidebar_find_list(uid));
 }
 
 void errands_sidebar_delete_list(const char *uid) {
+  if (!self) return;
   g_message("Sidebar: Deleting list %s", uid);
   ErrandsTaskListItem *list = errands_sidebar_find_list(uid);
   errands_task_list_item_delete(list);
