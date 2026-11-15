@@ -173,47 +173,46 @@ template $ErrandsTaskList: Adw.Bin {
           "toolbar",
         ]
 
-        Box {
-          styles [
-            "linked",
-          ]
+        Entry entry {
+          placeholder-text: _("Add Task");
+          tooltip-text: _("Add Task (Ctrl+N)");
+          hexpand: true;
+          activate => $on_task_list_entry_activated_cb(template);
+          changed => $on_task_list_entry_text_changed_cb(template);
 
-          Entry entry {
-            placeholder-text: _("Add Task");
-            tooltip-text: _("Add Task (Ctrl+N)");
-            hexpand: true;
-            activate => $on_task_list_entry_activated_cb(template);
-            changed => $on_task_list_entry_text_changed_cb(template);
+          ShortcutController {
+            scope: global;
 
-            ShortcutController {
-              scope: global;
-
-              Shortcut {
-                trigger: "<Control>N";
-                action: "action(task-list.focus-entry)";
-              }
+            Shortcut {
+              trigger: "<Control>N";
+              action: "action(task-list.focus-entry)";
             }
           }
+        }
 
-          MenuButton {
-            icon-name: "errands-question-symbolic";
+        MenuButton {
+          icon-name: "errands-question-symbolic";
+          valign: end;
 
-            popover: Popover {
-              Label {
-                use-markup: true;
-                wrap: true;
-                max-width-chars: 40;
-                label: _(
-                  "<b>Inline properties syntax:</b>\n\n<b>##tag</b>  Add tag.\n<b>#pN</b>     Set priority. <b>N</b> is number in range <b>0..9</b>."
-                );
-              }
-            };
-          }
+          popover: Popover {
+            Label {
+              use-markup: true;
+              wrap: true;
+              max-width-chars: 40;
+              label: _(
+                "<b>Inline properties syntax:</b>\n\n<b>##tag</b>  Add tag.\n<b>#pN</b>     Set priority. <b>N</b> is number in range <b>0..9</b>."
+              );
+            }
+          };
+
+          styles [
+            "circular",
+          ]
         }
 
         Button entry_apply_btn {
           icon-name: "errands-select-symbolic";
-          valign: center;
+          valign: end;
           tooltip-text: _("Add Task (Ctrl+Return)");
           sensitive: false;
           clicked => $on_task_list_entry_activated_cb(template);
