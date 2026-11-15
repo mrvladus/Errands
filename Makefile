@@ -10,6 +10,7 @@
 #    nextcloud-setup    Start a Nextcloud Podman container for sync testing
 #    sloc               Count lines of code in src/
 #    git-commit         Interactive staged-commit helper
+#    git-tag            Create new release tag
 
 # BUILD OPTIONS:
 #    prefix  = /usr/local              Installation prefix directory
@@ -367,6 +368,7 @@ git-tag:
 	set -e; \
 	tag="$(VERSION)"; \
 	echo "Current tag: $$tag"; \
+	echo "Current VERSION: $(VERSION)"; \
 	if git rev-parse -q --verify "refs/tags/$$tag" >/dev/null; then \
 		echo "Error: tag $$tag already exists. Update VERSION."; \
 		exit 1; \

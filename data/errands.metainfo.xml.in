@@ -65,6 +65,8 @@
             <ul>
                 <li>Added inline properties when writing task text</li>
                 <li>Added button to collapse sidebar</li>
+                <li>Added many keyboard shortcuts</li>
+                <li>Fixed deletion of completed and cancelled tasks</li>
             </ul>
         </description>
     </release>

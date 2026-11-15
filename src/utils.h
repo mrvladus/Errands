@@ -4,15 +4,15 @@
 #pragma once
 
 #include "data.h"
-#include "gio/gio.h"
-#include "glib.h"
 
 #include <ctype.h>
 #include <stdio.h>
+#include <string.h>
 
+#include <gio/gio.h>
+#include <glib.h>
 #include <gtk/gtk.h>
 #include <libical/ical.h>
-#include <string.h>
 
 #define STR_TO_BOOL(str)     (g_str_equal((str), "1") || g_str_equal((str), "true"))
 #define BOOL_TO_STR_NUM(val) ((val) ? "1" : "0")
@@ -312,6 +312,14 @@ static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
                                              GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   g_object_set_data(G_OBJECT(widget), "custom-color-provider", provider);
 }
+
+// static inline void errands_widget_add_shortcut(gpointer widget, const gchar *trigger, gpointer cb, gpointer data) {
+//   GtkEventController *ctrl = gtk_shortcut_controller_new();
+//   GtkShortcutTrigger *tg = gtk_shortcut_trigger_parse_string(trigger);
+//   GtkShortcutAction *action = gtk_callback_action_new(GtkShortcutFunc callback, gpointer data, GDestroyNotify destroy);
+//   GtkShortcut *shortcut = gtk_shortcut_new(tg, action);
+//   gtk_shortcut_controller_add_shortcut(GTK_SHORTCUT_CONTROLLER(ctrl), shortcut);
+// }
 
 // ---------- LIST MODELS ---------- //
 

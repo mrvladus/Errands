@@ -15,13 +15,22 @@ template $ErrandsTaskList: Adw.Bin {
         [start]
         ToggleButton sidebar_btn {
           icon-name: "errands-sidebar-left-symbolic";
-          tooltip-text: _("Toggle Sidebar");
+          tooltip-text: _("Toggle Sidebar (Ctrl+B)");
+
+          ShortcutController {
+            scope: global;
+
+            Shortcut {
+              trigger: "<Control>B";
+              action: "activate";
+            }
+          }
         }
 
         [start]
         MenuButton {
           icon-name: "errands-sort-symbolic";
-          tooltip-text: _("Sort / Filter");
+          tooltip-text: _("Sort / Filter (Ctrl+Shift+F)");
 
           menu-model: menu {
             section {
@@ -82,10 +91,20 @@ template $ErrandsTaskList: Adw.Bin {
               }
             }
           };
+
+          ShortcutController {
+            scope: global;
+
+            Shortcut {
+              trigger: "<Control><Shift>F";
+              action: "activate";
+            }
+          }
         }
 
         [end]
         MenuButton menu_btn {
+          tooltip-text: _("Task List Menu (Ctrl+M)");
           icon-name: "errands-more-symbolic";
           valign: center;
 
@@ -108,6 +127,15 @@ template $ErrandsTaskList: Adw.Bin {
               item (_("Delete List"), "task-list.delete")
             }
           };
+
+          ShortcutController {
+            scope: global;
+
+            Shortcut {
+              trigger: "<Control>M";
+              action: "activate";
+            }
+          }
         }
 
         [end]

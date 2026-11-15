@@ -80,6 +80,7 @@ int main(int argc, char **argv) {
   // Register CLI flags
   g_application_add_main_option(G_APPLICATION(state.app), "sync", 's', G_OPTION_FLAG_NONE, G_OPTION_ARG_NONE,
                                 "Perform sync on startup and quit", NULL);
+  // g_action_map_add_action(G_ACTION_MAP(state.app), G_ACTION(g_simple_action_new("quit", NULL)));
   // Connect signals
   g_signal_connect(state.app, "startup", G_CALLBACK(startup), NULL);
   g_signal_connect(state.app, "activate", G_CALLBACK(activate), NULL);

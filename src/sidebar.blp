@@ -4,6 +4,20 @@ using Gtk 4.0;
 using Adw 1;
 
 template $ErrandsSidebar: Adw.Bin {
+  ShortcutController {
+    scope: global;
+
+    Shortcut {
+      trigger: "<Control>K";
+      action: "action(sidebar.switch-list-prev)";
+    }
+
+    Shortcut {
+      trigger: "<Control>J";
+      action: "action(sidebar.switch-list-next)";
+    }
+  }
+
   Adw.ToolbarView {
     width-request: 200;
 
@@ -16,7 +30,7 @@ template $ErrandsSidebar: Adw.Bin {
       [start]
       MenuButton {
         icon-name: "errands-add-symbolic";
-        tooltip-text: _("Add Task List");
+        tooltip-text: _("Add Task List (Ctrl+L)");
 
         popover: PopoverMenu popover {
           menu-model: menu {
@@ -51,6 +65,15 @@ template $ErrandsSidebar: Adw.Bin {
             }
           }
         };
+
+        ShortcutController {
+          scope: global;
+
+          Shortcut {
+            trigger: "<Control>L";
+            action: "activate";
+          }
+        }
       }
 
       [end]
@@ -69,6 +92,10 @@ template $ErrandsSidebar: Adw.Bin {
             item (_("Shortcuts"), "app.shortcuts")
             item (_("About Errands"), "sidebar.about")
           }
+
+          // section {
+          //   item (_("Quit"), "app.quit")
+          // }
         };
 
         ShortcutController {

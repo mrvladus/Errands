@@ -25,8 +25,10 @@
 
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
 
-static void on_import_action_cb(GSimpleAction *action, GVariant *param);
-static void on_sync_action_cb();
+static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
+static void on_sync_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
+static void on_switch_list_prev_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
+static void on_switch_list_next_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self);
 
 static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user_data);
 static gboolean on_drop_cb(AdwSidebar *self, guint index, const GValue *value, GdkDragAction preferred_action,
@@ -100,10 +102,12 @@ static void errands_sidebar_init(ErrandsSidebar *sidebar) {
 
   GSimpleActionGroup *ag = errands_add_action_group(self, "sidebar");
   errands_add_action(ag, "import", on_import_action_cb, self, NULL);
-  GSimpleAction *sync_action = errands_add_action(ag, "sync", on_sync_action_cb, NULL, NULL);
-  g_object_bind_property(state.settings, "sync-enabled", sync_action, "enabled", G_BINDING_SYNC_CREATE);
+  errands_add_action(ag, "switch-list-prev", on_switch_list_prev_action_cb, self, NULL);
+  errands_add_action(ag, "switch-list-next", on_switch_list_next_action_cb, self, NULL);
   errands_add_action(ag, "preferences", errands_settings_dialog_show, self, NULL);
   errands_add_action(ag, "about", errands_about_dialog_show, self, NULL);
+  GSimpleAction *sync_action = errands_add_action(ag, "sync", on_sync_action_cb, NULL, NULL);
+  g_object_bind_property(state.settings, "sync-enabled", sync_action, "enabled", G_BINDING_SYNC_CREATE);
 
   GType dnd_types[] = {ERRANDS_TYPE_TASK_ITEM};
   adw_sidebar_setup_drop_target(ADW_SIDEBAR(self->sidebar), GDK_ACTION_MOVE | GDK_ACTION_COPY, dnd_types,
@@ -227,7 +231,7 @@ static void on_import_action_finish_cb(GObject *obj, GAsyncResult *res) {
   errands_sidebar_select_last_opened_page();
 }
 
-static void on_import_action_cb(GSimpleAction *action, GVariant *param) {
+static void on_import_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
   g_autoptr(GtkFileFilter) filter = gtk_file_filter_new();
   gtk_file_filter_add_pattern(filter, "*.ics");
@@ -235,7 +239,25 @@ static void on_import_action_cb(GSimpleAction *action, GVariant *param) {
   gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_import_action_finish_cb, self);
 }
 
-static void on_sync_action_cb() { errands_sync(); }
+static void on_sync_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self) { errands_sync(); }
+
+static void on_switch_list_prev_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self) {
+  g_autoptr(GtkSelectionModel) model = adw_sidebar_get_items(ADW_SIDEBAR(self->sidebar));
+  guint n = g_list_model_get_n_items(G_LIST_MODEL(model));
+  guint selected = adw_sidebar_get_selected(ADW_SIDEBAR(self->sidebar));
+  selected = selected == 0 ? n - 1 : selected - 1;
+  adw_sidebar_set_selected(ADW_SIDEBAR(self->sidebar), selected);
+  g_signal_emit_by_name(self->sidebar, "activated", selected, NULL);
+}
+
+static void on_switch_list_next_action_cb(GSimpleAction *action, GVariant *param, ErrandsSidebar *self) {
+  g_autoptr(GtkSelectionModel) model = adw_sidebar_get_items(ADW_SIDEBAR(self->sidebar));
+  guint n = g_list_model_get_n_items(G_LIST_MODEL(model));
+  guint selected = adw_sidebar_get_selected(ADW_SIDEBAR(self->sidebar));
+  selected = selected + 1 == n ? 0 : selected + 1;
+  adw_sidebar_set_selected(ADW_SIDEBAR(self->sidebar), selected);
+  g_signal_emit_by_name(self->sidebar, "activated", selected, NULL);
+}
 
 // --- SIGNAL HANDLERS --- //
 
@@ -245,10 +267,11 @@ static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user
   else if (index == 1) errands_task_list_show_today_tasks(task_list);
   else {
     AdwSidebarItem *item = adw_sidebar_get_item(self, index);
-    g_assert(item);
-    ErrandsTaskListItem *tl_item = g_object_get_data(G_OBJECT(item), "item");
-    errands_settings_set_last_list_uid(state.settings, tl_item->uid);
-    errands_task_list_show_task_list(task_list, tl_item);
+    if (item) {
+      ErrandsTaskListItem *tl_item = g_object_get_data(G_OBJECT(item), "item");
+      errands_settings_set_last_list_uid(state.settings, tl_item->uid);
+      errands_task_list_show_task_list(task_list, tl_item);
+    }
   }
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
   adw_overlay_split_view_set_show_sidebar(state.main_window->overlay_split_view, false);

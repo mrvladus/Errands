@@ -3,8 +3,6 @@
 
 #include "window.h"
 #include "config.h"
-#include "glib-object.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
