@@ -298,7 +298,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     if (!errands_data_get_synced(list->ical)) break;
     if (data->name && !g_str_equal(data->name, list->title)) {
       errands_task_list_item_set_title(list, data->name);
-      errands_task_list_update(state.main_window->task_list);
+      if (state.main_window) errands_task_list_update(state.main_window->task_list);
     }
     if (data->color) {
       const char *color = gdk_rgba_to_str(&list->color);
@@ -347,7 +347,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     errands_task_list_item_save(list);
     errands_task_list_item_update_count(list);
     errands_sidebar_update_filter_rows();
-    errands_task_list_update(state.main_window->task_list);
+    if (state.main_window) errands_task_list_update(state.main_window->task_list);
 
     g_message("Sync: Task added to list '%s': '%s'", list->uid, errands_data_get_uid(data->ical));
   } break;
@@ -371,7 +371,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     errands_task_list_item_save(list);
     errands_task_list_item_update_count(list);
     errands_sidebar_update_filter_rows();
-    errands_task_list_update(state.main_window->task_list);
+    if (state.main_window) errands_task_list_update(state.main_window->task_list);
   } break;
   }
 
@@ -415,7 +415,7 @@ static void obj_pushed_idle_cb(gpointer user_data) {
     errands_task_list_item_save(list);
     errands_task_list_item_update_count(list);
     errands_sidebar_update_filter_rows();
-    errands_task_list_update(state.main_window->task_list);
+    if (state.main_window) errands_task_list_update(state.main_window->task_list);
   } break;
   }
 
