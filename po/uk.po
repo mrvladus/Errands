@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-14 15:27+0000\n"
-"PO-Revision-Date: 2026-11-14 22:06+0200\n"
+"POT-Creation-Date: 2026-11-15 15:26+0000\n"
+"PO-Revision-Date: 2026-11-15 20:36+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -81,11 +81,11 @@ msgstr "Повторювати безкінечно"
 msgid "Repeat %zu times"
 msgstr "Повторити %zu разів"
 
-#: ../src/sidebar.c:290
+#: ../src/sidebar.c:296
 msgid "Only .ics files are supported"
 msgstr "Передбачено підтримку лише файлів .ics"
 
-#: ../src/sidebar.c:295
+#: ../src/sidebar.c:301
 msgid "Can't load list. It's incorrect or already exists"
 msgstr "Не вдалося завантажити список. Він помилковий або вже існує"
 
@@ -98,53 +98,53 @@ msgstr "Віддалений список завдань додано: %s"
 msgid "Sync Failed"
 msgstr "Спроба синхронізації зазнала невдачі"
 
-#: ../src/task.c:120
+#: ../src/task.c:121
 msgctxt "Start date"
 msgid "Start"
 msgstr "Початок"
 
-#: ../src/task.c:138
+#: ../src/task.c:139
 msgctxt "Due date"
 msgid "Due"
 msgstr "Термін"
 
-#: ../src/task.c:320
+#: ../src/task.c:321
 msgid "Copied to Clipboard"
 msgstr "Скопійовано в буфер обміну"
 
-#: ../src/task.c:353
+#: ../src/task.c:354
 msgid "Failed to Export"
 msgstr "Не вдалося експортувати"
 
-#: ../src/task.c:356 ../src/task-list.c:302
+#: ../src/task.c:357 ../src/task-list.c:308
 msgid "Exported"
 msgstr "Експортовано"
 
-#: ../src/task-item.c:748
+#: ../src/task-item.c:752
 msgid "Can't make task a sub-task of itself."
 msgstr "Не робіть завдання підзавданням самого завдання."
 
-#: ../src/task-item.c:869
+#: ../src/task-item.c:873
 msgctxt "Priority"
 msgid "High"
 msgstr "Високий"
 
-#: ../src/task-item.c:870
+#: ../src/task-item.c:874
 msgctxt "Priority"
 msgid "Medium"
 msgstr "Середній"
 
-#: ../src/task-item.c:871
+#: ../src/task-item.c:875
 msgctxt "Priority"
 msgid "Low"
 msgstr "Низький"
 
-#: ../src/task-item.c:872
+#: ../src/task-item.c:876
 msgctxt "Priority"
 msgid "None"
 msgstr "Немає"
 
-#: ../src/task-item.c:904
+#: ../src/task-item.c:908
 #, c-format
 msgid "Every second"
 msgid_plural "Every %d seconds"
@@ -153,7 +153,7 @@ msgstr[1] "кожні %d секунди"
 msgstr[2] "кожних %d секунд"
 msgstr[3] "кожну %d секунду"
 
-#: ../src/task-item.c:905
+#: ../src/task-item.c:909
 #, c-format
 msgid "Every minute"
 msgid_plural "Every %d minutes"
@@ -162,7 +162,7 @@ msgstr[1] "кожні %d хвилини"
 msgstr[2] "кожних %d хвилин"
 msgstr[3] "кожну %d хвилину"
 
-#: ../src/task-item.c:906
+#: ../src/task-item.c:910
 #, c-format
 msgid "Every hour"
 msgid_plural "Every %d hours"
@@ -171,7 +171,7 @@ msgstr[1] "кожні %d години"
 msgstr[2] "кожних %d годин"
 msgstr[3] "кожну %d годину"
 
-#: ../src/task-item.c:907
+#: ../src/task-item.c:911
 #, c-format
 msgid "Every day"
 msgid_plural "Every %d days"
@@ -180,7 +180,7 @@ msgstr[1] "кожні %d дні"
 msgstr[2] "кожних %d днів"
 msgstr[3] "кожного %d дня"
 
-#: ../src/task-item.c:908
+#: ../src/task-item.c:912
 #, c-format
 msgid "Every week"
 msgid_plural "Every %d weeks"
@@ -189,7 +189,7 @@ msgstr[1] "кожні %d тижні"
 msgstr[2] "кожних %d тижнів"
 msgstr[3] "кожного %d тижня"
 
-#: ../src/task-item.c:909
+#: ../src/task-item.c:913
 #, c-format
 msgid "Every month"
 msgid_plural "Every %d months"
@@ -198,7 +198,7 @@ msgstr[1] "кожні %d місяці"
 msgstr[2] "кожних %d місяців"
 msgstr[3] "кожен %d місяць"
 
-#: ../src/task-item.c:910
+#: ../src/task-item.c:914
 #, c-format
 msgid "Every year"
 msgid_plural "Every %d years"
@@ -207,12 +207,12 @@ msgstr[1] "кожні %d роки"
 msgstr[2] "кожні %d років"
 msgstr[3] "кожен %d рік"
 
-#: ../src/task-item.c:921
+#: ../src/task-item.c:925
 #, c-format
 msgid " until %s"
 msgstr " до %s"
 
-#: ../src/task-item.c:922
+#: ../src/task-item.c:926
 #, c-format
 msgid " once"
 msgid_plural " %d times"
@@ -221,15 +221,15 @@ msgstr[1] " %d рази"
 msgstr[2] " %d разів"
 msgstr[3] " один раз"
 
-#: ../src/task-list.c:291 ../src/task-list.c:296
+#: ../src/task-list.c:297 ../src/task-list.c:302
 msgid "Export failed"
 msgstr "Не вдалося експортувати"
 
-#: ../src/task-list.c:322 ../src/task-list.c:334
+#: ../src/task-list.c:328 ../src/task-list.c:340
 msgid "No tasks to delete"
 msgstr "Немає завдань для вилучення"
 
-#: ../src/task-list.c:327 ../src/task-list.c:339
+#: ../src/task-list.c:333 ../src/task-list.c:345
 #, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
@@ -238,11 +238,11 @@ msgstr[1] "Вилучено %d завдання"
 msgstr[2] "Вилучено %d завдань"
 msgstr[3] "Вилучено %d завдання"
 
-#: ../src/task-list.c:486 ../src/sidebar.blp:110
+#: ../src/task-list.c:492 ../src/sidebar.blp:110
 msgid "All Tasks"
 msgstr "Усі завдання"
 
-#: ../src/task-list.c:490 ../src/sidebar.blp:123
+#: ../src/task-list.c:496 ../src/sidebar.blp:123
 msgid "Tasks for Today"
 msgstr "Завдання на сьогодні"
 
@@ -250,15 +250,15 @@ msgstr "Завдання на сьогодні"
 msgid "Untitled"
 msgstr "Без назви"
 
-#: ../src/window.c:118
+#: ../src/window.c:122
 msgid "Remove Attachment"
 msgstr "Вилучити долучення"
 
-#: ../src/window.c:149
+#: ../src/window.c:153
 msgid "Enable Tag"
 msgstr "Увімкнути мітку"
 
-#: ../src/window.c:155
+#: ../src/window.c:159
 msgid "Remove Tag"
 msgstr "Вилучити мітку"
 
@@ -467,7 +467,6 @@ msgid "Miscellaneous"
 msgstr "Різне"
 
 #: ../src/settings-dialog.blp:48
-#| msgid "Work in the Background"
 msgid "Run in the Background"
 msgstr "Працювати у фоновому режимі"
 
@@ -619,11 +618,10 @@ msgid "Task Color"
 msgstr "Колір завдання"
 
 #: ../src/task.blp:145
-#| msgid "Task Color"
 msgid "Clear Color"
 msgstr "Зняти колір"
 
-#: ../src/task.blp:150 ../src/task.blp:209 ../src/task-list.blp:73
+#: ../src/task.blp:150 ../src/task.blp:209 ../src/task-list.blp:79
 msgid "Priority"
 msgstr "Пріоритет"
 
@@ -643,7 +641,7 @@ msgstr "Середній"
 msgid "High"
 msgstr "Високий"
 
-#: ../src/task.blp:179 ../src/task-list.blp:92
+#: ../src/task.blp:179 ../src/task-list.blp:98
 msgid "Export as \".ics\""
 msgstr "Експортувати як «.ics»"
 
@@ -655,7 +653,7 @@ msgstr "Скасувати / відновити"
 msgid "Start"
 msgstr "Початок"
 
-#: ../src/task.blp:236 ../src/task-list.blp:61 ../src/window.blp:85
+#: ../src/task.blp:236 ../src/task-list.blp:67 ../src/window.blp:85
 msgid "Start Date"
 msgstr "Дата початку"
 
@@ -663,7 +661,7 @@ msgstr "Дата початку"
 msgid "Due"
 msgstr "Термін"
 
-#: ../src/task.blp:252 ../src/task-list.blp:67 ../src/window.blp:93
+#: ../src/task.blp:252 ../src/task-list.blp:73 ../src/window.blp:93
 msgid "Due Date"
 msgstr "Термін виконання"
 
@@ -676,83 +674,100 @@ msgid "Add Sub-Task"
 msgstr "Додати нову підзадачу"
 
 #: ../src/task-list.blp:18
-#| msgid "Sort Order"
+#| msgid "Toggle Search"
+msgid "Toggle Sidebar"
+msgstr "Увімкнути або вимкнути бічну панель"
+
+#: ../src/task-list.blp:24
 msgid "Sort / Filter"
 msgstr "Сортування/Фільтрування"
 
-#: ../src/task-list.blp:22
+#: ../src/task-list.blp:28
 msgid "Show Tasks"
 msgstr "Показати завдання"
 
-#: ../src/task-list.blp:25
+#: ../src/task-list.blp:31
 msgid "Completed"
 msgstr "Виконано"
 
-#: ../src/task-list.blp:30
+#: ../src/task-list.blp:36
 msgid "Cancelled"
 msgstr "Скасовані"
 
-#: ../src/task-list.blp:36
+#: ../src/task-list.blp:42
 msgid "Sort Order"
 msgstr "Порядок сортування"
 
-#: ../src/task-list.blp:39
+#: ../src/task-list.blp:45
 msgid "Descending"
 msgstr "За спаданням"
 
-#: ../src/task-list.blp:45
+#: ../src/task-list.blp:51
 msgid "Ascending"
 msgstr "За зростанням"
 
-#: ../src/task-list.blp:52
+#: ../src/task-list.blp:58
 msgid "Sort By"
 msgstr "Сортувати за"
 
-#: ../src/task-list.blp:55
+#: ../src/task-list.blp:61
 msgid "Created"
 msgstr "Створено"
 
-#: ../src/task-list.blp:88
+#: ../src/task-list.blp:94
 msgid "Rename List"
 msgstr "Перейменувати список"
 
-#: ../src/task-list.blp:93
+#: ../src/task-list.blp:99
 msgid "Print"
 msgstr "Друк"
 
-#: ../src/task-list.blp:97
+#: ../src/task-list.blp:103
 msgid "Delete Completed"
 msgstr "Вилучити виконані завдання"
 
-#: ../src/task-list.blp:98
+#: ../src/task-list.blp:104
 msgid "Delete Cancelled"
 msgstr "Вилучити скасовані завдання"
 
-#: ../src/task-list.blp:102
+#: ../src/task-list.blp:108
 msgid "Delete List"
 msgstr "Вилучити список"
 
-#: ../src/task-list.blp:110
+#: ../src/task-list.blp:116
 msgid "Search (Ctrl+F)"
 msgstr "Пошук (Ctrl+F)"
 
-#: ../src/task-list.blp:143
+#: ../src/task-list.blp:154
 msgid "Add Task"
 msgstr "Додати нову задачу"
 
-#: ../src/task-list.blp:144
+#: ../src/task-list.blp:155
 msgid "Add Task (Ctrl+N)"
 msgstr "Додати нову задачу (Ctrl+N)"
 
-#: ../src/task-list.blp:162
+#: ../src/task-list.blp:179
+msgid ""
+"<b>Inline properties syntax:</b>\n"
+"\n"
+"<b>##tag</b>  Add tag.\n"
+"<b>#pN</b>     Set priority. <b>N</b> is number in range <b>0..9</b>."
+msgstr ""
+"<b>Синтаксис вбудованих властивостей:</b>\n"
+"\n"
+"<b>##tag</b>  Додати теґ.\n"
+"<b>#pN</b>     Встановити пріоритетність. <b>N</b> — число у діапазоні <b>0.."
+"9</b>."
+
+#: ../src/task-list.blp:189
 msgid "Add Task (Ctrl+Return)"
 msgstr "Додати нову задачу (Ctrl+Return)"
 
-#: ../src/task-list.blp:186
+#: ../src/task-list.blp:213
 msgid "No Tasks"
 msgstr "Немає завдань"
 
-#: ../src/task-list.blp:213
+#: ../src/task-list.blp:240
 msgid "Loading Tasks"
 msgstr "Завантаження завдань"
 
