@@ -5,6 +5,7 @@
 #include "config.h"
 #include "data.h"
 #include "delete-list-dialog.h"
+#include "glib-object.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
@@ -76,6 +77,7 @@ static void errands_task_list_class_init(ErrandsTaskListClass *class) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_apply_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, scrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, list_view);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, sidebar_btn);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_text_changed_cb);
@@ -141,7 +143,10 @@ static void errands_task_list_init(ErrandsTaskList *self) {
                           GTK_SELECTION_MODEL(gtk_no_selection_new(G_LIST_MODEL(self->tree_filter_model))));
 }
 
-ErrandsTaskList *errands_task_list_new() { return g_object_new(ERRANDS_TYPE_TASK_LIST, NULL); }
+ErrandsTaskList *errands_task_list_new() {
+  ErrandsTaskList *self = g_object_new(ERRANDS_TYPE_TASK_LIST, NULL);
+  return self;
+}
 
 // ---------- PRIVATE FUNCTIONS ---------- //
 

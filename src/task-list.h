@@ -30,6 +30,7 @@ struct _ErrandsTaskList {
   GtkWidget *entry_apply_btn;
   GtkWidget *scrl;
   GtkWidget *list_view;
+  GtkWidget *sidebar_btn;
 
   gchar *search_query;
 

@@ -63,7 +63,8 @@
     <release version="51.1.3" date="2026-11-16">
         <description translate="no">
             <ul>
-                <li>Added inline properties when writing task text.</li>
+                <li>Added inline properties when writing task text</li>
+                <li>Added button to collapse sidebar</li>
             </ul>
         </description>
     </release>

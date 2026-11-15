@@ -3,6 +3,7 @@
 
 #include "window.h"
 #include "config.h"
+#include "glib-object.h"
 #include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
@@ -83,6 +84,9 @@ static void errands_window_init(ErrandsWindow *self) {
   gtk_source_buffer_set_style_scheme(self->notes_buffer, style_scheme);
   g_object_bind_property_full(style_mgr, "dark", self->notes_buffer, "style-scheme", G_BINDING_SYNC_CREATE,
                               (GBindingTransformFunc)on_style_toggled_cb, NULL, self, NULL);
+
+  g_object_bind_property(self->split_view, "collapsed", self->task_list->sidebar_btn, "active",
+                         G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL | G_BINDING_INVERT_BOOLEAN);
 
   g_message("Window: Created");
 }
