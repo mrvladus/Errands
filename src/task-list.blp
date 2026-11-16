@@ -5,7 +5,7 @@ using Adw 1;
 
 template $ErrandsTaskList: Adw.Bin {
   Overlay {
-    child: Adw.ToolbarView {
+    child: Adw.ToolbarView tb_view {
       [top]
       Adw.HeaderBar {
         title-widget: Adw.WindowTitle title {
@@ -167,97 +167,110 @@ template $ErrandsTaskList: Adw.Bin {
         }
       }
 
-      [bottom]
-      Box entry_box {
-        styles [
-          "toolbar",
-        ]
+      content: Adw.OverlaySplitView overlay_split_view {
+        sidebar-position: end;
+        pin-sidebar: true;
+        collapsed: true;
+        show-sidebar: false;
+        min-sidebar-width: 360;
+        max-sidebar-width: 500;
+        notify::show-sidebar => $on_show_properties_toggled_cb(template);
 
-        Entry entry {
-          placeholder-text: _("Add Task");
-          tooltip-text: _("Add Task (Ctrl+N)");
-          hexpand: true;
-          activate => $on_task_list_entry_activated_cb(template);
-          changed => $on_task_list_entry_text_changed_cb(template);
+        content: Box {
+          orientation: vertical;
 
-          ShortcutController {
-            scope: global;
+          Adw.StatusPage {
+            title: _("No Tasks");
+            icon-name: "errands-select-symbolic";
+            vexpand: true;
+            visible: bind scrl.visible inverted;
+          }
 
-            Shortcut {
-              trigger: "<Control>N";
-              action: "action(task-list.focus-entry)";
+          ScrolledWindow scrl {
+            vexpand: true;
+
+            ListView list_view {
+              enable-rubberband: false;
+              // margin-end: 14;
+              factory: SignalListItemFactory {
+                setup => $on_setup_item_cb();
+                bind => $on_bind_item_cb();
+                unbind => $on_unbind_item_cb();
+              };
+
+              activate => $on_listview_activate_cb();
             }
           }
-        }
 
-        MenuButton {
-          icon-name: "errands-question-symbolic";
-          valign: end;
+          Separator {}
 
-          popover: Popover {
-            Label {
-              use-markup: true;
-              wrap: true;
-              max-width-chars: 40;
-              label: _(
-                "<b>Inline properties syntax:</b>\n\n<b>##tag</b>  Add tag.\n<b>#pN</b>     Set priority. <b>N</b> is number in range <b>0..9</b>."
-              );
+          Box entry_box {
+            styles [
+              "toolbar",
+            ]
+
+            Entry entry {
+              placeholder-text: _("Add Task");
+              tooltip-text: _("Add Task (Ctrl+N)");
+              hexpand: true;
+              activate => $on_task_list_entry_activated_cb(template);
+              changed => $on_task_list_entry_text_changed_cb(template);
+
+              ShortcutController {
+                scope: global;
+
+                Shortcut {
+                  trigger: "<Control>N";
+                  action: "action(task-list.focus-entry)";
+                }
+              }
             }
-          };
 
-          styles [
-            "circular",
-          ]
-        }
+            MenuButton {
+              icon-name: "errands-question-symbolic";
+              valign: end;
 
-        Button entry_apply_btn {
-          icon-name: "errands-select-symbolic";
-          valign: end;
-          tooltip-text: _("Add Task (Ctrl+Return)");
-          sensitive: false;
-          clicked => $on_task_list_entry_activated_cb(template);
+              popover: Popover {
+                Label {
+                  use-markup: true;
+                  wrap: true;
+                  max-width-chars: 40;
+                  label: _(
+                    "<b>Inline properties syntax:</b>\n\n<b>##tag</b>  Add tag.\n<b>#pN</b>     Set priority. <b>N</b> is number in range <b>0..9</b>."
+                  );
+                }
+              };
 
-          styles [
-            "circular",
-            "suggested-action",
-          ]
+              styles [
+                "circular",
+              ]
+            }
 
-          ShortcutController {
-            scope: global;
+            Button entry_apply_btn {
+              icon-name: "errands-select-symbolic";
+              valign: end;
+              tooltip-text: _("Add Task (Ctrl+Return)");
+              sensitive: false;
+              clicked => $on_task_list_entry_activated_cb(template);
 
-            Shortcut {
-              trigger: "<Control>Return";
-              action: "activate";
+              styles [
+                "circular",
+                "suggested-action",
+              ]
+
+              ShortcutController {
+                scope: global;
+
+                Shortcut {
+                  trigger: "<Control>Return";
+                  action: "activate";
+                }
+              }
             }
           }
-        }
-      }
+        };
 
-      content: Box {
-        orientation: vertical;
-
-        Adw.StatusPage {
-          title: _("No Tasks");
-          icon-name: "errands-select-symbolic";
-          vexpand: true;
-          visible: bind scrl.visible inverted;
-        }
-
-        ScrolledWindow scrl {
-          vexpand: true;
-
-          ListView list_view {
-            enable-rubberband: false;
-            // margin-end: 14;
-            factory: SignalListItemFactory {
-              setup => $on_setup_item_cb();
-              bind => $on_bind_item_cb();
-              unbind => $on_unbind_item_cb();
-            };
-
-            activate => $on_listview_activate_cb();
-          }
-        }
+        sidebar: $ErrandsTaskProperties properties {};
       };
     };
 

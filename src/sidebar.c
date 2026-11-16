@@ -274,7 +274,7 @@ static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user
     }
   }
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
-  adw_overlay_split_view_set_show_sidebar(state.main_window->overlay_split_view, false);
+  adw_overlay_split_view_set_show_sidebar(state.main_window->task_list->overlay_split_view, false);
 }
 
 static void on_entry_changed_cb(ErrandsSidebar *self, GtkEntry *entry) {

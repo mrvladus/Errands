@@ -33,20 +33,7 @@ struct _ErrandsWindow {
   AdwToastOverlay *toast_overlay;
   ErrandsSidebar *sidebar;
   AdwNavigationSplitView *split_view;
-  AdwOverlaySplitView *overlay_split_view;
-  AdwViewStack *stack;
-  ErrandsDateChooser *start_date_chooser;
-  ErrandsDateChooser *due_date_chooser;
-  ErrandsRruleRow *rrule_row;
-  GtkSourceView *notes_view;
-  GtkSourceBuffer *notes_buffer;
-  AdwPreferencesGroup *attachments;
-  AdwPreferencesGroup *tags;
-
-  ErrandsTaskItem *item;
 };
 
 ErrandsWindow *errands_window_new(GtkApplication *app);
 void errands_window_add_toast(const char *msg, int timeout);
-void errands_window_show_properties(ErrandsWindow *self, ErrandsTaskItem *item);
-void errands_window_show_notes(ErrandsWindow *self, ErrandsTaskItem *item);

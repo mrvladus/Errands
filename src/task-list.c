@@ -13,6 +13,7 @@
 #include "task-item.h"
 #include "task-list-item.h"
 #include "task-parser.h"
+#include "task-properties.h"
 #include "task.h"
 #include "utils.h"
 #include "window.h"
@@ -32,6 +33,7 @@ static void on_task_list_entry_activated_cb(ErrandsTaskList *self);
 static void on_task_list_entry_text_changed_cb(ErrandsTaskList *self);
 static void on_task_list_search_cb(ErrandsTaskList *self, GtkSearchEntry *entry);
 static void on_listview_activate_cb(GtkListView *list_view, guint position);
+static void on_show_properties_toggled_cb(ErrandsTaskList *self);
 
 static void on_focus_entry_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_action_export_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
@@ -61,31 +63,35 @@ static void finalize(GObject *gobject) {
   G_OBJECT_CLASS(errands_task_list_parent_class)->finalize(gobject);
 }
 
-static void errands_task_list_class_init(ErrandsTaskListClass *class) {
-  G_OBJECT_CLASS(class)->finalize = finalize;
+static void errands_task_list_class_init(ErrandsTaskListClass *klass) {
+  g_type_ensure(ERRANDS_TYPE_TASK_PROPERTIES);
 
-  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(class), RESOURCE_PATH "/ui/task-list.ui");
+  G_OBJECT_CLASS(klass)->finalize = finalize;
 
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, loading_page);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, title);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, menu_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_bar);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, search_entry);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_box);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, entry_apply_btn);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, scrl);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, list_view);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(class), ErrandsTaskList, sidebar_btn);
-
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_activated_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_entry_text_changed_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_task_list_search_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_listview_activate_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_setup_item_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_bind_item_cb);
-  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(class), on_unbind_item_cb);
+  gtk_widget_class_set_template_from_resource(GTK_WIDGET_CLASS(klass), RESOURCE_PATH "/ui/task-list.ui");
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, tb_view);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, loading_page);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, title);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, search_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, menu_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, search_bar);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, search_entry);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, entry_box);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, entry);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, entry_apply_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, scrl);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, list_view);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, sidebar_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, overlay_split_view);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskList, properties);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_task_list_entry_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_task_list_entry_text_changed_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_task_list_search_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_listview_activate_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_setup_item_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_bind_item_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_unbind_item_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_show_properties_toggled_cb);
 }
 
 static GListModel *task_children_func(gpointer item, gpointer user_data) {
@@ -653,4 +659,12 @@ static void on_listview_activate_cb(GtkListView *list_view, guint position) {
   g_autoptr(GtkTreeListRow) row = g_list_model_get_item(G_LIST_MODEL(gtk_list_view_get_model(list_view)), position);
   if (!row) return;
   if (GTK_IS_TREE_LIST_ROW(row)) gtk_tree_list_row_set_expanded(row, !gtk_tree_list_row_get_expanded(row));
+}
+
+static void on_show_properties_toggled_cb(ErrandsTaskList *self) {
+  gboolean opened = adw_overlay_split_view_get_show_sidebar(self->overlay_split_view);
+  adw_toolbar_view_set_top_bar_style(state.main_window->task_list->tb_view,
+                                     opened ? ADW_TOOLBAR_RAISED_BORDER : ADW_TOOLBAR_FLAT);
+  if (opened) return;
+  errands_task_properties_close(self->properties);
 }

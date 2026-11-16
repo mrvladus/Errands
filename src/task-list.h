@@ -4,6 +4,7 @@
 #pragma once
 
 #include "task-list-item.h"
+#include "task-properties.h"
 
 #include <adwaita.h>
 
@@ -19,6 +20,8 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST, Adw
 struct _ErrandsTaskList {
   AdwBin parent_instance;
 
+  AdwOverlaySplitView *overlay_split_view;
+  AdwToolbarView *tb_view;
   GtkWidget *loading_page;
   GtkWidget *title;
   GtkWidget *search_btn;
@@ -31,6 +34,7 @@ struct _ErrandsTaskList {
   GtkWidget *scrl;
   GtkWidget *list_view;
   GtkWidget *sidebar_btn;
+  ErrandsTaskProperties *properties;
 
   gchar *search_query;
 

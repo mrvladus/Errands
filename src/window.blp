@@ -1,7 +1,6 @@
 // Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com>
 // SPDX-License-Identifier: Zlib
 using Gtk 4.0;
-using GtkSource 5;
 using Adw 1;
 
 template $ErrandsWindow: Adw.ApplicationWindow {
@@ -47,108 +46,7 @@ template $ErrandsWindow: Adw.ApplicationWindow {
         width-request: 360;
         title: _("Content");
 
-        child: Adw.OverlaySplitView overlay_split_view {
-          sidebar-position: end;
-          pin-sidebar: true;
-          collapsed: true;
-          show-sidebar: false;
-          min-sidebar-width: 360;
-          max-sidebar-width: 500;
-          notify::show-sidebar => $on_show_properties_toggled_cb(template);
-
-          content: $ErrandsTaskList task_list {};
-
-          sidebar: Adw.ToolbarView {
-            top-bar-style: raised;
-
-            [top]
-            Adw.HeaderBar {
-              show-back-button: false;
-
-              title-widget: Adw.ViewSwitcher {
-                stack: stack;
-                policy: wide;
-              };
-            }
-
-            content: Adw.ViewStack stack {
-              Adw.ViewStackPage {
-                name: "properties";
-                title: _("Properties");
-                icon-name: "errands-calendar-symbolic";
-
-                child: Adw.PreferencesPage {
-                  Adw.PreferencesGroup {
-                    title: _("Date and Time");
-
-                    $ErrandsDateChooser start_date_chooser {
-                      subtitle: _("Start Date");
-
-                      styles [
-                        "property",
-                      ]
-                    }
-
-                    $ErrandsDateChooser due_date_chooser {
-                      subtitle: _("Due Date");
-                      visible: bind rrule_row.enable-expansion inverted;
-
-                      styles [
-                        "property",
-                      ]
-                    }
-
-                    $ErrandsRruleRow rrule_row {}
-                  }
-
-                  Adw.PreferencesGroup attachments {
-                    title: _("Attachments");
-                  }
-
-                  Adw.PreferencesGroup {
-                    Adw.ButtonRow {
-                      title: _("Add Attachment");
-                      start-icon-name: "errands-add-symbolic";
-                      action-name: "window.add-attachment";
-                    }
-                  }
-
-                  Adw.PreferencesGroup tags {
-                    title: _("Tags");
-                  }
-
-                  Adw.PreferencesGroup {
-                    Adw.EntryRow {
-                      title: _("New Tag");
-                      entry-activated => $on_tag_entry_activated_cb(template);
-                    }
-                  }
-                };
-              }
-
-              Adw.ViewStackPage {
-                name: "notes";
-                title: _("Notes");
-                icon-name: "errands-notes-symbolic";
-
-                child: ScrolledWindow {
-                  propagate-natural-height: true;
-                  vexpand: true;
-
-                  GtkSource.View notes_view {
-                    top-margin: 6;
-                    bottom-margin: 6;
-                    right-margin: 6;
-                    left-margin: 6;
-                    wrap-mode: word;
-
-                    buffer: GtkSource.Buffer notes_buffer {};
-                  }
-                };
-              }
-            };
-          };
-        };
+        child: $ErrandsTaskList task_list {};
       };
     }
   }

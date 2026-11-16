@@ -8,6 +8,7 @@
 #include "task-item.h"
 #include "task-list.h"
 #include "task-parser.h"
+#include "task-properties.h"
 #include "utils.h"
 #include "window.h"
 
@@ -327,11 +328,11 @@ static void on_priority_action_cb(GSimpleAction *action, GVariant *value, Errand
 }
 
 static void on_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_window_show_properties(state.main_window, self->item);
+  errands_task_properties_show_properties(state.main_window->task_list->properties, self->item);
 }
 
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_window_show_notes(state.main_window, self->item);
+  errands_task_properties_show_notes(state.main_window->task_list->properties, self->item);
 }
 
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
