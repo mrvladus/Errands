@@ -29,6 +29,7 @@ static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTa
 static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
+static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
@@ -247,6 +248,7 @@ static void errands_task_init(ErrandsTask *self) {
   errands_add_action(self->ag, "clear-color", on_clear_color_action_cb, self, NULL);
   errands_add_action(self->ag, "properties", on_properties_action_cb, self, NULL);
   errands_add_action(self->ag, "notes", on_notes_action_cb, self, NULL);
+  errands_add_action(self->ag, "tags", on_tags_action_cb, self, NULL);
   errands_add_action(self->ag, "cancel", on_cancel_action_cb, self, NULL);
   errands_add_action(self->ag, "delete", on_delete_action_cb, self, NULL);
   errands_add_action(self->ag, "export", on_export_action_cb, self, NULL);
@@ -264,7 +266,7 @@ static GtkWidget *errands_task_tag_new(const char *tag) {
   GtkWidget *label = g_object_new(GTK_TYPE_LABEL, "label", tag, "max-width-chars", 15, "halign", GTK_ALIGN_START, "ellipsize",
                                   PANGO_ELLIPSIZE_END, NULL);
   gtk_box_append(GTK_BOX(box), label);
-  GtkWidget *button = g_object_new(GTK_TYPE_BUTTON, "child", box, "action-name", "task.properties", NULL);
+  GtkWidget *button = g_object_new(GTK_TYPE_BUTTON, "child", box, "action-name", "task.tags", NULL);
   gtk_widget_add_css_class(button, "caption-heading");
   gtk_widget_add_css_class(button, "tag");
 
@@ -333,6 +335,10 @@ static void on_properties_action_cb(GSimpleAction *action, GVariant *param, Erra
 
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
   errands_task_properties_show_notes(state.main_window->task_list->properties, self->item);
+}
+
+static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
+  errands_task_properties_show_tags(state.main_window->task_list->properties, self->item);
 }
 
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {

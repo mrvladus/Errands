@@ -269,6 +269,12 @@ void errands_task_properties_show_notes(ErrandsTaskProperties *self, ErrandsTask
   adw_view_stack_set_visible_child_name(self->stack, "notes");
 }
 
+void errands_task_properties_show_tags(ErrandsTaskProperties *self, ErrandsTaskItem *item) {
+  g_message("Task Properties: Show tags");
+  set_item(self, item);
+  adw_view_stack_set_visible_child_name(self->stack, "tags");
+}
+
 void errands_task_properties_close(ErrandsTaskProperties *self) {
   g_message("Task Properties: Close");
 
@@ -336,7 +342,7 @@ static void on_add_attachment_action_finish_cb(GObject *obj, GAsyncResult *res, 
 
 static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskProperties *self) {
   g_autoptr(GtkFileDialog) dialog = gtk_file_dialog_new();
-  gtk_file_dialog_open(dialog, GTK_WINDOW(self), NULL, on_add_attachment_action_finish_cb, self);
+  gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, on_add_attachment_action_finish_cb, self);
 }
 
 // ---------- CALLBACKS ---------- //

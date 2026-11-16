@@ -6,10 +6,10 @@ using Adw 1;
 
 template $ErrandsTaskProperties: Adw.Bin {
   Adw.ToolbarView {
-    [top]
+    [bottom]
     Adw.ViewSwitcher {
       stack: stack;
-      policy: wide;
+      policy: narrow;
       halign: center;
       margin-top: 6;
       margin-bottom: 6;
@@ -53,18 +53,7 @@ template $ErrandsTaskProperties: Adw.Bin {
             Adw.ButtonRow {
               title: _("Add Attachment");
               start-icon-name: "errands-add-symbolic";
-              action-name: "window.add-attachment";
-            }
-          }
-
-          Adw.PreferencesGroup tags {
-            title: _("Tags");
-          }
-
-          Adw.PreferencesGroup {
-            Adw.EntryRow {
-              title: _("New Tag");
-              entry-activated => $on_tag_entry_activated_cb(template);
+              action-name: "task-properties.add-attachment";
             }
           }
         };
@@ -77,8 +66,6 @@ template $ErrandsTaskProperties: Adw.Bin {
 
         child: Box {
           orientation: vertical;
-
-          Separator {}
 
           ScrolledWindow {
             propagate-natural-height: true;
@@ -94,6 +81,25 @@ template $ErrandsTaskProperties: Adw.Bin {
               buffer: GtkSource.Buffer notes_buffer {};
             }
           }
+
+          Separator {}
+        };
+      }
+
+      Adw.ViewStackPage {
+        name: "tags";
+        title: _("Tags");
+        icon-name: "errands-tag-symbolic";
+
+        child: Adw.PreferencesPage {
+          Adw.PreferencesGroup {
+            Adw.EntryRow {
+              title: _("New Tag");
+              entry-activated => $on_tag_entry_activated_cb(template);
+            }
+          }
+
+          Adw.PreferencesGroup tags {}
         };
       }
     };

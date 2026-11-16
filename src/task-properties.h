@@ -13,4 +13,5 @@ G_DECLARE_FINAL_TYPE(ErrandsTaskProperties, errands_task_properties, ERRANDS, TA
 ErrandsTaskProperties *errands_task_properties_new();
 void errands_task_properties_show_properties(ErrandsTaskProperties *self, ErrandsTaskItem *item);
 void errands_task_properties_show_notes(ErrandsTaskProperties *self, ErrandsTaskItem *item);
+void errands_task_properties_show_tags(ErrandsTaskProperties *self, ErrandsTaskItem *item);
 void errands_task_properties_close(ErrandsTaskProperties *self);
