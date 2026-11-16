@@ -219,6 +219,22 @@ static inline bool merge_tasks(icalcomponent *old, icalcomponent *new) {
        prop = icalcomponent_get_next_property(new, ICAL_ANY_PROPERTY)) {
     g_ptr_array_add(props, prop);
   }
+  // Drop properties the remote side no longer has. Without this, a property removed on the server
+  // survives locally, e.g. COMPLETED after a task was reopened (Tasks.org also drops STATUS), so the
+  // task stays completed here. Keep identity properties and local X- properties (sync state etc.).
+  g_autoptr(GPtrArray) stale = g_ptr_array_new();
+  for (icalproperty *prop = icalcomponent_get_first_property(old, ICAL_ANY_PROPERTY); prop;
+       prop = icalcomponent_get_next_property(old, ICAL_ANY_PROPERTY)) {
+    icalproperty_kind kind = icalproperty_isa(prop);
+    if (kind == ICAL_UID_PROPERTY || kind == ICAL_RECURRENCEID_PROPERTY || kind == ICAL_X_PROPERTY) continue;
+    if (!icalcomponent_get_first_property(new, kind)) g_ptr_array_add(stale, prop);
+  }
+  for (guint i = 0; i < stale->len; i++) {
+    icalproperty *prop = g_ptr_array_index(stale, i);
+    icalcomponent_remove_property(old, prop);
+    icalproperty_free(prop);
+  }
+
   // Group by kind: for each kind present in new, remove ALL old ones, then add all of new's.
   // This avoids duplicates for multi-valued props.
   GHashTable *by_kind = g_hash_table_new(g_direct_hash, g_direct_equal);
