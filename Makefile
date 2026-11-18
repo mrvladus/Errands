@@ -1,4 +1,4 @@
-# BUILD TARGETS:
+# TARGETS:
 #    all                Build the executable into $(BUILD_DIR) (default target)
 #    clean              Remove build artifacts
 #    install            Install binary, desktop, icons, D-Bus service into $(DESTDIR)$(prefix)
@@ -7,12 +7,13 @@
 #    flatpak-run        Build Flatpak and run it
 #    flatpak-bundle     Build Flatpak bundle into $(BUILD_DIR)
 #    distrobox-setup    Create/configure the errands-distrobox dev environment
-#    nextcloud-setup    Start a Nextcloud Podman container for sync testing
+#    nextcloud-setup    Start a Nextcloud test container
+#    radicale-setup     Setup Radicale test container
 #    sloc               Count lines of code in src/
 #    git-commit         Interactive staged-commit helper
 #    git-tag            Create new release tag
 
-# BUILD OPTIONS:
+# OPTIONS:
 #    prefix  = /usr/local              Installation prefix directory
 #    DESTDIR = (not set)               Installation destination directory
 #    CFLAGS  = (not set)               Compile flags
