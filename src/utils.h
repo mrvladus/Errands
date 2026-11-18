@@ -360,6 +360,7 @@ static inline icalcomponent *find_vtodo_by_uid(icalcomponent *ical, const char *
 
 static inline bool icaltime_is_null_date(const icaltimetype t) { return t.year == 0 && t.month == 0 && t.day == 0; }
 
+
 static inline icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date, const struct icaltimetype time) {
   icaltimetype result = date;
   result.hour = time.hour;
@@ -418,6 +419,31 @@ static inline time_t ical_to_utc_timet(icaltimetype t) {
 static inline icaltimetype icaltime_now() {
   g_autoptr(GDateTime) dt = g_date_time_new_now_local();
   return utc_to_local(icaltime_from_timet_with_zone(g_date_time_to_unix(dt), 0, NULL));
+}
+
+// RFC 5545 requires DTSTART and DUE of a VTODO to have the same value type (DATE or DATE-TIME),
+// and strict servers (sabre/dav, Baikal) reject the object otherwise with 415.
+// Default start for a recurring task: today as DATE if due is all-day (or unset), now if due has a time.
+static inline icaltimetype errands_default_dtstart(const icaltimetype due) {
+  if (!icaltime_is_null_date(due) && !icaltime_is_date(due)) return icaltime_now();
+  return icaltime_today();
+}
+
+// Make an existing start match the value type of the due date. Returns true if start was changed.
+static inline bool errands_match_dtstart_to_due(icaltimetype *start, const icaltimetype due) {
+  if (icaltime_is_null_date(*start) || icaltime_is_null_date(due)) return false;
+  if (icaltime_is_date(*start) == icaltime_is_date(due)) return false;
+  if (icaltime_is_date(due)) {
+    start->is_date = 1;
+    start->hour = start->minute = start->second = 0;
+    start->zone = NULL;
+  } else {
+    start->is_date = 0;
+    start->hour = due.hour;
+    start->minute = due.minute;
+    start->second = due.second;
+  }
+  return true;
 }
 
 static inline bool icalrecurrence_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {

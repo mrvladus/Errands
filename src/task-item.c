@@ -585,9 +585,13 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
   self->lock = FALSE;
 
   // Set dtstart if rrule is set and no dtstart exists
-  if (!icaltime_is_null_time(self->dtstart) && self->rrule && self->rrule->freq != ICAL_NO_RECURRENCE) {
-    icaltimetype now = icaltime_now();
-    errands_task_item_set_dtstart(self, &now);
+  if (icaltime_is_null_date(self->dtstart) && self->rrule && self->rrule->freq != ICAL_NO_RECURRENCE) {
+    icaltimetype start = errands_default_dtstart(self->dtend);
+    errands_task_item_set_dtstart(self, &start);
+  } else {
+    // Repair tasks whose DTSTART and DUE value types differ (rejected by strict CalDAV servers)
+    icaltimetype start = self->dtstart;
+    if (errands_match_dtstart_to_due(&start, self->dtend)) errands_task_item_set_dtstart(self, &start);
   }
 
   update_search_blob(self);

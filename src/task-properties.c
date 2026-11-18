@@ -294,15 +294,19 @@ void errands_task_properties_close(ErrandsTaskProperties *self) {
   if (!icalrecurrence_compare(new_rrule, old_rrule)) {
     errands_task_item_set_rrule(self->item, new_rrule);
     if (icaltime_is_null_date(new_sdt) && new_rrule && new_rrule->freq != ICAL_NO_RECURRENCE) {
-      icaltimetype now = icaltime_now();
-      errands_task_item_set_dtstart(self->item, &now);
+      icaltimetype start = errands_default_dtstart(new_ddt);
+      errands_task_item_set_dtstart(self->item, &start);
     }
   }
   if (new_rrule && icaltime_is_null_date(new_sdt)) {
-    icaltimetype now = icaltime_now();
-    errands_task_item_set_dtstart(self->item, &now);
+    icaltimetype start = errands_default_dtstart(new_ddt);
+    errands_task_item_set_dtstart(self->item, &start);
     icalrecurrencetype_unref(new_rrule);
   }
+  // Keep DTSTART and DUE the same value type (DATE vs DATE-TIME)
+  icaltimetype cur_sdt = errands_task_item_get_dtstart(self->item);
+  if (errands_match_dtstart_to_due(&cur_sdt, errands_task_item_get_dtend(self->item)))
+    errands_task_item_set_dtstart(self->item, &cur_sdt);
 
   // Notes
   GtkTextIter start, end;
