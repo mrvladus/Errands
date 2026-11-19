@@ -191,7 +191,9 @@ template $ErrandsTaskList: Adw.Bin {
 
             ListView list_view {
               enable-rubberband: false;
-              // margin-end: 14;
+              single-click-activate: false;
+              tab-behavior: item;
+
               factory: SignalListItemFactory {
                 setup => $on_setup_item_cb();
                 bind => $on_bind_item_cb();

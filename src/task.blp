@@ -30,6 +30,11 @@ template $ErrandsTask: Box {
     drop => $on_drop_cb(template) not-swapped;
   }
 
+  GestureClick {
+    button: 1;
+    released => $on_click_released_cb(template);
+  }
+
   // Title Box
   Box {
     spacing: 6;

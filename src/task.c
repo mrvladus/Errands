@@ -40,6 +40,7 @@ static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointe
 static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self);
 static void on_drop_motion_ctrl_enter_cb(ErrandsTask *self);
 static void on_progressbar_fraction_changed_cb(ErrandsTask *self);
+static void on_click_released_cb(ErrandsTask *self, gint n_press);
 
 static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *self);
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
@@ -232,6 +233,7 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_progressbar_fraction_changed_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_click_released_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_motion_ctrl_enter_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_prepare_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_begin_cb);
@@ -447,6 +449,11 @@ static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
 static void on_progressbar_fraction_changed_cb(ErrandsTask *self) {
   gfloat curr = gtk_progress_bar_get_fraction(GTK_PROGRESS_BAR(self->progress_bar));
   gtk_widget_set_visible(self->progress_bar, curr > 0.0);
+}
+
+static void on_click_released_cb(ErrandsTask *self, gint n_press) {
+  if (n_press != 1) return;
+  errands_task_properties_show_properties(state.main_window->task_list->properties, self->item);
 }
 
 // --- DND CALLBACKS --- //
