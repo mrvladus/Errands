@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-14 15:27+0000\n"
-"PO-Revision-Date: 2026-11-15 08:19+0800\n"
+"POT-Creation-Date: 2026-11-18 12:08+0000\n"
+"PO-Revision-Date: 2026-11-19 08:03+0800\n"
 "Last-Translator: lumingzh <lumingzh@qq.com>\n"
 "Language-Team: Chinese (China) <i18n-zh@googlegroups.com>\n"
 "Language: zh_CN\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Gtranslator 51.0\n"
 
-#: ../src/about-dialog.h:15 ../src/sidebar.blp:13 ../src/window.blp:8
+#: ../src/about-dialog.h:15 ../src/sidebar.blp:27 ../src/window.blp:7
 msgid "Errands"
 msgstr "Errands"
 
@@ -84,159 +84,147 @@ msgstr "永远重复"
 msgid "Repeat %zu times"
 msgstr "重复 %zu 次"
 
-#: ../src/sidebar.c:290
+#: ../src/sidebar.c:319
 msgid "Only .ics files are supported"
 msgstr "仅支持 .ics 文件"
 
-#: ../src/sidebar.c:295
+#: ../src/sidebar.c:324
 msgid "Can't load list. It's incorrect or already exists"
 msgstr "无法加载列表。列表不正确或已经存在"
 
-#: ../src/sync.c:287
+#: ../src/sync.c:303
 #, c-format
 msgid "Added remote task list: %s"
 msgstr "已添加远程任务列表：%s"
 
-#: ../src/sync.c:520
+#: ../src/sync.c:536
 msgid "Sync Failed"
 msgstr "同步失败"
 
-#: ../src/task.c:120
+#: ../src/task.c:123
 msgctxt "Start date"
 msgid "Start"
 msgstr "开始"
 
-#: ../src/task.c:138
+#: ../src/task.c:141
 msgctxt "Due date"
 msgid "Due"
 msgstr "截止"
 
-#: ../src/task.c:320
+#: ../src/task.c:324
 msgid "Copied to Clipboard"
 msgstr "已复制到剪贴板"
 
-#: ../src/task.c:353
+#: ../src/task.c:361
 msgid "Failed to Export"
 msgstr "导出失败"
 
-#: ../src/task.c:356 ../src/task-list.c:302
+#: ../src/task.c:364 ../src/task-list.c:314
 msgid "Exported"
 msgstr "已导出"
 
-#: ../src/task-item.c:748
+#: ../src/task-item.c:756
 msgid "Can't make task a sub-task of itself."
 msgstr "无法使任务成为其自身的子任务。"
 
-#: ../src/task-item.c:869
+#: ../src/task-item.c:877
 msgctxt "Priority"
 msgid "High"
 msgstr "高"
 
-#: ../src/task-item.c:870
+#: ../src/task-item.c:878
 msgctxt "Priority"
 msgid "Medium"
 msgstr "中"
 
-#: ../src/task-item.c:871
+#: ../src/task-item.c:879
 msgctxt "Priority"
 msgid "Low"
 msgstr "低"
 
-#: ../src/task-item.c:872
+#: ../src/task-item.c:880
 msgctxt "Priority"
 msgid "None"
 msgstr "无"
 
-#: ../src/task-item.c:904
+#: ../src/task-item.c:912
 #, c-format
 msgid "Every second"
 msgid_plural "Every %d seconds"
 msgstr[0] "每 %d 秒"
 
-#: ../src/task-item.c:905
+#: ../src/task-item.c:913
 #, c-format
 msgid "Every minute"
 msgid_plural "Every %d minutes"
 msgstr[0] "每 %d 分钟"
 
-#: ../src/task-item.c:906
+#: ../src/task-item.c:914
 #, c-format
 msgid "Every hour"
 msgid_plural "Every %d hours"
 msgstr[0] "每 %d 小时"
 
-#: ../src/task-item.c:907
+#: ../src/task-item.c:915
 #, c-format
 msgid "Every day"
 msgid_plural "Every %d days"
 msgstr[0] "每 %d 天"
 
-#: ../src/task-item.c:908
+#: ../src/task-item.c:916
 #, c-format
 msgid "Every week"
 msgid_plural "Every %d weeks"
 msgstr[0] "每 %d 周"
 
-#: ../src/task-item.c:909
+#: ../src/task-item.c:917
 #, c-format
 msgid "Every month"
 msgid_plural "Every %d months"
 msgstr[0] "每 %d 个月"
 
-#: ../src/task-item.c:910
+#: ../src/task-item.c:918
 #, c-format
 msgid "Every year"
 msgid_plural "Every %d years"
 msgstr[0] "每 %d 年"
 
-#: ../src/task-item.c:921
+#: ../src/task-item.c:929
 #, c-format
 msgid " until %s"
 msgstr "直到 %s"
 
-#: ../src/task-item.c:922
+#: ../src/task-item.c:930
 #, c-format
 msgid " once"
 msgid_plural " %d times"
 msgstr[0] " %d 次"
 
-#: ../src/task-list.c:291 ../src/task-list.c:296
+#: ../src/task-list.c:303 ../src/task-list.c:308
 msgid "Export failed"
 msgstr "导出失败"
 
-#: ../src/task-list.c:322 ../src/task-list.c:334
+#: ../src/task-list.c:334 ../src/task-list.c:346
 msgid "No tasks to delete"
 msgstr "没有可删除的任务"
 
-#: ../src/task-list.c:327 ../src/task-list.c:339
+#: ../src/task-list.c:339 ../src/task-list.c:351
 #, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
 msgstr[0] "已删除 %d 个任务"
 
-#: ../src/task-list.c:486 ../src/sidebar.blp:110
+#: ../src/task-list.c:498 ../src/sidebar.blp:137
 msgid "All Tasks"
 msgstr "所有任务"
 
-#: ../src/task-list.c:490 ../src/sidebar.blp:123
+#: ../src/task-list.c:502 ../src/sidebar.blp:150
 msgid "Tasks for Today"
 msgstr "今日任务"
 
 #: ../src/task-list-item.c:150
 msgid "Untitled"
 msgstr "无标题"
-
-#: ../src/window.c:118
-msgid "Remove Attachment"
-msgstr "移除附件"
-
-#: ../src/window.c:149
-msgid "Enable Tag"
-msgstr "启用标签"
-
-#: ../src/window.c:155
-msgid "Remove Tag"
-msgstr "移除标签"
 
 #: ../src/date-chooser.blp:13
 msgid "Reset"
@@ -446,8 +434,8 @@ msgstr "杂项"
 msgid "Run in the Background"
 msgstr "后台运行"
 
-#: ../src/settings-dialog.blp:58 ../src/shortcuts-dialog.blp:49
-#: ../src/sidebar.blp:64 ../src/sidebar.blp:95
+#: ../src/settings-dialog.blp:58 ../src/shortcuts-dialog.blp:79
+#: ../src/sidebar.blp:87 ../src/sidebar.blp:122
 msgid "Sync"
 msgstr "同步"
 
@@ -479,7 +467,7 @@ msgstr "密码"
 msgid "General"
 msgstr "常规"
 
-#: ../src/shortcuts-dialog.blp:12 ../src/sidebar.blp:68
+#: ../src/shortcuts-dialog.blp:12 ../src/sidebar.blp:91
 msgid "Preferences"
 msgstr "首选项"
 
@@ -500,64 +488,88 @@ msgid "Task List"
 msgstr "任务列表"
 
 #: ../src/shortcuts-dialog.blp:37
+msgid "Add Task List"
+msgstr "添加任务列表"
+
+#: ../src/shortcuts-dialog.blp:42
 msgid "Toggle Search"
 msgstr "切换搜索"
 
-#: ../src/shortcuts-dialog.blp:42
+#: ../src/shortcuts-dialog.blp:47
 msgid "New Toplevel Task"
 msgstr "新建顶级任务"
 
 #: ../src/shortcuts-dialog.blp:52
+msgid "Switch to the next Task List"
+msgstr "切换至下个任务列表"
+
+#: ../src/shortcuts-dialog.blp:57
+msgid "Switch to the previous Task List"
+msgstr "切换至上个任务列表"
+
+#: ../src/shortcuts-dialog.blp:62
+msgid "Toggle sidebar"
+msgstr "切换侧边栏"
+
+#: ../src/shortcuts-dialog.blp:67
+msgid "Open Task List Menu"
+msgstr "打开任务列表菜单"
+
+#: ../src/shortcuts-dialog.blp:72
+msgid "Open \"Sort / Filter\" Menu"
+msgstr "打开“排序/筛选”菜单"
+
+#: ../src/shortcuts-dialog.blp:82
 msgid "Sync Now"
 msgstr "立即同步"
 
-#: ../src/sidebar.blp:19
-msgid "Add Task List"
-msgstr "添加任务列表"
+#: ../src/sidebar.blp:33
+msgid "Add Task List (Ctrl+L)"
+msgstr "添加任务列表（Ctrl+L）"
 
-#: ../src/sidebar.blp:28
+#: ../src/sidebar.blp:42
 msgid "Import \".ics\" file"
 msgstr "导入“.ics”文件"
 
-#: ../src/sidebar.blp:37
+#: ../src/sidebar.blp:51
 msgid "New list name"
 msgstr "新列表名称"
 
-#: ../src/sidebar.blp:43
+#: ../src/sidebar.blp:57
 msgid "Create"
 msgstr "创建"
 
-#: ../src/sidebar.blp:60
+#: ../src/sidebar.blp:83
 msgid "Main Menu (F10)"
 msgstr "主菜单（F10）"
 
-#: ../src/sidebar.blp:69
+#: ../src/sidebar.blp:92
 msgid "Shortcuts"
 msgstr "快捷键"
 
-#: ../src/sidebar.blp:70
+#: ../src/sidebar.blp:93
 msgid "About Errands"
 msgstr "关于 Errands"
 
-#: ../src/sidebar.blp:109
+#: ../src/sidebar.blp:136
 msgctxt "All Tasks"
 msgid "All"
 msgstr "全部"
 
-#: ../src/sidebar.blp:122
+#: ../src/sidebar.blp:149
 msgctxt "Tasks for Today"
 msgid "Today"
 msgstr "今天"
 
-#: ../src/sidebar.blp:136
+#: ../src/sidebar.blp:163
 msgid "Task Lists"
 msgstr "任务列表"
 
-#: ../src/sidebar.blp:141
+#: ../src/sidebar.blp:168
 msgid "No Task Lists"
 msgstr "没有任务列表"
 
-#: ../src/sidebar.blp:142
+#: ../src/sidebar.blp:169
 msgid "Create new or import “.ics”"
 msgstr "新建或导入“.ics”"
 
@@ -573,11 +585,11 @@ msgstr "恢复"
 msgid "Toggle Sub-Tasks Entry"
 msgstr "切换子任务条目"
 
-#: ../src/task.blp:134 ../src/window.blp:77
+#: ../src/task.blp:134
 msgid "Properties"
 msgstr "属性"
 
-#: ../src/task.blp:135 ../src/task.blp:273 ../src/window.blp:131
+#: ../src/task.blp:135 ../src/task.blp:273
 msgid "Notes"
 msgstr "备注"
 
@@ -597,7 +609,7 @@ msgstr "任务颜色"
 msgid "Clear Color"
 msgstr "清除颜色"
 
-#: ../src/task.blp:150 ../src/task.blp:209 ../src/task-list.blp:73
+#: ../src/task.blp:150 ../src/task.blp:209 ../src/task-list.blp:88
 msgid "Priority"
 msgstr "优先级"
 
@@ -617,7 +629,7 @@ msgstr "中"
 msgid "High"
 msgstr "高"
 
-#: ../src/task.blp:179 ../src/task-list.blp:92
+#: ../src/task.blp:179 ../src/task-list.blp:117
 msgid "Export as \".ics\""
 msgstr "导出为“.ics”"
 
@@ -629,7 +641,7 @@ msgstr "取消/恢复"
 msgid "Start"
 msgstr "开始"
 
-#: ../src/task.blp:236 ../src/task-list.blp:61 ../src/window.blp:85
+#: ../src/task.blp:236 ../src/task-list.blp:76
 msgid "Start Date"
 msgstr "开始日期"
 
@@ -637,11 +649,11 @@ msgstr "开始日期"
 msgid "Due"
 msgstr "截止"
 
-#: ../src/task.blp:252 ../src/task-list.blp:67 ../src/window.blp:93
+#: ../src/task.blp:252 ../src/task-list.blp:82
 msgid "Due Date"
 msgstr "截止日期"
 
-#: ../src/task.blp:283 ../src/task.blp:289 ../src/window.blp:105
+#: ../src/task.blp:283 ../src/task.blp:289
 msgid "Attachments"
 msgstr "附件"
 
@@ -650,108 +662,133 @@ msgid "Add Sub-Task"
 msgstr "添加子任务"
 
 #: ../src/task-list.blp:18
-msgid "Sort / Filter"
-msgstr "排序/筛选"
+msgid "Toggle Sidebar (Ctrl+B)"
+msgstr "切换侧边栏（Ctrl+B）"
 
-#: ../src/task-list.blp:22
+#: ../src/task-list.blp:33
+msgid "Sort / Filter (Ctrl+Shift+F)"
+msgstr "排序/筛选（Ctrl+Shift+F）"
+
+#: ../src/task-list.blp:37
 msgid "Show Tasks"
 msgstr "显示任务"
 
-#: ../src/task-list.blp:25
+#: ../src/task-list.blp:40
 msgid "Completed"
 msgstr "已完成"
 
-#: ../src/task-list.blp:30
+#: ../src/task-list.blp:45
 msgid "Cancelled"
 msgstr "已取消"
 
-#: ../src/task-list.blp:36
+#: ../src/task-list.blp:51
 msgid "Sort Order"
 msgstr "排序"
 
-#: ../src/task-list.blp:39
+#: ../src/task-list.blp:54
 msgid "Descending"
 msgstr "降序"
 
-#: ../src/task-list.blp:45
+#: ../src/task-list.blp:60
 msgid "Ascending"
 msgstr "升序"
 
-#: ../src/task-list.blp:52
+#: ../src/task-list.blp:67
 msgid "Sort By"
 msgstr "排序方式"
 
-#: ../src/task-list.blp:55
+#: ../src/task-list.blp:70
 msgid "Created"
 msgstr "已创建"
 
-#: ../src/task-list.blp:88
+#: ../src/task-list.blp:107
+msgid "Task List Menu (Ctrl+M)"
+msgstr "任务列表菜单（Ctrl+M）"
+
+#: ../src/task-list.blp:113
 msgid "Rename List"
 msgstr "重命名列表"
 
-#: ../src/task-list.blp:93
+#: ../src/task-list.blp:118
 msgid "Print"
 msgstr "打印"
 
-#: ../src/task-list.blp:97
+#: ../src/task-list.blp:122
 msgid "Delete Completed"
 msgstr "删除已完成任务"
 
-#: ../src/task-list.blp:98
+#: ../src/task-list.blp:123
 msgid "Delete Cancelled"
 msgstr "删除已取消任务"
 
-#: ../src/task-list.blp:102
+#: ../src/task-list.blp:127
 msgid "Delete List"
 msgstr "删除列表"
 
-#: ../src/task-list.blp:110
+#: ../src/task-list.blp:144
 msgid "Search (Ctrl+F)"
 msgstr "搜索（Ctrl+F）"
 
-#: ../src/task-list.blp:143
-msgid "Add Task"
-msgstr "添加任务"
-
-#: ../src/task-list.blp:144
-msgid "Add Task (Ctrl+N)"
-msgstr "添加任务（Ctrl+N）"
-
-#: ../src/task-list.blp:162
-msgid "Add Task (Ctrl+Return)"
-msgstr "添加任务（Ctrl+Return）"
-
-#: ../src/task-list.blp:186
+#: ../src/task-list.blp:183
 msgid "No Tasks"
 msgstr "没有任务"
 
 #: ../src/task-list.blp:213
+msgid "Add Task"
+msgstr "添加任务"
+
+#: ../src/task-list.blp:214
+msgid "Add Task (Ctrl+N)"
+msgstr "添加任务（Ctrl+N）"
+
+#: ../src/task-list.blp:218
+msgid ""
+"<b>Inline properties syntax:</b>\n"
+"\n"
+"<b>##tag</b>  Add tag.\n"
+"<b>#pN</b>     Set priority. <b>N</b> is number in range <b>0..9</b>."
+msgstr ""
+"<b>内联属性语法：</b>\n"
+"\n"
+"<b>##tag</b>  添加标签。\n"
+"<b>#pN</b>     设置优先级。<b>N</b> 是在 <b>0..9</b> 范围内的数字。"
+
+#: ../src/task-list.blp:236
+msgid "Add Task (Ctrl+Return)"
+msgstr "添加任务（Ctrl+Return）"
+
+#: ../src/task-list.blp:264
 msgid "Loading Tasks"
 msgstr "正在加载任务"
 
-#: ../src/window.blp:41
+#: ../src/window.blp:40
 msgid "Sidebar"
 msgstr "侧边栏"
 
-#: ../src/window.blp:48
+#: ../src/window.blp:47
 msgid "Content"
 msgstr "内容"
 
-#: ../src/window.blp:82
-msgid "Date and Time"
-msgstr "日期和时间"
+#~ msgid "Remove Attachment"
+#~ msgstr "移除附件"
 
-#: ../src/window.blp:110
-msgid "Add Attachment"
-msgstr "添加附件"
+#~ msgid "Enable Tag"
+#~ msgstr "启用标签"
 
-#: ../src/window.blp:117
-msgid "Tags"
-msgstr "标签"
+#~ msgid "Remove Tag"
+#~ msgstr "移除标签"
 
-#: ../src/window.blp:122
-msgid "New Tag"
-msgstr "新建标签"
+#~ msgid "Date and Time"
+#~ msgstr "日期和时间"
+
+#~ msgid "Add Attachment"
+#~ msgstr "添加附件"
+
+#~ msgid "Tags"
+#~ msgstr "标签"
+
+#~ msgid "New Tag"
+#~ msgstr "新建标签"
 
 #, c-format
 #~ msgid "Removed remote task list: %s"
