@@ -22,6 +22,7 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include <math.h>
 
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
 
@@ -277,6 +278,8 @@ static void on_sidebar_activated_cb(AdwSidebar *self, guint index, gpointer user
   }
   adw_navigation_split_view_set_show_content(state.main_window->split_view, true);
   adw_overlay_split_view_set_show_sidebar(state.main_window->task_list->overlay_split_view, false);
+  gboolean collapsed = adw_navigation_split_view_get_collapsed(state.main_window->split_view);
+  if (collapsed) adw_sidebar_set_selected(self, GTK_INVALID_LIST_POSITION);
 }
 
 static void on_entry_changed_cb(ErrandsSidebar *self, GtkEntry *entry) {

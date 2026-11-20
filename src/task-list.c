@@ -64,7 +64,7 @@ static void on_task_lists_changed_cb(GListModel *lists, guint position, guint re
   g_list_store_splice(self->toplevel_tasks_models, position, removed, tasks->pdata, tasks->len);
 }
 
-G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
+G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BREAKPOINT_BIN)
 
 static void finalize(GObject *gobject) {
   ErrandsTaskList *self = ERRANDS_TASK_LIST(gobject);
@@ -523,7 +523,8 @@ void errands_task_list_update(ErrandsTaskList *self) {
       if (errands_data_is_completed(task)) completed++;
       total++;
     }
-    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), tmp_str_printf("Completed: %d / %d", completed, total));
+    const char *subtitle = tmp_str_printf("Completed: %d / %d", completed, total);
+    adw_window_title_set_subtitle(ADW_WINDOW_TITLE(self->title), subtitle);
   } break;
   }
   adw_window_title_set_title(ADW_WINDOW_TITLE(self->title), title);

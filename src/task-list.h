@@ -15,7 +15,7 @@ typedef enum {
 } ErrandsTaskListPage;
 
 #define ERRANDS_TYPE_TASK_LIST (errands_task_list_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST, AdwBin)
+G_DECLARE_FINAL_TYPE(ErrandsTaskList, errands_task_list, ERRANDS, TASK_LIST, AdwBreakpointBin)
 
 struct _ErrandsTaskList {
   AdwBin parent_instance;

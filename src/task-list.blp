@@ -3,13 +3,25 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $ErrandsTaskList: Adw.Bin {
+template $ErrandsTaskList: Adw.BreakpointBin {
+  width-request: 360;
+  height-request: 200;
+
+  Adw.Breakpoint {
+    condition ("max-width: 610")
+
+    setters {
+      sidebar_btn.visible: false;
+    }
+  }
+
   Overlay {
     child: Adw.ToolbarView tb_view {
       [top]
       Adw.HeaderBar {
         title-widget: Adw.WindowTitle title {
           title: _("Task List");
+          tooltip-text: bind title.subtitle;
         };
 
         [start]

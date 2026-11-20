@@ -8,7 +8,7 @@
 #include <adwaita.h>
 
 #define ERRANDS_TYPE_TASK_PROPERTIES (errands_task_properties_get_type())
-G_DECLARE_FINAL_TYPE(ErrandsTaskProperties, errands_task_properties, ERRANDS, TASK_PROPERTIES, AdwToolbarView)
+G_DECLARE_FINAL_TYPE(ErrandsTaskProperties, errands_task_properties, ERRANDS, TASK_PROPERTIES, AdwBin)
 
 ErrandsTaskProperties *errands_task_properties_new();
 void errands_task_properties_show_properties(ErrandsTaskProperties *self, ErrandsTaskItem *item);
