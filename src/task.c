@@ -323,6 +323,7 @@ void errands_task_set_item(ErrandsTask *self, ErrandsTaskItem *item) {
   g_object_set(self, "item", item, NULL);
   g_object_set(item, "task-widget", self, NULL);
   errands_task_add_binding(self, g_object_bind_property(item, "color", self, "color", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "title", self->title, "label", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "priority", self, "priority", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "notes", self, "notes", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "dtstart", self, "dtstart", G_BINDING_SYNC_CREATE));
