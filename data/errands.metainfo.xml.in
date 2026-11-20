@@ -60,6 +60,21 @@
     <display_length compare="ge">360</display_length>
   </requires>
   <releases>
+    <release version="51.2.1" date="2026-11-20">
+        <description translate="no">
+            <ul>
+                <li>Moved priority and task color to the properties sidebar</li>
+                <li>Added click on task to open properties action</li>
+                <li
+                    >Fixed multiple sync, search, task list and Today page view bugs by @amadeusp</li>
+            </ul>
+            <p>Added / Updated translations:</p>
+            <ul>
+            <li>Chinese</li>
+            </ul>
+            <p>Thanks to everyone on Damned Lies!</p>
+        </description>
+    </release>
     <release version="51.2" date="2026-11-18">
         <description translate="no">
             <ul>
