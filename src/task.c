@@ -232,6 +232,7 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, drop_motion_ctrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, progress_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, counter);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, cancel_btn);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated_cb);
@@ -324,6 +325,7 @@ void errands_task_set_item(ErrandsTask *self, ErrandsTaskItem *item) {
   g_object_set(item, "task-widget", self, NULL);
   errands_task_add_binding(self, g_object_bind_property(item, "color", self, "color", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "title", self->title, "label", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "cancelled", self->cancel_btn, "visible", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "priority", self, "priority", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "notes", self, "notes", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "dtstart", self, "dtstart", G_BINDING_SYNC_CREATE));

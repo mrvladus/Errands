@@ -38,6 +38,7 @@ struct _ErrandsTask {
   GtkWidget *sub_entry;
   GtkWidget *progress_bar;
   GtkWidget *counter;
+  GtkWidget *cancel_btn;
   GtkDropControllerMotion *drop_motion_ctrl;
 
   // Property bindings to the current item. Row widgets are recycled by the list view,
