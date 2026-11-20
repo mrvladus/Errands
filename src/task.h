@@ -39,6 +39,10 @@ struct _ErrandsTask {
   GtkWidget *progress_bar;
   GtkDropControllerMotion *drop_motion_ctrl;
 
+  // Property bindings to the current item. Row widgets are recycled by the list view,
+  // so these must be released before the widget is bound to another item.
+  GPtrArray *bindings;
+
   // GObject Properties
   ErrandsTaskItem *item;
   const char *color;
@@ -53,3 +57,5 @@ struct _ErrandsTask {
 
 ErrandsTask *errands_task_new();
 void errands_task_set_item(ErrandsTask *task, ErrandsTaskItem *item);
+void errands_task_unbind_item(ErrandsTask *task);
+void errands_task_add_binding(ErrandsTask *task, GBinding *binding);
