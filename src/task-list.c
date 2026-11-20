@@ -47,8 +47,8 @@ static void on_action_show_cancelled_cb(GSimpleAction *action, GVariant *param, 
 static void on_action_sort_order_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 static void on_action_sort_by_cb(GSimpleAction *action, GVariant *param, ErrandsTaskList *self);
 
-static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self);
-static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
+static gboolean today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self);
+static gboolean tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self);
 static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *self);
 
 // ---------- WIDGET TEMPLATE ---------- //
@@ -179,7 +179,7 @@ static gboolean task_match_search(ErrandsTaskItem *item, const char *query, gboo
   return matched;
 }
 
-static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
+static gboolean today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
   // Match task
   if (errands_task_item_is_due(item)) return true;
   // Match parent tasks
@@ -194,7 +194,7 @@ static bool today_filter_func(ErrandsTaskItem *item, ErrandsTaskList *self) {
   return false;
 }
 
-static bool tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
+static gboolean tree_filter_func(GtkTreeListRow *row, ErrandsTaskList *self) {
   g_autoptr(ErrandsTaskItem) item = gtk_tree_list_row_get_item(row);
   if (!errands_settings_get_show_completed(state.settings) && errands_task_item_get_completed(item)) return false;
   if (!errands_settings_get_show_cancelled(state.settings) && errands_task_item_get_cancelled(item)) return false;
