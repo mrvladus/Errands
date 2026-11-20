@@ -49,7 +49,7 @@ struct _ErrandsTask {
   const char *notes;
   icaltimetype dtstart;
   icaltimetype dtend;
-  gint priority;
+  guint priority;
   GStrv tags;
   GStrv attachments;
   struct icalrecurrencetype *rrule;

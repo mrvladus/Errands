@@ -38,7 +38,7 @@ struct _ErrandsTaskItem {
   gchar *notes;
   gboolean completed;
   gboolean cancelled;
-  gint priority;
+  guint priority;
   gfloat percent_complete;
   icaltimetype dtstart;
   icaltimetype dtend;
@@ -99,7 +99,7 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   case PROP_COMPLETED: g_value_set_boolean(value, self->completed); break;
   case PROP_CANCELLED: g_value_set_boolean(value, self->cancelled); break;
   case PROP_COLOR: g_value_set_string(value, self->color); break;
-  case PROP_PRIORITY: g_value_set_int(value, self->priority); break;
+  case PROP_PRIORITY: g_value_set_uint(value, self->priority); break;
   case PROP_PERCENT_COMPLETE: g_value_set_float(value, self->percent_complete); break;
   case PROP_NOTES: g_value_set_string(value, self->notes); break;
   case PROP_DTSTART: g_value_set_pointer(value, &self->dtstart); break;
@@ -206,7 +206,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
 
   case PROP_PRIORITY: {
-    gint new_priority = CLAMP(g_value_get_int(value), 0, 10);
+    guint new_priority = CLAMP(g_value_get_uint(value), 0, 9);
     if (new_priority == self->priority) break;
     self->priority = new_priority;
     errands_data_set_priority(self->ical, self->priority);
@@ -381,7 +381,7 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
   obj_properties[PROP_CANCELLED] =
       g_param_spec_boolean("cancelled", "Cancelled", "Whether the task is cancelled", FALSE, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Task Color", "Color of the task", NULL, G_PARAM_READWRITE);
-  obj_properties[PROP_PRIORITY] = g_param_spec_int("priority", "Priority", "Priority of the task", 0, 10, 0, G_PARAM_READWRITE);
+  obj_properties[PROP_PRIORITY] = g_param_spec_uint("priority", "Priority", "Priority of the task", 0, 10, 0, G_PARAM_READWRITE);
   obj_properties[PROP_PERCENT_COMPLETE] = g_param_spec_float("percent-complete", "Percent Complete",
                                                              "Completion percent of the task", 0.0, 1.0, 0.0, G_PARAM_READWRITE);
   obj_properties[PROP_NOTES] = g_param_spec_string("notes", "Notes", "Notes of the task", NULL, G_PARAM_READWRITE);
@@ -848,7 +848,7 @@ ErrandsTaskListItem *errands_task_item_get_list(ErrandsTaskItem *self) { return 
 const char *errands_task_item_get_uid(ErrandsTaskItem *self) { return self->uid; }
 const char *errands_task_item_get_title(ErrandsTaskItem *self) { return self->title; }
 icalcomponent *errands_task_item_get_ical(ErrandsTaskItem *self) { return self->ical; }
-gint errands_task_item_get_priority(ErrandsTaskItem *self) { return self->priority; }
+guint errands_task_item_get_priority(ErrandsTaskItem *self) { return self->priority; }
 gboolean errands_task_item_get_completed(ErrandsTaskItem *self) { return self->completed; }
 gboolean errands_task_item_get_cancelled(ErrandsTaskItem *self) { return self->cancelled; }
 const char *errands_task_item_get_notes(ErrandsTaskItem *self) { return self->notes; }
@@ -944,15 +944,7 @@ void errands_task_item_set_cancelled(ErrandsTaskItem *self, gboolean cancelled) 
 void errands_task_item_set_search_matched(ErrandsTaskItem *self, gboolean matched) {
   g_object_set(self, "search-matched", matched, NULL);
 }
-void errands_task_item_set_priority(ErrandsTaskItem *self, gint priority) { g_object_set(self, "priority", priority, NULL); }
-void errands_task_item_set_priority_from_string(ErrandsTaskItem *self, const char *priority) {
-  gint p = 0;
-  if (!priority || g_str_equal(priority, "none")) p = 0;
-  else if (g_str_equal(priority, "low")) p = 10;
-  else if (g_str_equal(priority, "medium")) p = 6;
-  else if (g_str_equal(priority, "high")) p = 1;
-  g_object_set(self, "priority", p, NULL);
-}
+void errands_task_item_set_priority(ErrandsTaskItem *self, guint priority) { g_object_set(self, "priority", priority, NULL); }
 void errands_task_item_set_notes(ErrandsTaskItem *self, const char *notes) { g_object_set(self, "notes", notes, NULL); }
 void errands_task_item_set_color(ErrandsTaskItem *self, const char *color) { g_object_set(self, "color", color, NULL); }
 void errands_task_item_set_dtstart(ErrandsTaskItem *self, const icaltimetype *dtstart) {

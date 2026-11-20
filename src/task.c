@@ -33,7 +33,6 @@ static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTas
 static void on_cancel_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_delete_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_priority_action_cb(GSimpleAction *action, GVariant *value, ErrandsTask *self);
 
 // Callbacks
 static void on_title_edit_cb(GtkEditableLabel *label, GParamSpec *pspec, gpointer user_data);
@@ -89,15 +88,9 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
 
   case PROP_PRIORITY: {
-    self->priority = g_value_get_int(value);
-    // Update action state
-    GSimpleAction *priority_action = G_SIMPLE_ACTION(g_action_map_lookup_action(G_ACTION_MAP(self->ag), "priority"));
-    GVariant *value = g_variant_new_string(errands_task_item_get_priority_as_string(self->item));
-    g_simple_action_set_state(priority_action, value);
-    // UI
+    self->priority = g_value_get_uint(value);
     gtk_label_set_label(GTK_LABEL(self->priority_label), errands_task_item_get_priority_as_tstring(self->item));
     gtk_widget_set_visible(self->priority_box, self->priority > 0);
-
     errands_task_update_toolbar(self);
   } break;
 
@@ -198,7 +191,7 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   obj_properties[PROP_ITEM] =
       g_param_spec_object("item", "Task Item", "Task item associated with the task.", ERRANDS_TYPE_TASK_ITEM, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Color", "Color of the task.", NULL, G_PARAM_READWRITE);
-  obj_properties[PROP_PRIORITY] = g_param_spec_int("priority", "Priority", "Priority of the task.", 0, 10, 0, G_PARAM_READWRITE);
+  obj_properties[PROP_PRIORITY] = g_param_spec_uint("priority", "Priority", "Priority of the task.", 0, 10, 0, G_PARAM_READWRITE);
   obj_properties[PROP_NOTES] = g_param_spec_string("notes", "Notes", "Notes of the task.", NULL, G_PARAM_WRITABLE);
   obj_properties[PROP_DTSTART] = g_param_spec_pointer("dtstart", "Start Date", "Start date of the task.", G_PARAM_WRITABLE);
   obj_properties[PROP_DTEND] = g_param_spec_pointer("dtend", "End Date", "End date of the task.", G_PARAM_WRITABLE);
@@ -255,8 +248,6 @@ static void errands_task_init(ErrandsTask *self) {
   errands_add_action(self->ag, "cancel", on_cancel_action_cb, self, NULL);
   errands_add_action(self->ag, "delete", on_delete_action_cb, self, NULL);
   errands_add_action(self->ag, "export", on_export_action_cb, self, NULL);
-  errands_add_stateful_action(self->ag, "priority", G_VARIANT_TYPE_STRING, g_variant_new_string("none"), on_priority_action_cb,
-                              self);
 }
 
 ErrandsTask *errands_task_new() { return g_object_new(ERRANDS_TYPE_TASK, NULL); }
@@ -351,11 +342,6 @@ static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTas
   GdkClipboard *clipboard = gdk_display_get_clipboard(gtk_widget_get_display(GTK_WIDGET(self)));
   gdk_clipboard_set(clipboard, G_TYPE_STRING, text);
   errands_window_add_toast(_("Copied to Clipboard"), 1);
-}
-
-static void on_priority_action_cb(GSimpleAction *action, GVariant *value, ErrandsTask *self) {
-  g_simple_action_set_state(action, value);
-  errands_task_item_set_priority_from_string(self->item, g_variant_get_string(value, NULL));
 }
 
 static void on_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {

@@ -36,7 +36,7 @@ const char *errands_task_item_get_title(ErrandsTaskItem *self);
 icalcomponent *errands_task_item_get_ical(ErrandsTaskItem *self);
 gboolean errands_task_item_get_completed(ErrandsTaskItem *self);
 gboolean errands_task_item_get_cancelled(ErrandsTaskItem *self);
-gint errands_task_item_get_priority(ErrandsTaskItem *self);
+guint errands_task_item_get_priority(ErrandsTaskItem *self);
 const char *errands_task_item_get_priority_as_string(ErrandsTaskItem *self);
 // Get priority as translated string
 const char *errands_task_item_get_priority_as_tstring(ErrandsTaskItem *self);
@@ -67,8 +67,7 @@ void errands_task_item_set_parent(ErrandsTaskItem *self, ErrandsTaskItem *parent
 void errands_task_item_set_title(ErrandsTaskItem *self, const char *title);
 void errands_task_item_set_completed(ErrandsTaskItem *self, gboolean completed);
 void errands_task_item_set_cancelled(ErrandsTaskItem *self, gboolean cancelled);
-void errands_task_item_set_priority(ErrandsTaskItem *self, gint priority);
-void errands_task_item_set_priority_from_string(ErrandsTaskItem *self, const char *priority);
+void errands_task_item_set_priority(ErrandsTaskItem *self, guint priority);
 void errands_task_item_set_notes(ErrandsTaskItem *self, const char *notes);
 void errands_task_item_set_color(ErrandsTaskItem *self, const char *color);
 void errands_task_item_set_dtstart(ErrandsTaskItem *self, const icaltimetype *dtstart);

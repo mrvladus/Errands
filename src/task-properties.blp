@@ -45,6 +45,23 @@ template $ErrandsTaskProperties: Adw.Bin {
             $ErrandsRruleRow rrule_row {}
           }
 
+          Adw.PreferencesGroup {
+            title: _("Priority");
+
+            Adw.ComboRow priority {
+              title: _("Level");
+
+              model: StringList {
+                strings [
+                  _("None"),
+                  _("Low"),
+                  _("Medium"),
+                  _("High"),
+                ]
+              };
+            }
+          }
+
           Adw.PreferencesGroup attachments {
             title: _("Attachments");
           }

@@ -5,6 +5,7 @@ using Adw 1;
 
 template $ErrandsTask: Box {
   orientation: vertical;
+  tooltip-text: _("Open Properties");
 
   styles [
     "card",
@@ -128,6 +129,7 @@ template $ErrandsTask: Box {
       // Properties menu
       MenuButton {
         icon-name: "errands-more-symbolic";
+        tooltip-text: _("Task Menu");
         valign: center;
 
         popover: PopoverMenu popover_menu {
@@ -148,36 +150,6 @@ template $ErrandsTask: Box {
             section {
               item (_("Task Color"), "task.color")
               item (_("Clear Color"), "task.clear-color")
-            }
-
-            section {
-              submenu {
-                label: _("Priority");
-
-                item {
-                  label: _("None");
-                  action: "task.priority";
-                  target: "none";
-                }
-
-                item {
-                  label: _("Low");
-                  action: "task.priority";
-                  target: "low";
-                }
-
-                item {
-                  label: _("Medium");
-                  action: "task.priority";
-                  target: "medium";
-                }
-
-                item {
-                  label: _("High");
-                  action: "task.priority";
-                  target: "high";
-                }
-              }
             }
 
             section {

@@ -8,6 +8,7 @@
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
+#include "task-item.h"
 #include "utils.h"
 #include "window.h"
 
@@ -33,6 +34,7 @@ struct _ErrandsTaskProperties {
   GtkSourceBuffer *notes_buffer;
   AdwPreferencesGroup *attachments;
   AdwPreferencesGroup *tags;
+  AdwComboRow *priority;
 
   ErrandsTaskItem *item;
 
@@ -91,6 +93,7 @@ static void errands_task_properties_class_init(ErrandsTaskPropertiesClass *klass
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, rrule_row);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, attachments);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, tags);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, priority);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_tag_entry_activated_cb);
 }
 
@@ -184,6 +187,9 @@ static inline void set_item(ErrandsTaskProperties *self, ErrandsTaskItem *item) 
   errands_rrule_row_set_rrule(self->rrule_row, rrule);
   adw_expander_row_set_expanded(ADW_EXPANDER_ROW(self->rrule_row), rrule && rrule->freq != ICAL_NO_RECURRENCE);
   if (rrule) icalrecurrencetype_unref(rrule);
+
+  // Priority
+  adw_combo_row_set_selected(self->priority, errands_task_item_get_priority(self->item));
 
   // Notes
   const char *notes = errands_task_item_get_notes(item);
@@ -307,6 +313,13 @@ void errands_task_properties_close(ErrandsTaskProperties *self) {
   icaltimetype cur_sdt = errands_task_item_get_dtstart(self->item);
   if (errands_match_dtstart_to_due(&cur_sdt, errands_task_item_get_dtend(self->item)))
     errands_task_item_set_dtstart(self->item, &cur_sdt);
+
+  // Priority
+  guint priority = adw_combo_row_get_selected(self->priority);
+  if (priority == 1) priority = 9;
+  else if (priority == 2) priority = 6;
+  else if (priority == 3) priority = 1;
+  errands_task_item_set_priority(self->item, priority);
 
   // Notes
   GtkTextIter start, end;
