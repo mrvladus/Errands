@@ -60,6 +60,15 @@
     <display_length compare="ge">360</display_length>
   </requires>
   <releases>
+    <release version="51.2.2" date="2026-11-20">
+        <description translate="no">
+            <ul>
+                <li>Added background for counters</li>
+                <li>Added more tooltips</li>
+                <li>Adaptivity improvements</li>
+            </ul>
+        </description>
+    </release>
     <release version="51.2.1" date="2026-11-20">
         <description translate="no">
             <ul>

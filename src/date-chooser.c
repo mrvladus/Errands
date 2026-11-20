@@ -98,19 +98,19 @@ static void errands_date_chooser_init(ErrandsDateChooser *self) {
 
 static void update_title(ErrandsDateChooser *self) {
   if (icaltime_is_null_time(self->dt) || icaltime_is_null_date(self->dt)) {
-    g_object_set(self, "title", _("Not Set"), NULL);
+    g_object_set(self, "subtitle", "", NULL);
     return;
   }
   g_autoptr(GDateTime) date = gtk_calendar_get_date(self->calendar);
   g_autofree gchar *date_str = g_date_time_format(date, "%x");
   if (icaltime_is_date(self->dt)) {
-    g_object_set(self, "title", date_str, NULL);
+    g_object_set(self, "subtitle", date_str, NULL);
     return;
   }
   int hour = self->dt.hour;
   int minute = self->dt.minute;
   g_autofree gchar *title = g_strdup_printf("%s, %02d:%02d", date_str, hour, minute);
-  g_object_set(self, "title", title, NULL);
+  g_object_set(self, "subtitle", title, NULL);
 }
 
 // ---------- PUBLIC FUNCTIONS ---------- //

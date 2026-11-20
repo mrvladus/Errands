@@ -26,20 +26,12 @@ template $ErrandsTaskProperties: Adw.Bin {
             title: _("Date and Time");
 
             $ErrandsDateChooser start_date_chooser {
-              subtitle: _("Start Date");
-
-              styles [
-                "property",
-              ]
+              title: _("Start Date");
             }
 
             $ErrandsDateChooser due_date_chooser {
-              subtitle: _("Due Date");
+              title: _("Due Date");
               visible: bind rrule_row.enable-expansion inverted;
-
-              styles [
-                "property",
-              ]
             }
 
             $ErrandsRruleRow rrule_row {}
