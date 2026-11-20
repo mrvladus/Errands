@@ -11,7 +11,7 @@
 #define ERRANDS_TYPE_TASK_ITEM (errands_task_item_get_type())
 G_DECLARE_FINAL_TYPE(ErrandsTaskItem, errands_task_item, ERRANDS, TASK_ITEM, GObject)
 
-// Takes reference of `ical`.
+// Takes ownership of `ical`.
 ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem *list, ErrandsTaskItem *parent);
 ErrandsTaskItem *errands_task_item_create_task(ErrandsTaskItem *parent, const char *text);
 

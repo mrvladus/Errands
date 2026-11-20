@@ -85,10 +85,12 @@ static AdwSidebarItem *create_sidebar_task_list_item_create_func(ErrandsTaskList
                               NULL);
   gtk_widget_add_css_class(counter, "dim-label");
   gtk_widget_add_css_class(counter, "caption");
+  gtk_widget_add_css_class(counter, "counter");
+  gtk_widget_set_valign(counter, GTK_ALIGN_CENTER);
   GtkColorDialog *dialog = gtk_color_dialog_new();
   GtkWidget *color = gtk_color_dialog_button_new(dialog);
   g_object_bind_property(item, "color", color, "rgba", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
-  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
+  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 3);
   gtk_box_append(GTK_BOX(box), counter);
   gtk_box_append(GTK_BOX(box), color);
   adw_sidebar_item_set_suffix(self, box);

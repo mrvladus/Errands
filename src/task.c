@@ -59,6 +59,7 @@ enum {
   PROP_TAGS,
   PROP_ATTACHMENTS,
   PROP_RRULE,
+  PROP_UNCOMPLETED_COUNT,
 
   N_PROPERTIES,
 };
@@ -164,6 +165,12 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (label) adw_button_content_set_label(ADW_BUTTON_CONTENT(self->rrule_btn_content), label);
   } break;
 
+  case PROP_UNCOMPLETED_COUNT: {
+    guint count = g_value_get_uint(value);
+    gtk_label_set_label(GTK_LABEL(self->counter), tmp_str_printf("%u", count));
+    gtk_widget_set_visible(self->counter, count > 0);
+  } break;
+
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
 }
@@ -190,6 +197,9 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
       g_param_spec_object("item", "Task Item", "Task item associated with the task.", ERRANDS_TYPE_TASK_ITEM, G_PARAM_READWRITE);
   obj_properties[PROP_COLOR] = g_param_spec_string("color", "Color", "Color of the task.", NULL, G_PARAM_READWRITE);
   obj_properties[PROP_PRIORITY] = g_param_spec_uint("priority", "Priority", "Priority of the task.", 0, 10, 0, G_PARAM_READWRITE);
+  obj_properties[PROP_UNCOMPLETED_COUNT] =
+      g_param_spec_uint("uncompleted-count", "Uncompleted Count", "Number of uncompleted tasks for the counter.", 0, G_MAXUINT, 0,
+                        G_PARAM_WRITABLE);
   obj_properties[PROP_NOTES] = g_param_spec_string("notes", "Notes", "Notes of the task.", NULL, G_PARAM_WRITABLE);
   obj_properties[PROP_DTSTART] = g_param_spec_pointer("dtstart", "Start Date", "Start date of the task.", G_PARAM_WRITABLE);
   obj_properties[PROP_DTEND] = g_param_spec_pointer("dtend", "End Date", "End date of the task.", G_PARAM_WRITABLE);
@@ -221,6 +231,7 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, sub_entry);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, drop_motion_ctrl);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, progress_bar);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, counter);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated_cb);
@@ -319,6 +330,8 @@ void errands_task_set_item(ErrandsTask *self, ErrandsTaskItem *item) {
   errands_task_add_binding(self, g_object_bind_property(item, "tags", self, "tags", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "attachments", self, "attachments", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "rrule", self, "rrule", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self,
+                           g_object_bind_property(item, "uncompleted-count", self, "uncompleted-count", G_BINDING_SYNC_CREATE));
   errands_task_add_binding(self, g_object_bind_property(item, "completed", self->complete_btn, "active",
                                                         G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL));
   errands_task_add_binding(

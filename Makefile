@@ -25,7 +25,7 @@
 # --- Project info --- #
 
 NAME    = errands
-VERSION = 51.2.1
+VERSION = 51.2.2
 CC 		= gcc
 
 # --- Project directories --- #

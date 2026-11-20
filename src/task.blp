@@ -103,26 +103,28 @@ template $ErrandsTask: Box {
     }
 
     Box {
-      Label {
-        label: bind template.item as <$ErrandsTaskItem>.uncompleted-count;
+      Label counter {
+        valign: center;
         margin-end: 12;
+        tooltip-text: _("Uncompleted Sub-Tasks");
 
         styles [
           "dimmed",
           "caption",
+          "counter",
         ]
       }
 
       ToggleButton sub_toggle_btn {
         tooltip-text: _("Toggle Sub-Tasks Entry");
-        icon-name: "errands-add-symbolic";
+        icon-name: "errands-add-small-symbolic";
         valign: center;
         visible: bind edit_title.editing inverted;
+        opacity: 0.8;
 
         styles [
           "flat",
           "circular",
-          "sub-toggle-btn",
         ]
       }
 

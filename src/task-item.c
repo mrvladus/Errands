@@ -48,7 +48,7 @@ struct _ErrandsTaskItem {
   gchar *search_blob;
   gboolean search_matched;
 
-  gchar *uncompleted_count; // The number of uncompleted subtasks
+  guint uncompleted_count;  // The number of uncompleted subtasks
   gboolean has_no_children; // If the task can be expanded (has any children)
 
   icalcomponent *ical;
@@ -109,7 +109,7 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   case PROP_RRULE: g_value_set_pointer(value, self->rrule); break;
   case PROP_SEARCH_BLOB: g_value_set_string(value, self->search_blob); break;
   case PROP_SEARCH_MATCHED: g_value_set_boolean(value, self->search_matched); break;
-  case PROP_UNCOMPLETED_COUNT: g_value_set_string(value, self->uncompleted_count); break;
+  case PROP_UNCOMPLETED_COUNT: g_value_set_uint(value, self->uncompleted_count); break;
   case PROP_HAS_NO_CHILDREN: g_value_set_boolean(value, self->has_no_children); break;
   case PROP_ICAL: g_value_set_pointer(value, self->ical); break;
   case PROP_CHILDREN_MODEL: g_value_set_object(value, self->children_model); break;
@@ -304,12 +304,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
 
   case PROP_SEARCH_MATCHED: self->search_matched = g_value_get_boolean(value); break;
-
-  case PROP_UNCOMPLETED_COUNT: {
-    g_clear_pointer(&self->uncompleted_count, g_free);
-    self->uncompleted_count = g_strdup(g_value_get_string(value));
-  } break;
-
+  case PROP_UNCOMPLETED_COUNT: self->uncompleted_count = g_value_get_uint(value); break;
   case PROP_HAS_NO_CHILDREN: self->has_no_children = g_value_get_boolean(value); break;
 
   case PROP_ICAL: {
@@ -362,7 +357,6 @@ static void finalize(GObject *object) {
   g_clear_pointer(&self->tags, g_strfreev);
   g_clear_pointer(&self->attachments, g_strfreev);
   g_clear_pointer(&self->search_blob, g_free);
-  g_clear_pointer(&self->uncompleted_count, g_free);
   g_clear_handle_id(&self->rrule_timeout_id, g_source_remove);
 
   G_OBJECT_CLASS(errands_task_item_parent_class)->finalize(object);
@@ -395,8 +389,8 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
       g_param_spec_string("search-blob", "Search Blob", "Search blob of the task", NULL, G_PARAM_READABLE);
   obj_properties[PROP_SEARCH_MATCHED] =
       g_param_spec_boolean("search-matched", "Search Mathed", "Task matched search", true, G_PARAM_READWRITE);
-  obj_properties[PROP_UNCOMPLETED_COUNT] =
-      g_param_spec_string("uncompleted-count", "Uncompleted Count", "Number of uncompleted subtasks", NULL, G_PARAM_READWRITE);
+  obj_properties[PROP_UNCOMPLETED_COUNT] = g_param_spec_uint(
+      "uncompleted-count", "Uncompleted Count", "Number of uncompleted subtasks", 0, G_MAXUINT, 0, G_PARAM_READWRITE);
   obj_properties[PROP_HAS_NO_CHILDREN] =
       g_param_spec_boolean("has-no-children", "Has No Children", "Whether the task has any children", true, G_PARAM_READWRITE);
   obj_properties[PROP_ICAL] =
@@ -608,7 +602,7 @@ void errands_task_item_update(ErrandsTaskItem *self) {
   bool show_completed = errands_settings_get_show_completed(state.settings);
   bool show_cancelled = errands_settings_get_show_cancelled(state.settings);
   GListModel *children_model = G_LIST_MODEL(self->children_model);
-  gint visible = 0, uncompleted = 0, completed = 0, total = 0;
+  guint visible = 0, uncompleted = 0, completed = 0, total = 0;
   for_range(i, 0, g_list_model_get_n_items(children_model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(children_model, i);
     if (errands_data_get_deleted(item->ical)) continue;
@@ -619,8 +613,7 @@ void errands_task_item_update(ErrandsTaskItem *self) {
     visible++;
   }
   gfloat percent = total > 0 ? (gfloat)completed / (gfloat)total : 0.0;
-  g_object_set(self, "uncompleted-count", uncompleted > 0 ? tmp_str_printf("%d", uncompleted) : "", "has-no-children",
-               visible == 0, "percent-complete", percent, NULL);
+  g_object_set(self, "uncompleted-count", uncompleted, "has-no-children", visible == 0, "percent-complete", percent, NULL);
 }
 
 void errands_task_item_add_tag(ErrandsTaskItem *self, const char *tag) {
