@@ -200,6 +200,7 @@ static inline char *string_trim(char *str) {
 }
 
 static inline const char *gdk_rgba_to_str(const GdkRGBA *rgba) {
+  if (rgba->red == 0 && rgba->green == 0 && rgba->blue == 0 && rgba->alpha == 0) return NULL;
   int r = (int)(rgba->red * 255);
   int g = (int)(rgba->green * 255);
   int b = (int)(rgba->blue * 255);
@@ -359,7 +360,6 @@ static inline icalcomponent *find_vtodo_by_uid(icalcomponent *ical, const char *
 }
 
 static inline bool icaltime_is_null_date(const icaltimetype t) { return t.year == 0 && t.month == 0 && t.day == 0; }
-
 
 static inline icaltimetype icaltime_merge_date_and_time(const struct icaltimetype date, const struct icaltimetype time) {
   icaltimetype result = date;

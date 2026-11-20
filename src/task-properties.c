@@ -4,7 +4,11 @@
 #include "task-properties.h"
 #include "config.h"
 #include "date-chooser.h"
+#include "gdk/gdk.h"
+#include "glib-object.h"
+#include "glib.h"
 #include "glib/gi18n.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
@@ -19,8 +23,11 @@
 #define TAGS_LIST_BOX gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->tags))))
 
 static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskProperties *self);
+static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskProperties *self);
+
 static void on_tag_entry_activated_cb(ErrandsTaskProperties *self, AdwEntryRow *entry);
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, ErrandsTaskProperties *self);
+static void on_rgba_changed_cb(ErrandsTaskProperties *self, GParamSpec *pspec, GtkColorDialogButton *btn);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -35,6 +42,8 @@ struct _ErrandsTaskProperties {
   AdwPreferencesGroup *attachments;
   AdwPreferencesGroup *tags;
   AdwComboRow *priority;
+  GtkColorDialogButton *color;
+  GtkWidget *reset_color_btn;
 
   ErrandsTaskItem *item;
 };
@@ -60,13 +69,17 @@ static void errands_task_properties_class_init(ErrandsTaskPropertiesClass *klass
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, attachments);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, tags);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, priority);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, color);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, reset_color_btn);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_tag_entry_activated_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_rgba_changed_cb);
 }
 
 static void errands_task_properties_init(ErrandsTaskProperties *self) {
   gtk_widget_init_template(GTK_WIDGET(self));
   GSimpleActionGroup *ag = errands_add_action_group(self, "task-properties");
   errands_add_action(ag, "add-attachment", on_add_attachment_action_cb, self, NULL);
+  errands_add_action(ag, "clear-color", on_clear_color_action_cb, self, NULL);
 
   // Notes
   gtk_source_init();
@@ -156,6 +169,13 @@ static inline void set_item(ErrandsTaskProperties *self, ErrandsTaskItem *item) 
 
   // Priority
   adw_combo_row_set_selected(self->priority, errands_task_item_get_priority(self->item));
+
+  // Color
+  const char *curr_color = errands_task_item_get_color(self->item);
+  GdkRGBA color = {0};
+  if (curr_color) gdk_rgba_parse(&color, curr_color);
+  gtk_color_dialog_button_set_rgba(self->color, &color);
+  gtk_widget_set_visible(GTK_WIDGET(self->reset_color_btn), curr_color != NULL);
 
   // Notes
   const char *notes = errands_task_item_get_notes(item);
@@ -287,6 +307,10 @@ void errands_task_properties_close(ErrandsTaskProperties *self) {
   else if (priority == 3) priority = 1;
   errands_task_item_set_priority(self->item, priority);
 
+  // Color
+  const char *color = gdk_rgba_to_str(gtk_color_dialog_button_get_rgba(self->color));
+  errands_task_item_set_color(self->item, color);
+
   // Notes
   GtkTextIter start, end;
   gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(self->notes_buffer), &start);
@@ -328,6 +352,12 @@ static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, 
   gtk_file_dialog_open(dialog, GTK_WINDOW(state.main_window), NULL, on_add_attachment_action_finish_cb, self);
 }
 
+static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskProperties *self) {
+  GdkRGBA color = {0};
+  gtk_color_dialog_button_set_rgba(self->color, &color);
+  gtk_widget_set_visible(GTK_WIDGET(self->reset_color_btn), FALSE);
+}
+
 // ---------- CALLBACKS ---------- //
 
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, ErrandsTaskProperties *self) {
@@ -350,4 +380,10 @@ static void on_tag_entry_activated_cb(ErrandsTaskProperties *self, AdwEntryRow *
   add_tag(self, tag);
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   gtk_widget_set_visible(GTK_WIDGET(self->tags), true);
+}
+
+static void on_rgba_changed_cb(ErrandsTaskProperties *self, GParamSpec *pspec, GtkColorDialogButton *btn) {
+  const GdkRGBA *rgba = gtk_color_dialog_button_get_rgba(self->color);
+  gboolean is_null = rgba->red == 0 && rgba->green == 0 && rgba->blue == 0 && rgba->alpha == 0;
+  gtk_widget_set_visible(GTK_WIDGET(self->reset_color_btn), !is_null);
 }

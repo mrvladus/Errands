@@ -62,6 +62,41 @@ template $ErrandsTaskProperties: Adw.Bin {
             }
           }
 
+          Adw.PreferencesGroup {
+            title: _("Color");
+
+            Adw.ActionRow {
+              title: _("Task Accent Color");
+
+              [suffix]
+              Box {
+                spacing: 6;
+
+                styles [
+                  "toolbar",
+                ]
+
+                Button reset_color_btn {
+                  valign: center;
+                  icon-name: "errands-reset-symbolic";
+                  tooltip-text: _("Clear Color");
+                  action-name: "task-properties.clear-color";
+                }
+
+                ColorDialogButton color {
+                  valign: center;
+                  halign: center;
+
+                  dialog: ColorDialog {
+                    with-alpha: false;
+                  };
+
+                  notify::rgba => $on_rgba_changed_cb(template);
+                }
+              }
+            }
+          }
+
           Adw.PreferencesGroup attachments {
             title: _("Attachments");
           }

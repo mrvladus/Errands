@@ -25,8 +25,6 @@ static GtkWidget *errands_task_tag_new(const char *tag);
 
 static void on_edit_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_copy_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
-static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_properties_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_notes_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
 static void on_tags_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self);
@@ -240,8 +238,6 @@ static void errands_task_init(ErrandsTask *self) {
   self->ag = errands_add_action_group(self, "task");
   errands_add_action(self->ag, "edit", on_edit_action_cb, self, NULL);
   errands_add_action(self->ag, "copy", on_copy_action_cb, self, NULL);
-  errands_add_action(self->ag, "color", on_color_action_cb, self, NULL);
-  errands_add_action(self->ag, "clear-color", on_clear_color_action_cb, self, NULL);
   errands_add_action(self->ag, "properties", on_properties_action_cb, self, NULL);
   errands_add_action(self->ag, "notes", on_notes_action_cb, self, NULL);
   errands_add_action(self->ag, "tags", on_tags_action_cb, self, NULL);
@@ -384,25 +380,6 @@ static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   const char *filename = tmp_str_printf("%s.ics", errands_task_item_get_uid(self->item));
   g_object_set(dialog, "initial-name", filename, NULL);
   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_export_finish_cb, self->item);
-}
-
-static void on_finish_cb(GObject *source_object, GAsyncResult *res, gpointer data) {
-  g_autoptr(ErrandsTaskItem) item = data;
-  g_autoptr(GdkRGBA) rgba = gtk_color_dialog_choose_rgba_finish(GTK_COLOR_DIALOG(source_object), res, NULL);
-  if (!rgba || !item) return;
-  errands_task_item_set_color(item, gdk_rgba_to_str(rgba));
-}
-
-static void on_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  g_autoptr(GtkColorDialog) color_dialog = g_object_new(GTK_TYPE_COLOR_DIALOG, "with-alpha", false, NULL);
-  const char *color = errands_task_item_get_color(self->item);
-  GdkRGBA rgba = {1};
-  if (color) gdk_rgba_parse(&rgba, color);
-  gtk_color_dialog_choose_rgba(color_dialog, GTK_WINDOW(state.main_window), &rgba, NULL, on_finish_cb, g_object_ref(self->item));
-}
-
-static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTask *self) {
-  errands_task_item_set_color(self->item, NULL);
 }
 
 // ---------- CALLBACKS ---------- //
