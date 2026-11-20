@@ -183,6 +183,7 @@ static void finalize(GObject *gobject) {
     g_source_remove(self->toolbar_update_id);
     self->toolbar_update_id = 0;
   }
+  g_clear_pointer(&self->bindings, g_ptr_array_unref);
   gtk_widget_dispose_template(GTK_WIDGET(gobject), ERRANDS_TYPE_TASK);
   G_OBJECT_CLASS(errands_task_parent_class)->finalize(gobject);
 }
@@ -296,19 +297,45 @@ static void errands_task_update_toolbar(ErrandsTask *self) {
 
 // ---------- PUBLIC FUNCTIONS ---------- //
 
+static void release_binding(GBinding *binding) {
+  g_binding_unbind(binding);
+  g_object_unref(binding);
+}
+
+void errands_task_add_binding(ErrandsTask *self, GBinding *binding) {
+  if (!binding) return;
+  if (!self->bindings) self->bindings = g_ptr_array_new_with_free_func((GDestroyNotify)release_binding);
+  // Keep our own reference so unbinding stays safe even if the item is finalized first
+  g_ptr_array_add(self->bindings, g_object_ref(binding));
+}
+
+static void clear_bindings(ErrandsTask *self) {
+  if (self->bindings) g_ptr_array_set_size(self->bindings, 0);
+}
+
+void errands_task_unbind_item(ErrandsTask *self) {
+  clear_bindings(self);
+  if (self->item) g_object_set(self->item, "task-widget", NULL, NULL);
+}
+
 void errands_task_set_item(ErrandsTask *self, ErrandsTaskItem *item) {
+  // The widget may be recycled from another item: drop the old bindings first, otherwise
+  // the bidirectional "completed" binding keeps the checkbox wired to every item it ever showed.
+  clear_bindings(self);
   g_object_set(self, "item", item, NULL);
   g_object_set(item, "task-widget", self, NULL);
-  g_object_bind_property(item, "color", self, "color", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "priority", self, "priority", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "notes", self, "notes", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "dtstart", self, "dtstart", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "dtend", self, "dtend", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "tags", self, "tags", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "attachments", self, "attachments", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "rrule", self, "rrule", G_BINDING_SYNC_CREATE);
-  g_object_bind_property(item, "completed", self->complete_btn, "active", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
-  g_object_bind_property(item, "percent-complete", self->progress_bar, "fraction", G_BINDING_SYNC_CREATE);
+  errands_task_add_binding(self, g_object_bind_property(item, "color", self, "color", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "priority", self, "priority", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "notes", self, "notes", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "dtstart", self, "dtstart", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "dtend", self, "dtend", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "tags", self, "tags", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "attachments", self, "attachments", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "rrule", self, "rrule", G_BINDING_SYNC_CREATE));
+  errands_task_add_binding(self, g_object_bind_property(item, "completed", self->complete_btn, "active",
+                                                        G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL));
+  errands_task_add_binding(
+      self, g_object_bind_property(item, "percent-complete", self->progress_bar, "fraction", G_BINDING_SYNC_CREATE));
 }
 
 // ---------- ACTION CALLBACKS ---------- //
