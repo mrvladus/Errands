@@ -53,6 +53,17 @@ static int sort_func(ErrandsTaskItem *a, ErrandsTaskItem *b, ErrandsTaskList *se
 
 // ---------- WIDGET TEMPLATE ---------- //
 
+// Mirror task_lists_model into toplevel_tasks_models, which feeds the "All" and "Today" pages
+static void on_task_lists_changed_cb(GListModel *lists, guint position, guint removed, guint added, ErrandsTaskList *self) {
+  g_autoptr(GPtrArray) tasks = g_ptr_array_new_with_free_func(g_object_unref);
+  for (guint i = position; i < position + added; i++) {
+    ErrandsTaskListItem *item = g_list_model_get_item(lists, i);
+    g_ptr_array_add(tasks, g_object_ref(item->tasks));
+    g_object_unref(item);
+  }
+  g_list_store_splice(self->toplevel_tasks_models, position, removed, tasks->pdata, tasks->len);
+}
+
 G_DEFINE_TYPE(ErrandsTaskList, errands_task_list, ADW_TYPE_BIN)
 
 static void finalize(GObject *gobject) {
@@ -131,10 +142,9 @@ static void errands_task_list_init(ErrandsTaskList *self) {
   gtk_search_bar_connect_entry(GTK_SEARCH_BAR(self->search_bar), GTK_EDITABLE(self->search_entry));
 
   self->toplevel_tasks_models = g_list_store_new(G_TYPE_LIST_MODEL);
-  for_range(i, 0, g_list_model_get_n_items(G_LIST_MODEL(task_lists_model))) {
-    g_autoptr(ErrandsTaskListItem) item = g_list_model_get_item(G_LIST_MODEL(task_lists_model), i);
-    g_list_store_append(self->toplevel_tasks_models, item->tasks);
-  }
+  on_task_lists_changed_cb(G_LIST_MODEL(task_lists_model), 0, 0, g_list_model_get_n_items(G_LIST_MODEL(task_lists_model)), self);
+  // Lists added later (by sync or by the user) must show up in "All" and "Today" too
+  g_signal_connect_object(task_lists_model, "items-changed", G_CALLBACK(on_task_lists_changed_cb), self, 0);
   self->all_tasks_model = gtk_flatten_list_model_new(G_LIST_MODEL(self->toplevel_tasks_models));
   self->today_filter = GTK_FILTER(gtk_custom_filter_new((GtkCustomFilterFunc)today_filter_func, self, NULL));
   self->today_model = gtk_filter_list_model_new(G_LIST_MODEL(self->all_tasks_model), g_object_ref(self->today_filter));
