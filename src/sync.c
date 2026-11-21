@@ -75,6 +75,8 @@ typedef struct {
   gint count;
 } PushObj;
 
+static inline void refresh_queued_task_copy(PushObj *o);
+
 static inline PushObj *push_obj_new(enum PushObjOP op, const char *uid) {
   g_assert_nonnull(uid);
 
@@ -436,6 +438,20 @@ static void obj_pushed_idle_cb(gpointer user_data) {
   }
 
   if (--o->count <= 0) g_ptr_array_remove(objects_to_push, o);
+  // Still queued because the task changed during this sync: push its current version next time
+  else refresh_queued_task_copy(o);
+}
+
+// Replace the queued copy of a task with its current version. Main thread only, never while
+// the worker thread may be pushing this object.
+static inline void refresh_queued_task_copy(PushObj *o) {
+  if (!o->task || (o->op != PUSH_OBJ_TASK_PUSH && o->op != PUSH_OBJ_TASK_DELETE)) return;
+  icalcomponent *ical = errands_task_item_get_ical(o->task);
+  if (!ical) return;
+  g_clear_pointer(&o->ical, icalcomponent_free);
+  o->ical = icalcomponent_clone(ical);
+  // One upload of the current version is enough
+  o->count = 1;
 }
 
 // ---------- CALDAV CALLBACKS ---------- //
@@ -628,7 +644,12 @@ void errands_sync_push_task(ErrandsTaskItem *task) {
   enum PushObjOP op = errands_data_get_deleted(ical) ? PUSH_OBJ_TASK_DELETE : PUSH_OBJ_TASK_PUSH;
   PushObj *o = objects_to_push_has(uid, op);
   if (o) {
+    // The task changed again before its queued copy was uploaded. Refresh the copy, otherwise the
+    // version from the first change is uploaded and later edits are overwritten on the server.
+    // While a sync runs, the worker thread may be reading o->ical: then obj_pushed_idle_cb()
+    // refreshes it once that object has been pushed.
     o->count++;
+    if (!sync_in_progress) refresh_queued_task_copy(o);
     return;
   }
 
