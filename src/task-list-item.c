@@ -118,6 +118,8 @@ static gboolean save_timeout_cb(gpointer user_data) {
 ErrandsTaskListItem *errands_task_list_item_new(icalcomponent *ical) {
   g_assert_nonnull(ical);
 
+  icalcomponent_strip_errors(ical);
+
   ErrandsTaskListItem *self = g_object_new(ERRANDS_TYPE_TASK_LIST_ITEM, NULL);
   self->ical = ical;
   self->uid = g_strdup(errands_data_get_uid(self->ical));

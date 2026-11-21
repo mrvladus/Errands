@@ -548,6 +548,8 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
   g_assert_nonnull(ical);
   g_assert_nonnull(list);
 
+  icalcomponent_strip_errors(ical);
+
   ErrandsTaskItem *self = g_object_new(ERRANDS_TYPE_TASK_ITEM, NULL);
   self->lock = TRUE;
   self->ical = ical;
