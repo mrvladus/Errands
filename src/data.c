@@ -193,6 +193,8 @@ void errands_data_init() {
   migrate_from_46();
   create_backup();
 
+  icalproperty_set_allow_empty_properties(true);
+
   // --- Load lists --- //
 
   g_autoptr(GDir) dir = g_dir_open(calendars_dir, 0, NULL);
