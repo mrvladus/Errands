@@ -35,7 +35,7 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   switch (prop_id) {
   case PROP_UID: g_value_set_string(value, self->uid); break;
   case PROP_TITLE: g_value_set_string(value, self->title); break;
-  case PROP_COLOR: g_value_set_boxed(value, &self->color); break;
+  case PROP_COLOR: g_value_set_pointer(value, &self->color); break;
   case PROP_COUNT: g_value_set_int(value, self->count); break;
   default: G_OBJECT_WARN_INVALID_PROPERTY_ID(object, prop_id, pspec); break;
   }
@@ -55,7 +55,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
 
   case PROP_COLOR: {
-    GdkRGBA *color = g_value_get_boxed(value);
+    GdkRGBA *color = g_value_get_pointer(value);
     if (!color || gdk_rgba_equal(&self->color, color)) return;
     self->color = *color;
     errands_data_set_color(self->ical, gdk_rgba_to_str(&self->color));
@@ -89,8 +89,7 @@ static void errands_task_list_item_class_init(ErrandsTaskListItemClass *klass) {
   obj_properties[PROP_UID] =
       g_param_spec_pointer("uid", "Task List UID", "Unique identifier for the task list", G_PARAM_READABLE);
   obj_properties[PROP_TITLE] = g_param_spec_string("title", "Task List Title", "Title of the task list", NULL, G_PARAM_READWRITE);
-  obj_properties[PROP_COLOR] =
-      g_param_spec_boxed("color", "Task List Color", "Color of the task list", GDK_TYPE_RGBA, G_PARAM_READWRITE);
+  obj_properties[PROP_COLOR] = g_param_spec_pointer("color", "Task List Color", "Color of the task list", G_PARAM_READWRITE);
   obj_properties[PROP_COUNT] =
       g_param_spec_int("count", "Task List Count", "Number of uncompleted tasks", 0, G_MAXINT, 0, G_PARAM_READABLE);
 

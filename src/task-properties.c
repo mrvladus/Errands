@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Zlib
 
 #include "task-properties.h"
+#include "color-button.h"
 #include "config.h"
 #include "date-chooser.h"
 #include "gdk/gdk.h"
@@ -27,7 +28,7 @@ static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, Err
 
 static void on_tag_entry_activated_cb(ErrandsTaskProperties *self, AdwEntryRow *entry);
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, ErrandsTaskProperties *self);
-static void on_rgba_changed_cb(ErrandsTaskProperties *self, GParamSpec *pspec, GtkColorDialogButton *btn);
+static void on_rgba_changed_cb(ErrandsTaskProperties *self, GParamSpec *pspec, ErrandsColorButton *btn);
 
 // ---------- WIDGET TEMPLATE ---------- //
 
@@ -42,7 +43,7 @@ struct _ErrandsTaskProperties {
   AdwPreferencesGroup *attachments;
   AdwPreferencesGroup *tags;
   AdwComboRow *priority;
-  GtkColorDialogButton *color;
+  ErrandsColorButton *color;
   GtkWidget *reset_color_btn;
 
   ErrandsTaskItem *item;
@@ -174,7 +175,7 @@ static inline void set_item(ErrandsTaskProperties *self, ErrandsTaskItem *item) 
   const char *curr_color = errands_task_item_get_color(self->item);
   GdkRGBA color = {0};
   if (curr_color) gdk_rgba_parse(&color, curr_color);
-  gtk_color_dialog_button_set_rgba(self->color, &color);
+  errands_color_button_set_rgba(self->color, &color);
   gtk_widget_set_visible(GTK_WIDGET(self->reset_color_btn), curr_color != NULL);
 
   // Notes
@@ -308,7 +309,8 @@ void errands_task_properties_close(ErrandsTaskProperties *self) {
   errands_task_item_set_priority(self->item, priority);
 
   // Color
-  const char *color = gdk_rgba_to_str(gtk_color_dialog_button_get_rgba(self->color));
+  GdkRGBA rgba = errands_color_button_get_rgba(self->color);
+  const char *color = gdk_rgba_to_str(&rgba);
   errands_task_item_set_color(self->item, color);
 
   // Notes
@@ -354,7 +356,7 @@ static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, 
 
 static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskProperties *self) {
   GdkRGBA color = {0};
-  gtk_color_dialog_button_set_rgba(self->color, &color);
+  errands_color_button_set_rgba(self->color, &color);
   gtk_widget_set_visible(GTK_WIDGET(self->reset_color_btn), FALSE);
 }
 
@@ -382,8 +384,8 @@ static void on_tag_entry_activated_cb(ErrandsTaskProperties *self, AdwEntryRow *
   gtk_widget_set_visible(GTK_WIDGET(self->tags), true);
 }
 
-static void on_rgba_changed_cb(ErrandsTaskProperties *self, GParamSpec *pspec, GtkColorDialogButton *btn) {
-  const GdkRGBA *rgba = gtk_color_dialog_button_get_rgba(self->color);
-  gboolean is_null = rgba->red == 0 && rgba->green == 0 && rgba->blue == 0 && rgba->alpha == 0;
+static void on_rgba_changed_cb(ErrandsTaskProperties *self, GParamSpec *pspec, ErrandsColorButton *btn) {
+  GdkRGBA rgba = errands_color_button_get_rgba(btn);
+  gboolean is_null = rgba.red == 0 && rgba.green == 0 && rgba.blue == 0 && rgba.alpha == 0;
   gtk_widget_set_visible(GTK_WIDGET(self->reset_color_btn), !is_null);
 }

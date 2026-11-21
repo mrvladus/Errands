@@ -1,4 +1,5 @@
 src/about-dialog.h
+src/color-button.c
 src/date-chooser.c
 src/main.c
 src/rrule-row.c

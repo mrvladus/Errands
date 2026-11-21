@@ -3,6 +3,7 @@
 
 #include "sidebar.h"
 #include "about-dialog.h"
+#include "color-button.h"
 #include "config.h"
 #include "data.h"
 #include "settings-dialog.h"
@@ -88,12 +89,11 @@ static AdwSidebarItem *create_sidebar_task_list_item_create_func(ErrandsTaskList
   gtk_widget_add_css_class(counter, "caption");
   gtk_widget_add_css_class(counter, "counter");
   gtk_widget_set_valign(counter, GTK_ALIGN_CENTER);
-  GtkColorDialog *dialog = gtk_color_dialog_new();
-  GtkWidget *color = gtk_color_dialog_button_new(dialog);
+  ErrandsColorButton *color = errands_color_button_new();
   g_object_bind_property(item, "color", color, "rgba", G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL);
-  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 3);
+  GtkWidget *box = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 6);
   gtk_box_append(GTK_BOX(box), counter);
-  gtk_box_append(GTK_BOX(box), color);
+  gtk_box_append(GTK_BOX(box), GTK_WIDGET(color));
   adw_sidebar_item_set_suffix(self, box);
   errands_sidebar_task_list_update_counter(item->uid);
   return self;

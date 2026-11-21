@@ -275,6 +275,13 @@ static inline gchar *str_to_markup(const char *str) {
   return markup;
 }
 
+static inline void gtk_widget_add_css_string(GtkWidget *widget, const gchar *css) {
+  g_autoptr(GtkCssProvider) provider = gtk_css_provider_new();
+  gtk_css_provider_load_from_string(provider, css);
+  gtk_style_context_add_provider_for_display(gtk_widget_get_display(widget), GTK_STYLE_PROVIDER(provider),
+                                             GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+}
+
 static inline void gtk_widget_set_color(GtkWidget *widget, const char *color) {
   g_assert_nonnull(widget);
 

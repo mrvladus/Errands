@@ -44,20 +44,6 @@ checkbutton > check {
     transition: 0s;
 }
 
-colorbutton button {
-    border-radius: 9999px;
-    padding: 0px;
-    margin: 0px;
-    transform: scale(0.8);
-    min-height: 36px;
-    min-width: 36px;
-}
-
-colorbutton button colorswatch {
-    border-radius: 9999px;
-    transform: scale(0.8);
-}
-
 calendar {
     background: var(--view-bg-color);
 }

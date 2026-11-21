@@ -92,8 +92,7 @@ int main(int argc, char **argv) {
   // Cleanup
   errands_sync_cleanup();
   errands_data_cleanup();
-  g_clear_object(&state.settings);
-  g_clear_object(&state.app);
+  errands_state_cleanup();
 
   return status;
 }

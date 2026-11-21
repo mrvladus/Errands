@@ -75,14 +75,7 @@ template $ErrandsTaskProperties: Adw.Bin {
                   action-name: "task-properties.clear-color";
                 }
 
-                ColorDialogButton color {
-                  valign: center;
-                  halign: center;
-
-                  dialog: ColorDialog {
-                    with-alpha: false;
-                  };
-
+                $ErrandsColorButton color {
                   notify::rgba => $on_rgba_changed_cb(template);
                 }
               }
