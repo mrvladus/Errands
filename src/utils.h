@@ -430,27 +430,36 @@ static inline icaltimetype icaltime_now() {
 
 // RFC 5545 requires DTSTART and DUE of a VTODO to have the same value type (DATE or DATE-TIME),
 // and strict servers (sabre/dav, Baikal) reject the object otherwise with 415.
-// Default start for a recurring task: today as DATE if due is all-day (or unset), now if due has a time.
+// Start for a repeating task that has none. Use the due date when there is one: a start of "today"
+// lies after an overdue due date, and CalDAV servers (sabre/dav, Baikal) reject such a VTODO with 415.
 static inline icaltimetype errands_default_dtstart(const icaltimetype due) {
-  if (!icaltime_is_null_date(due) && !icaltime_is_date(due)) return icaltime_now();
+  if (!icaltime_is_null_date(due)) return due;
   return icaltime_today();
 }
 
 // Make an existing start match the value type of the due date. Returns true if start was changed.
+// Also moves a start that lies after the due date back to the due date: servers reject that too.
 static inline bool errands_match_dtstart_to_due(icaltimetype *start, const icaltimetype due) {
   if (icaltime_is_null_date(*start) || icaltime_is_null_date(due)) return false;
-  if (icaltime_is_date(*start) == icaltime_is_date(due)) return false;
-  if (icaltime_is_date(due)) {
-    start->is_date = 1;
-    start->hour = start->minute = start->second = 0;
-    start->zone = NULL;
-  } else {
-    start->is_date = 0;
-    start->hour = due.hour;
-    start->minute = due.minute;
-    start->second = due.second;
+  bool changed = false;
+  if (icaltime_is_date(*start) != icaltime_is_date(due)) {
+    if (icaltime_is_date(due)) {
+      start->is_date = 1;
+      start->hour = start->minute = start->second = 0;
+      start->zone = NULL;
+    } else {
+      start->is_date = 0;
+      start->hour = due.hour;
+      start->minute = due.minute;
+      start->second = due.second;
+    }
+    changed = true;
   }
-  return true;
+  if (icaltime_compare(*start, due) > 0) {
+    *start = due;
+    changed = true;
+  }
+  return changed;
 }
 
 static inline bool icalrecurrence_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {

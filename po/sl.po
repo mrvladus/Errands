@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Errands main\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-16 03:27+0000\n"
-"PO-Revision-Date: 2026-11-16 08:43+0100\n"
+"POT-Creation-Date: 2026-11-20 15:14+0000\n"
+"PO-Revision-Date: 2026-11-20 22:52+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -20,7 +20,7 @@ msgstr ""
 "X-Generator: Poedit 3.8\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
-#: ../src/about-dialog.h:15 ../src/sidebar.blp:27 ../src/window.blp:8
+#: ../src/about-dialog.h:15 ../src/sidebar.blp:27 ../src/window.blp:7
 msgid "Errands"
 msgstr "Opravki"
 
@@ -81,70 +81,70 @@ msgstr "Ponavljaj zavedno"
 msgid "Repeat %zu times"
 msgstr "Ponovi %zu-krat"
 
-#: ../src/sidebar.c:319
+#: ../src/sidebar.c:321
 msgid "Only .ics files are supported"
 msgstr "Podprte so samo datoteke .ics"
 
-#: ../src/sidebar.c:324
+#: ../src/sidebar.c:326
 msgid "Can't load list. It's incorrect or already exists"
 msgstr "Seznama ni moč naložiti. Je nepravilen ali pa že obstaja"
 
-#: ../src/sync.c:287
+#: ../src/sync.c:303
 #, c-format
 msgid "Added remote task list: %s"
 msgstr "Dodan oddaljeni seznam nalog: %s"
 
-#: ../src/sync.c:520
+#: ../src/sync.c:536
 msgid "Sync Failed"
 msgstr "Usklajevanje je spodletelo"
 
-#: ../src/task.c:121
+#: ../src/task.c:116
 msgctxt "Start date"
 msgid "Start"
 msgstr "Začetek"
 
-#: ../src/task.c:139
+#: ../src/task.c:134
 msgctxt "Due date"
 msgid "Due"
 msgstr "Zapade"
 
-#: ../src/task.c:321
+#: ../src/task.c:356
 msgid "Copied to Clipboard"
 msgstr "Kopirano na odložišče"
 
-#: ../src/task.c:354
+#: ../src/task.c:388
 msgid "Failed to Export"
 msgstr "Izvoz ni uspel"
 
-#: ../src/task.c:357 ../src/task-list.c:308
+#: ../src/task.c:391 ../src/task-list.c:325
 msgid "Exported"
 msgstr "izvoženo"
 
-#: ../src/task-item.c:752
+#: ../src/task-item.c:749
 msgid "Can't make task a sub-task of itself."
 msgstr "Naloge ni možno definirati kot podnaloge same sebe."
 
-#: ../src/task-item.c:873
+#: ../src/task-item.c:870
 msgctxt "Priority"
 msgid "High"
 msgstr "Visoka"
 
-#: ../src/task-item.c:874
+#: ../src/task-item.c:871
 msgctxt "Priority"
 msgid "Medium"
 msgstr "Srednja"
 
-#: ../src/task-item.c:875
+#: ../src/task-item.c:872
 msgctxt "Priority"
 msgid "Low"
 msgstr "Nizka"
 
-#: ../src/task-item.c:876
+#: ../src/task-item.c:873
 msgctxt "Priority"
 msgid "None"
 msgstr "Brez"
 
-#: ../src/task-item.c:908
+#: ../src/task-item.c:905
 #, c-format
 msgid "Every second"
 msgid_plural "Every %d seconds"
@@ -153,7 +153,7 @@ msgstr[1] "Vsako %d sekundo"
 msgstr[2] "Vsaki %d sekundi"
 msgstr[3] "Vsake %d sekunde"
 
-#: ../src/task-item.c:909
+#: ../src/task-item.c:906
 #, c-format
 msgid "Every minute"
 msgid_plural "Every %d minutes"
@@ -162,7 +162,7 @@ msgstr[1] "Vsako %d minuto"
 msgstr[2] "Vsaki %d minuti"
 msgstr[3] "Vsake %d minute"
 
-#: ../src/task-item.c:910
+#: ../src/task-item.c:907
 #, c-format
 msgid "Every hour"
 msgid_plural "Every %d hours"
@@ -171,7 +171,7 @@ msgstr[1] "Vsako %d uro"
 msgstr[2] "Vsaki %d uri"
 msgstr[3] "Vsake %d ure"
 
-#: ../src/task-item.c:911
+#: ../src/task-item.c:908
 #, c-format
 msgid "Every day"
 msgid_plural "Every %d days"
@@ -180,7 +180,7 @@ msgstr[1] "Vsak %d dan"
 msgstr[2] "Vsaka %d dneva"
 msgstr[3] "Vsake %d dni"
 
-#: ../src/task-item.c:912
+#: ../src/task-item.c:909
 #, c-format
 msgid "Every week"
 msgid_plural "Every %d weeks"
@@ -189,7 +189,7 @@ msgstr[1] "Vsak %d teden"
 msgstr[2] "Vsaka %d tedna"
 msgstr[3] "Vsake %d tedne"
 
-#: ../src/task-item.c:913
+#: ../src/task-item.c:910
 #, c-format
 msgid "Every month"
 msgid_plural "Every %d months"
@@ -198,7 +198,7 @@ msgstr[1] "Vsak %d mesec"
 msgstr[2] "Vsaka %d meseca"
 msgstr[3] "Vsake %d mesece"
 
-#: ../src/task-item.c:914
+#: ../src/task-item.c:911
 #, c-format
 msgid "Every year"
 msgid_plural "Every %d years"
@@ -207,12 +207,12 @@ msgstr[1] "Vsako %d leto"
 msgstr[2] "Vsaki %d leti"
 msgstr[3] "Vsaka %d leta"
 
-#: ../src/task-item.c:925
+#: ../src/task-item.c:922
 #, c-format
 msgid " until %s"
 msgstr "do %s"
 
-#: ../src/task-item.c:926
+#: ../src/task-item.c:923
 #, c-format
 msgid " once"
 msgid_plural " %d times"
@@ -221,15 +221,15 @@ msgstr[1] " %d-krat"
 msgstr[2] " %d-krat"
 msgstr[3] " %d-krat"
 
-#: ../src/task-list.c:297 ../src/task-list.c:302
+#: ../src/task-list.c:314 ../src/task-list.c:319
 msgid "Export failed"
 msgstr "Izvoz ni uspel"
 
-#: ../src/task-list.c:328 ../src/task-list.c:340
+#: ../src/task-list.c:345 ../src/task-list.c:357
 msgid "No tasks to delete"
 msgstr "Ni nalog za brisanje"
 
-#: ../src/task-list.c:333 ../src/task-list.c:345
+#: ../src/task-list.c:350 ../src/task-list.c:362
 #, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
@@ -238,29 +238,17 @@ msgstr[1] "Izbrisana %d naloga"
 msgstr[2] "Izbrisani %d nalogi"
 msgstr[3] "Izbrisane %d naloge"
 
-#: ../src/task-list.c:492 ../src/sidebar.blp:137
+#: ../src/task-list.c:509 ../src/sidebar.blp:137
 msgid "All Tasks"
 msgstr "Vse naloge"
 
-#: ../src/task-list.c:496 ../src/sidebar.blp:150
+#: ../src/task-list.c:513 ../src/sidebar.blp:153
 msgid "Tasks for Today"
 msgstr "Naloge za danes"
 
 #: ../src/task-list-item.c:150
 msgid "Untitled"
 msgstr "Neimenovano"
-
-#: ../src/window.c:120
-msgid "Remove Attachment"
-msgstr "Odstrani priponko"
-
-#: ../src/window.c:151
-msgid "Enable Tag"
-msgstr "Omogoči značko"
-
-#: ../src/window.c:157
-msgid "Remove Tag"
-msgstr "Odstrani značko"
 
 #: ../src/date-chooser.blp:13
 msgid "Reset"
@@ -306,7 +294,7 @@ msgstr "Ali ste prepričani?"
 msgid "Cancel"
 msgstr "Prekliči"
 
-#: ../src/delete-list-dialog.blp:13 ../src/task.blp:184
+#: ../src/delete-list-dialog.blp:13 ../src/task.blp:157
 msgid "Delete"
 msgstr "Izbriši"
 
@@ -318,7 +306,7 @@ msgstr "Preimenuj"
 msgid "New List Name"
 msgstr "Ime novega seznama"
 
-#: ../src/rrule-row.blp:7 ../src/task.blp:267
+#: ../src/rrule-row.blp:7 ../src/task.blp:240
 msgid "Repeat"
 msgstr "Ponovi"
 
@@ -592,108 +580,100 @@ msgctxt "All Tasks"
 msgid "All"
 msgstr "Vse"
 
-#: ../src/sidebar.blp:149
+#: ../src/sidebar.blp:152
 msgctxt "Tasks for Today"
 msgid "Today"
 msgstr "Danes"
 
-#: ../src/sidebar.blp:163
+#: ../src/sidebar.blp:169
 msgid "Task Lists"
 msgstr "Seznam nalog"
 
-#: ../src/sidebar.blp:168
+#: ../src/sidebar.blp:174
 msgid "No Task Lists"
 msgstr "Ni seznamov nalog"
 
-#: ../src/sidebar.blp:169
+#: ../src/sidebar.blp:175
 msgid "Create new or import “.ics”"
 msgstr "Ustvari novega ali uvozi ».ics«"
 
-#: ../src/task.blp:47
+#: ../src/task.blp:8
+msgid "Open Properties"
+msgstr "Odpri lastnosti"
+
+#: ../src/task.blp:53
 msgid "Toggle Completion"
 msgstr "Preklopi med dokončanji"
 
-#: ../src/task.blp:59
+#: ../src/task.blp:65
 msgid "Restore"
 msgstr "Obnovi"
 
-#: ../src/task.blp:111
+#: ../src/task.blp:107
+msgid "Uncompleted Sub-Tasks"
+msgstr "Nedokončane podnaloge"
+
+#: ../src/task.blp:117
 msgid "Toggle Sub-Tasks Entry"
 msgstr "Preklopi vnos podnalog"
 
-#: ../src/task.blp:134 ../src/window.blp:77
+#: ../src/task.blp:132
+msgid "Task Menu"
+msgstr "Meni seznama nalog"
+
+#: ../src/task.blp:141
 msgid "Properties"
 msgstr "Lastnosti"
 
-#: ../src/task.blp:135 ../src/task.blp:273 ../src/window.blp:131
+#: ../src/task.blp:142 ../src/task.blp:246
 msgid "Notes"
 msgstr "Opombe"
 
-#: ../src/task.blp:139
+#: ../src/task.blp:143
+msgid "Tags"
+msgstr "Značke"
+
+#: ../src/task.blp:147
 msgid "Edit Text"
 msgstr "Uredi besedilo"
 
-#: ../src/task.blp:140
+#: ../src/task.blp:148
 msgid "Copy Text"
 msgstr "Kopiraj besedilo"
 
-#: ../src/task.blp:144
-msgid "Task Color"
-msgstr "Barva naloge"
-
-#: ../src/task.blp:145
-msgid "Clear Color"
-msgstr "Počisti barvo"
-
-#: ../src/task.blp:150 ../src/task.blp:209 ../src/task-list.blp:88
-msgid "Priority"
-msgstr "Prioriteta"
-
-#: ../src/task.blp:153
-msgid "None"
-msgstr "Brez"
-
-#: ../src/task.blp:159
-msgid "Low"
-msgstr "Nizka"
-
-#: ../src/task.blp:165
-msgid "Medium"
-msgstr "Srednja"
-
-#: ../src/task.blp:171
-msgid "High"
-msgstr "Visoka"
-
-#: ../src/task.blp:179 ../src/task-list.blp:117
+#: ../src/task.blp:152 ../src/task-list.blp:117
 msgid "Export as \".ics\""
 msgstr "Izvozi kot ».ics«"
 
-#: ../src/task.blp:183
+#: ../src/task.blp:156
 msgid "Cancel / Restore"
 msgstr "Prekliči / obnovi"
 
-#: ../src/task.blp:235
+#: ../src/task.blp:182 ../src/task-list.blp:88
+msgid "Priority"
+msgstr "Prioriteta"
+
+#: ../src/task.blp:208
 msgid "Start"
 msgstr "Začetek"
 
-#: ../src/task.blp:236 ../src/task-list.blp:76 ../src/window.blp:85
+#: ../src/task.blp:209 ../src/task-list.blp:76
 msgid "Start Date"
 msgstr "Datum začetka"
 
-#: ../src/task.blp:251
+#: ../src/task.blp:224
 msgid "Due"
 msgstr "Zapade"
 
-#: ../src/task.blp:252 ../src/task-list.blp:82 ../src/window.blp:93
+#: ../src/task.blp:225 ../src/task-list.blp:82
 msgid "Due Date"
 msgstr "Datum zapadlosti"
 
-#: ../src/task.blp:283 ../src/task.blp:289 ../src/window.blp:105
+#: ../src/task.blp:256 ../src/task.blp:262
 msgid "Attachments"
 msgstr "Priloge"
 
-#: ../src/task.blp:329
+#: ../src/task.blp:302
 msgid "Add Sub-Task"
 msgstr "Dodaj podnalogo"
 
@@ -765,15 +745,19 @@ msgstr "Izbriši seznam"
 msgid "Search (Ctrl+F)"
 msgstr "Iskanje (krmilka+F)"
 
-#: ../src/task-list.blp:177
+#: ../src/task-list.blp:183
+msgid "No Tasks"
+msgstr "Ni nalog"
+
+#: ../src/task-list.blp:215
 msgid "Add Task"
 msgstr "Dodaj nalogo"
 
-#: ../src/task-list.blp:178
+#: ../src/task-list.blp:216
 msgid "Add Task (Ctrl+N)"
 msgstr "Dodaj nalogo (krmilka+N)"
 
-#: ../src/task-list.blp:203
+#: ../src/task-list.blp:220
 msgid ""
 "<b>Inline properties syntax:</b>\n"
 "\n"
@@ -786,38 +770,18 @@ msgstr ""
 "<b>#pN</b>    Nastavi prioriteto. <b>N</b> je število v obsegu <b>od 0 do 9</"
 "b>."
 
-#: ../src/task-list.blp:216
+#: ../src/task-list.blp:238
 msgid "Add Task (Ctrl+Return)"
 msgstr "Dodaj nalogo (krmilka+vnašalka)"
 
-#: ../src/task-list.blp:240
-msgid "No Tasks"
-msgstr "Ni nalog"
-
-#: ../src/task-list.blp:267
+#: ../src/task-list.blp:266
 msgid "Loading Tasks"
 msgstr "Nalaganje nalog"
 
-#: ../src/window.blp:41
+#: ../src/window.blp:40
 msgid "Sidebar"
 msgstr "Stranska vrstica"
 
-#: ../src/window.blp:48
+#: ../src/window.blp:47
 msgid "Content"
 msgstr "Vsebina"
-
-#: ../src/window.blp:82
-msgid "Date and Time"
-msgstr "Datum in čas"
-
-#: ../src/window.blp:110
-msgid "Add Attachment"
-msgstr "Dodaj prilogo"
-
-#: ../src/window.blp:117
-msgid "Tags"
-msgstr "Značke"
-
-#: ../src/window.blp:122
-msgid "New Tag"
-msgstr "Nova značka"
