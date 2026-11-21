@@ -65,6 +65,7 @@
             <ul>
                 <li>Added background for counters</li>
                 <li>Added more tooltips</li>
+                <li>Added tag entry in task menu</li>
                 <li>Adaptivity improvements</li>
                 <li>Custom color button</li>
                 <li>Fixed several caldav issues by @amadeusp</li>
