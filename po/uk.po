@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-20 15:14+0000\n"
-"PO-Revision-Date: 2026-11-20 18:55+0200\n"
+"POT-Creation-Date: 2026-11-21 13:26+0000\n"
+"PO-Revision-Date: 2026-11-21 20:59+0200\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
 "Language: uk\n"
@@ -28,9 +28,10 @@ msgstr "Errands"
 msgid "translator-credits"
 msgstr "volkov <volkovissocool@gmail.com>"
 
-#: ../src/date-chooser.c:101 ../src/date-chooser.blp:7
-msgid "Not Set"
-msgstr "Не встановлено"
+#: ../src/color-button.c:70
+#| msgid "Clear Color"
+msgid "Select Color"
+msgstr "Виберіть колір"
 
 #: ../src/rrule-row.c:176
 msgctxt "Repeat every ..."
@@ -81,20 +82,20 @@ msgstr "Повторювати безкінечно"
 msgid "Repeat %zu times"
 msgstr "Повторити %zu разів"
 
-#: ../src/sidebar.c:321
+#: ../src/sidebar.c:324
 msgid "Only .ics files are supported"
 msgstr "Передбачено підтримку лише файлів .ics"
 
-#: ../src/sidebar.c:326
+#: ../src/sidebar.c:329
 msgid "Can't load list. It's incorrect or already exists"
 msgstr "Не вдалося завантажити список. Він помилковий або вже існує"
 
-#: ../src/sync.c:303
+#: ../src/sync.c:305
 #, c-format
 msgid "Added remote task list: %s"
 msgstr "Віддалений список завдань додано: %s"
 
-#: ../src/sync.c:536
+#: ../src/sync.c:552
 msgid "Sync Failed"
 msgstr "Спроба синхронізації зазнала невдачі"
 
@@ -246,43 +247,43 @@ msgstr "Усі завдання"
 msgid "Tasks for Today"
 msgstr "Завдання на сьогодні"
 
-#: ../src/task-list-item.c:150
+#: ../src/task-list-item.c:149
 msgid "Untitled"
 msgstr "Без назви"
 
-#: ../src/date-chooser.blp:13
+#: ../src/date-chooser.blp:11
 msgid "Reset"
 msgstr "Скинути"
 
-#: ../src/date-chooser.blp:27 ../src/rrule-row.blp:50
+#: ../src/date-chooser.blp:25 ../src/rrule-row.blp:50
 msgid "Date"
 msgstr "Дата"
 
-#: ../src/date-chooser.blp:36
+#: ../src/date-chooser.blp:34
 msgid "Today"
 msgstr "Сьогодні"
 
-#: ../src/date-chooser.blp:50
+#: ../src/date-chooser.blp:48
 msgid "Tomorrow"
 msgstr "Завтра"
 
-#: ../src/date-chooser.blp:85
+#: ../src/date-chooser.blp:83
 msgid "Time"
 msgstr "Час"
 
-#: ../src/date-chooser.blp:149
+#: ../src/date-chooser.blp:147
 msgid "9:00"
 msgstr "9:00"
 
-#: ../src/date-chooser.blp:164
+#: ../src/date-chooser.blp:162
 msgid "12:00"
 msgstr "12:00"
 
-#: ../src/date-chooser.blp:179
+#: ../src/date-chooser.blp:177
 msgid "17:00"
 msgstr "17:00"
 
-#: ../src/date-chooser.blp:194
+#: ../src/date-chooser.blp:192
 msgid "20:00"
 msgstr "20:00"
 
@@ -507,7 +508,7 @@ msgstr "Закрити вікно"
 msgid "Quit"
 msgstr "Вийти"
 
-#: ../src/shortcuts-dialog.blp:34 ../src/task-list.blp:12
+#: ../src/shortcuts-dialog.blp:34 ../src/task-list.blp:23
 msgid "Task List"
 msgstr "Список завдань"
 
@@ -598,7 +599,6 @@ msgid "Create new or import “.ics”"
 msgstr "Створити новий або імпортувати «.ics»"
 
 #: ../src/task.blp:8
-#| msgid "Properties"
 msgid "Open Properties"
 msgstr "Відкрити властивості"
 
@@ -611,7 +611,6 @@ msgid "Restore"
 msgstr "Відновити"
 
 #: ../src/task.blp:107
-#| msgid "Add Sub-Task"
 msgid "Uncompleted Sub-Tasks"
 msgstr "Незавершені підзавдання"
 
@@ -620,7 +619,6 @@ msgid "Toggle Sub-Tasks Entry"
 msgstr "Перемкнути введення підзавдань"
 
 #: ../src/task.blp:132
-#| msgid "Open Task List Menu"
 msgid "Task Menu"
 msgstr "Меню завдання"
 
@@ -644,7 +642,7 @@ msgstr "Редагувати текст"
 msgid "Copy Text"
 msgstr "Копіювати текст"
 
-#: ../src/task.blp:152 ../src/task-list.blp:117
+#: ../src/task.blp:152 ../src/task-list.blp:129
 msgid "Export as \".ics\""
 msgstr "Експортувати як «.ics»"
 
@@ -652,7 +650,7 @@ msgstr "Експортувати як «.ics»"
 msgid "Cancel / Restore"
 msgstr "Скасувати / відновити"
 
-#: ../src/task.blp:182 ../src/task-list.blp:88
+#: ../src/task.blp:182 ../src/task-list.blp:100
 msgid "Priority"
 msgstr "Пріоритет"
 
@@ -660,7 +658,7 @@ msgstr "Пріоритет"
 msgid "Start"
 msgstr "Початок"
 
-#: ../src/task.blp:209 ../src/task-list.blp:76
+#: ../src/task.blp:209 ../src/task-list.blp:88
 msgid "Start Date"
 msgstr "Дата початку"
 
@@ -668,7 +666,7 @@ msgstr "Дата початку"
 msgid "Due"
 msgstr "Термін"
 
-#: ../src/task.blp:225 ../src/task-list.blp:82
+#: ../src/task.blp:225 ../src/task-list.blp:94
 msgid "Due Date"
 msgstr "Термін виконання"
 
@@ -680,87 +678,87 @@ msgstr "Долучення"
 msgid "Add Sub-Task"
 msgstr "Додати нову підзадачу"
 
-#: ../src/task-list.blp:18
+#: ../src/task-list.blp:30
 msgid "Toggle Sidebar (Ctrl+B)"
 msgstr "Увімкнути або вимкнути бічну панель (Ctrl+B)"
 
-#: ../src/task-list.blp:33
+#: ../src/task-list.blp:45
 msgid "Sort / Filter (Ctrl+Shift+F)"
 msgstr "Сортування/Фільтрування (Ctrl+Shift+F)"
 
-#: ../src/task-list.blp:37
+#: ../src/task-list.blp:49
 msgid "Show Tasks"
 msgstr "Показати завдання"
 
-#: ../src/task-list.blp:40
+#: ../src/task-list.blp:52
 msgid "Completed"
 msgstr "Виконано"
 
-#: ../src/task-list.blp:45
+#: ../src/task-list.blp:57
 msgid "Cancelled"
 msgstr "Скасовані"
 
-#: ../src/task-list.blp:51
+#: ../src/task-list.blp:63
 msgid "Sort Order"
 msgstr "Порядок сортування"
 
-#: ../src/task-list.blp:54
+#: ../src/task-list.blp:66
 msgid "Descending"
 msgstr "За спаданням"
 
-#: ../src/task-list.blp:60
+#: ../src/task-list.blp:72
 msgid "Ascending"
 msgstr "За зростанням"
 
-#: ../src/task-list.blp:67
+#: ../src/task-list.blp:79
 msgid "Sort By"
 msgstr "Сортувати за"
 
-#: ../src/task-list.blp:70
+#: ../src/task-list.blp:82
 msgid "Created"
 msgstr "Створено"
 
-#: ../src/task-list.blp:107
+#: ../src/task-list.blp:119
 msgid "Task List Menu (Ctrl+M)"
 msgstr "Меню списку завдань (Ctrl+M)"
 
-#: ../src/task-list.blp:113
+#: ../src/task-list.blp:125
 msgid "Rename List"
 msgstr "Перейменувати список"
 
-#: ../src/task-list.blp:118
+#: ../src/task-list.blp:130
 msgid "Print"
 msgstr "Друк"
 
-#: ../src/task-list.blp:122
+#: ../src/task-list.blp:134
 msgid "Delete Completed"
 msgstr "Вилучити виконані завдання"
 
-#: ../src/task-list.blp:123
+#: ../src/task-list.blp:135
 msgid "Delete Cancelled"
 msgstr "Вилучити скасовані завдання"
 
-#: ../src/task-list.blp:127
+#: ../src/task-list.blp:139
 msgid "Delete List"
 msgstr "Вилучити список"
 
-#: ../src/task-list.blp:144
+#: ../src/task-list.blp:156
 msgid "Search (Ctrl+F)"
 msgstr "Пошук (Ctrl+F)"
 
-#: ../src/task-list.blp:183
+#: ../src/task-list.blp:195
 msgid "No Tasks"
 msgstr "Немає завдань"
 
-#: ../src/task-list.blp:215
+#: ../src/task-list.blp:227
 msgid "Add Task"
 msgstr "Додати нову задачу"
 
-#: ../src/task-list.blp:216
+#: ../src/task-list.blp:228
 msgid "Add Task (Ctrl+N)"
 msgstr "Додати нову задачу (Ctrl+N)"
 
-#: ../src/task-list.blp:220
+#: ../src/task-list.blp:232
 msgid ""
 "<b>Inline properties syntax:</b>\n"
 "\n"
@@ -773,11 +771,11 @@ msgstr ""
 "<b>#pN</b>     Встановити пріоритетність. <b>N</b> — число у діапазоні "
 "<b>0..9</b>."
 
-#: ../src/task-list.blp:238
+#: ../src/task-list.blp:250
 msgid "Add Task (Ctrl+Return)"
 msgstr "Додати нову задачу (Ctrl+Return)"
 
-#: ../src/task-list.blp:266
+#: ../src/task-list.blp:278
 msgid "Loading Tasks"
 msgstr "Завантаження завдань"
 
@@ -789,11 +787,11 @@ msgstr "Бічна панель"
 msgid "Content"
 msgstr "Вміст"
 
+#~ msgid "Not Set"
+#~ msgstr "Не встановлено"
+
 #~ msgid "Task Color"
 #~ msgstr "Колір завдання"
-
-#~ msgid "Clear Color"
-#~ msgstr "Зняти колір"
 
 #~ msgid "None"
 #~ msgstr "Немає"
