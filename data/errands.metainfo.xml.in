@@ -60,6 +60,13 @@
     <display_length compare="ge">360</display_length>
   </requires>
   <releases>
+    <release version="51.2.4" date="2026-11-22">
+        <description translate="no">
+            <ul>
+                <li>Bugfixes</li>
+            </ul>
+        </description>
+    </release>
     <release version="51.2.3" date="2026-11-22">
         <description translate="no">
             <ul>
