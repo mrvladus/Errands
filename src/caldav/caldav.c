@@ -134,6 +134,60 @@ static inline gchar *caldav_util_pull_etag(CalDAVClient *c, SoupSession *session
   return etag;
 }
 
+static inline gchar *caldav_util_pull_ctag(CalDAVClient *c, const gchar *calendar_url) {
+  const gchar *body = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                      "<d:propfind xmlns:d=\"" DAV_NS "\" "
+                      "xmlns:cs=\"" CS_NS "\">"
+                      "<d:prop><cs:getctag/></d:prop>"
+                      "</d:propfind>";
+
+  g_autoptr(SoupSession) session = soup_session_new();
+  g_autoptr(SoupMessage) message = soup_message_new("PROPFIND", calendar_url);
+  g_autoptr(GBytes) request_body = g_bytes_new(body, strlen(body));
+  g_autoptr(GError) error = NULL;
+  soup_message_headers_replace(soup_message_get_request_headers(message), "Depth", "0");
+  soup_message_set_request_body_from_bytes(message, "application/xml; charset=utf-8", request_body);
+  caldav_util_add_basic_auth(message, c);
+  g_autoptr(GBytes) response = soup_session_send_and_read(session, message, NULL, &error);
+  if (!response || soup_message_get_status(message) != 207) return NULL;
+
+  gsize size;
+  const gchar *data = g_bytes_get_data(response, &size);
+  xmlDocPtr doc = xmlReadMemory(data, size, NULL, NULL, XML_PARSE_NONET | XML_PARSE_NOBLANKS);
+  if (!doc) return NULL;
+
+  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
+  xmlXPathRegisterNs(xpath, BAD_CAST "cs", BAD_CAST CS_NS);
+  xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST "//cs:getctag", xpath);
+  gchar *ctag = NULL;
+  if (result && result->nodesetval && result->nodesetval->nodeNr > 0)
+    ctag = caldav_util_get_node_content(result->nodesetval->nodeTab[0]);
+  if (result) xmlXPathFreeObject(result);
+  xmlXPathFreeContext(xpath);
+  xmlFreeDoc(doc);
+
+  return ctag;
+}
+
+static inline guint caldav_send_create_calendar_request(CalDAVClient *c, SoupSession *session, const gchar *method,
+                                                        const gchar *url, const gchar *body) {
+  g_autoptr(SoupMessage) message = soup_message_new(method, url);
+  g_autoptr(GBytes) request_body = g_bytes_new(body, strlen(body));
+  g_autoptr(GError) error = NULL;
+
+  if (!message) return 0;
+
+  soup_message_set_request_body_from_bytes(message, "application/xml; charset=utf-8", request_body);
+  caldav_util_add_basic_auth(message, c);
+  g_autoptr(GBytes) response = soup_session_send_and_read(session, message, NULL, &error);
+  if (!response) {
+    g_warning("CalDAV: %s request failed: %s", method, error->message);
+    return 0;
+  }
+
+  return soup_message_get_status(message);
+}
+
 // -------------------- CalDAVClient -------------------- //
 
 struct _CalDAVClient {
@@ -436,12 +490,81 @@ GPtrArray *caldav_client_pull_calendars(CalDAVClient *self) {
     g_autofree gchar *display_name = caldav_util_get_node_content(display_node);
     g_autofree gchar *ctag = caldav_util_get_node_content(ctag_node);
     g_autofree gchar *color = caldav_util_get_node_content(color_node);
-    CalDAVCalendar *calendar = caldav_calendar_new(url, display_name, color, ctag);
+    CalDAVCalendar *calendar = caldav_calendar_new(self, url, display_name, color, ctag);
     g_ptr_array_add(calendars, calendar);
   }
   xmlFreeDoc(doc);
 
   return calendars;
+}
+
+CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *self, const gchar *display_name, const gchar *color) {
+  g_return_val_if_fail(CALDAV_IS_CLIENT(self), NULL);
+
+  const gchar *home_set_url = caldav_client_get_home_set(self);
+
+  g_return_val_if_fail(home_set_url && *home_set_url, NULL);
+  g_return_val_if_fail(display_name && *display_name, NULL);
+
+  // Generate calendar URL
+  g_autofree gchar *uuid = g_uuid_string_random();
+  g_autofree gchar *collection_url =
+      g_str_has_suffix(home_set_url, "/") ? g_strdup(home_set_url) : g_strconcat(home_set_url, "/", NULL);
+  g_autofree gchar *calendar_url = g_uri_resolve_relative(collection_url, uuid, G_URI_FLAGS_NONE, NULL);
+  if (!calendar_url) return NULL;
+
+  // Escape XML values
+  g_autofree gchar *escaped_name = g_markup_escape_text(display_name, -1);
+  g_autofree gchar *escaped_color = color ? g_markup_escape_text(color, -1) : NULL;
+  g_autofree gchar *color_prop =
+      escaped_color ? g_strdup_printf("<a:calendar-color>%s</a:calendar-color>", escaped_color) : g_strdup("");
+
+  // Standard MKCALENDAR body
+  g_autofree gchar *mkcalendar_body = g_strdup_printf("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                                                      "<c:mkcalendar xmlns:d=\"" DAV_NS "\" "
+                                                      "xmlns:c=\"" CALDAV_NS "\" "
+                                                      "xmlns:a=\"" APPLE_NS "\">"
+                                                      "<d:set><d:prop>"
+                                                      "<d:resourcetype><d:collection/><c:calendar/></d:resourcetype>"
+                                                      "<d:displayname>%s</d:displayname>"
+                                                      "<c:supported-calendar-component-set>"
+                                                      "<c:comp name=\"VTODO\"/>"
+                                                      "</c:supported-calendar-component-set>"
+                                                      "%s"
+                                                      "</d:prop></d:set>"
+                                                      "</c:mkcalendar>",
+                                                      escaped_name, color_prop);
+
+  // Radicale-compatible MKCOL body
+  g_autofree gchar *mkcol_body = g_strdup_printf("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                                                 "<d:create xmlns:d=\"" DAV_NS "\" "
+                                                 "xmlns:c=\"" CALDAV_NS "\" "
+                                                 "xmlns:a=\"" APPLE_NS "\">"
+                                                 "<d:set><d:prop>"
+                                                 "<d:resourcetype><d:collection/><c:calendar/></d:resourcetype>"
+                                                 "<d:displayname>%s</d:displayname>"
+                                                 "<c:supported-calendar-component-set>"
+                                                 "<c:comp name=\"VTODO\"/>"
+                                                 "</c:supported-calendar-component-set>"
+                                                 "%s"
+                                                 "</d:prop></d:set>"
+                                                 "</d:create>",
+                                                 escaped_name, color_prop);
+
+  g_autoptr(SoupSession) session = soup_session_new();
+  // Try standard CalDAV method first
+  guint status = caldav_send_create_calendar_request(self, session, "MKCALENDAR", calendar_url, mkcalendar_body);
+  // Fall back to MKCOL (Radicale compatibility)
+  if (status == SOUP_STATUS_METHOD_NOT_ALLOWED || status == SOUP_STATUS_NOT_IMPLEMENTED)
+    status = caldav_send_create_calendar_request(self, session, "MKCOL", calendar_url, mkcol_body);
+  if (status != SOUP_STATUS_CREATED) {
+    g_warning("CalDAV: Create calendar returned HTTP %u", status);
+    return NULL;
+  }
+
+  g_autofree gchar *ctag = caldav_util_pull_ctag(self, calendar_url);
+
+  return caldav_calendar_new(self, calendar_url, display_name, color, ctag);
 }
 
 const char *caldav_client_get_url(CalDAVClient *c) { return c->url; }
@@ -501,6 +624,8 @@ void caldav_calendar_changes_free(CalDAVCalendarChanges *self) {
 
 struct _CalDAVCalendar {
   GObject parent_instance;
+
+  CalDAVClient *client;
 
   gchar *url;
   gchar *ctag;
@@ -596,67 +721,13 @@ static void caldav_calendar_class_init(CalDAVCalendarClass *klass) {
 
 static void caldav_calendar_init(CalDAVCalendar *self) {}
 
-// ---------- PRIVATE ---------- //
-
-static inline gchar *caldav_pull_ctag(CalDAVClient *c, const gchar *calendar_url) {
-  const gchar *body = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-                      "<d:propfind xmlns:d=\"" DAV_NS "\" "
-                      "xmlns:cs=\"" CS_NS "\">"
-                      "<d:prop><cs:getctag/></d:prop>"
-                      "</d:propfind>";
-
-  g_autoptr(SoupSession) session = soup_session_new();
-  g_autoptr(SoupMessage) message = soup_message_new("PROPFIND", calendar_url);
-  g_autoptr(GBytes) request_body = g_bytes_new(body, strlen(body));
-  g_autoptr(GError) error = NULL;
-  soup_message_headers_replace(soup_message_get_request_headers(message), "Depth", "0");
-  soup_message_set_request_body_from_bytes(message, "application/xml; charset=utf-8", request_body);
-  caldav_util_add_basic_auth(message, c);
-  g_autoptr(GBytes) response = soup_session_send_and_read(session, message, NULL, &error);
-  if (!response || soup_message_get_status(message) != 207) return NULL;
-
-  gsize size;
-  const gchar *data = g_bytes_get_data(response, &size);
-  xmlDocPtr doc = xmlReadMemory(data, size, NULL, NULL, XML_PARSE_NONET | XML_PARSE_NOBLANKS);
-  if (!doc) return NULL;
-
-  xmlXPathContextPtr xpath = xmlXPathNewContext(doc);
-  xmlXPathRegisterNs(xpath, BAD_CAST "cs", BAD_CAST CS_NS);
-  xmlXPathObjectPtr result = xmlXPathEvalExpression(BAD_CAST "//cs:getctag", xpath);
-  gchar *ctag = NULL;
-  if (result && result->nodesetval && result->nodesetval->nodeNr > 0)
-    ctag = caldav_util_get_node_content(result->nodesetval->nodeTab[0]);
-  if (result) xmlXPathFreeObject(result);
-  xmlXPathFreeContext(xpath);
-  xmlFreeDoc(doc);
-
-  return ctag;
-}
-
-static inline guint caldav_send_create_calendar_request(CalDAVClient *c, SoupSession *session, const gchar *method,
-                                                        const gchar *url, const gchar *body) {
-  g_autoptr(SoupMessage) message = soup_message_new(method, url);
-  g_autoptr(GBytes) request_body = g_bytes_new(body, strlen(body));
-  g_autoptr(GError) error = NULL;
-
-  if (!message) return 0;
-
-  soup_message_set_request_body_from_bytes(message, "application/xml; charset=utf-8", request_body);
-  caldav_util_add_basic_auth(message, c);
-  g_autoptr(GBytes) response = soup_session_send_and_read(session, message, NULL, &error);
-  if (!response) {
-    g_warning("CalDAV: %s request failed: %s", method, error->message);
-    return 0;
-  }
-
-  return soup_message_get_status(message);
-}
-
 // ---------- PUBLIC ---------- //
 
-CalDAVCalendar *caldav_calendar_new(const gchar *url, const gchar *display_name, const gchar *color, const gchar *ctag) {
+CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, const gchar *url, const gchar *display_name, const gchar *color,
+                                    const gchar *ctag) {
   CalDAVCalendar *self = g_object_new(CALDAV_TYPE_CALENDAR, NULL);
 
+  self->client = client;
   self->url = g_strdup(url);
   self->display_name = g_strdup(display_name);
   self->color = g_strdup(color);
@@ -665,82 +736,13 @@ CalDAVCalendar *caldav_calendar_new(const gchar *url, const gchar *display_name,
   return self;
 }
 
-CalDAVCalendar *caldav_calendar_create(CalDAVClient *c, const gchar *display_name, const gchar *color) {
-  g_return_val_if_fail(CALDAV_IS_CLIENT(c), NULL);
+gboolean caldav_calendar_delete(CalDAVCalendar *self) {
+  g_return_val_if_fail(CALDAV_IS_CALENDAR(self), FALSE);
 
-  const gchar *home_set_url = caldav_client_get_home_set(c);
-
-  g_return_val_if_fail(home_set_url && *home_set_url, NULL);
-  g_return_val_if_fail(display_name && *display_name, NULL);
-
-  // Generate calendar URL
-  g_autofree gchar *uuid = g_uuid_string_random();
-  g_autofree gchar *collection_url =
-      g_str_has_suffix(home_set_url, "/") ? g_strdup(home_set_url) : g_strconcat(home_set_url, "/", NULL);
-  g_autofree gchar *calendar_url = g_uri_resolve_relative(collection_url, uuid, G_URI_FLAGS_NONE, NULL);
-  if (!calendar_url) return NULL;
-
-  // Escape XML values
-  g_autofree gchar *escaped_name = g_markup_escape_text(display_name, -1);
-  g_autofree gchar *escaped_color = color ? g_markup_escape_text(color, -1) : NULL;
-  g_autofree gchar *color_prop =
-      escaped_color ? g_strdup_printf("<a:calendar-color>%s</a:calendar-color>", escaped_color) : g_strdup("");
-
-  // Standard MKCALENDAR body
-  g_autofree gchar *mkcalendar_body = g_strdup_printf("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-                                                      "<c:mkcalendar xmlns:d=\"" DAV_NS "\" "
-                                                      "xmlns:c=\"" CALDAV_NS "\" "
-                                                      "xmlns:a=\"" APPLE_NS "\">"
-                                                      "<d:set><d:prop>"
-                                                      "<d:resourcetype><d:collection/><c:calendar/></d:resourcetype>"
-                                                      "<d:displayname>%s</d:displayname>"
-                                                      "<c:supported-calendar-component-set>"
-                                                      "<c:comp name=\"VTODO\"/>"
-                                                      "</c:supported-calendar-component-set>"
-                                                      "%s"
-                                                      "</d:prop></d:set>"
-                                                      "</c:mkcalendar>",
-                                                      escaped_name, color_prop);
-
-  // Radicale-compatible MKCOL body
-  g_autofree gchar *mkcol_body = g_strdup_printf("<?xml version=\"1.0\" encoding=\"utf-8\"?>"
-                                                 "<d:create xmlns:d=\"" DAV_NS "\" "
-                                                 "xmlns:c=\"" CALDAV_NS "\" "
-                                                 "xmlns:a=\"" APPLE_NS "\">"
-                                                 "<d:set><d:prop>"
-                                                 "<d:resourcetype><d:collection/><c:calendar/></d:resourcetype>"
-                                                 "<d:displayname>%s</d:displayname>"
-                                                 "<c:supported-calendar-component-set>"
-                                                 "<c:comp name=\"VTODO\"/>"
-                                                 "</c:supported-calendar-component-set>"
-                                                 "%s"
-                                                 "</d:prop></d:set>"
-                                                 "</d:create>",
-                                                 escaped_name, color_prop);
-
-  g_autoptr(SoupSession) session = soup_session_new();
-  // Try standard CalDAV method first
-  guint status = caldav_send_create_calendar_request(c, session, "MKCALENDAR", calendar_url, mkcalendar_body);
-  // Fall back to MKCOL (Radicale compatibility)
-  if (status == SOUP_STATUS_METHOD_NOT_ALLOWED || status == SOUP_STATUS_NOT_IMPLEMENTED)
-    status = caldav_send_create_calendar_request(c, session, "MKCOL", calendar_url, mkcol_body);
-  if (status != SOUP_STATUS_CREATED) {
-    g_warning("CalDAV: Create calendar returned HTTP %u", status);
-    return NULL;
-  }
-
-  g_autofree gchar *ctag = caldav_pull_ctag(c, calendar_url);
-
-  return caldav_calendar_new(calendar_url, display_name, color, ctag);
-}
-
-gboolean caldav_calendar_delete(CalDAVClient *c, CalDAVCalendar *calendar) {
-  g_return_val_if_fail(CALDAV_IS_CLIENT(c), FALSE);
-  g_return_val_if_fail(CALDAV_IS_CALENDAR(calendar), FALSE);
-  const gchar *url = caldav_calendar_get_url(calendar);
+  const gchar *url = caldav_calendar_get_url(self);
   g_return_val_if_fail(url && *url, FALSE);
   guint status;
-  g_autoptr(GBytes) response = caldav_util_request(c, "DELETE", url, &status);
+  g_autoptr(GBytes) response = caldav_util_request(self->client, "DELETE", url, &status);
   if (!response) return FALSE;
   if (status != SOUP_STATUS_OK && status != SOUP_STATUS_NO_CONTENT && status != SOUP_STATUS_ACCEPTED) {
     g_warning("CalDAV: Delete calendar returned HTTP %u", status);
@@ -749,11 +751,10 @@ gboolean caldav_calendar_delete(CalDAVClient *c, CalDAVCalendar *calendar) {
   return TRUE;
 }
 
-gboolean caldav_calendar_update(CalDAVClient *c, CalDAVCalendar *calendar, const gchar *display_name, const gchar *color) {
-  g_return_val_if_fail(CALDAV_IS_CLIENT(c), FALSE);
-  g_return_val_if_fail(CALDAV_IS_CALENDAR(calendar), FALSE);
+gboolean caldav_calendar_update(CalDAVCalendar *self, const gchar *display_name, const gchar *color) {
+  g_return_val_if_fail(CALDAV_IS_CALENDAR(self), FALSE);
 
-  const gchar *url = caldav_calendar_get_url(calendar);
+  const gchar *url = caldav_calendar_get_url(self);
   g_return_val_if_fail(url && *url, FALSE);
 
   g_autofree gchar *escaped_name = display_name ? g_markup_escape_text(display_name, -1) : NULL;
@@ -779,7 +780,7 @@ gboolean caldav_calendar_update(CalDAVClient *c, CalDAVCalendar *calendar, const
   if (!message) return FALSE;
 
   soup_message_set_request_body_from_bytes(message, "application/xml; charset=utf-8", request_body);
-  caldav_util_add_basic_auth(message, c);
+  caldav_util_add_basic_auth(message, self->client);
   g_autoptr(GBytes) response = soup_session_send_and_read(session, message, NULL, &error);
   if (!response) {
     g_warning("CalDAV: Update calendar request failed: %s", error->message);
@@ -791,20 +792,19 @@ gboolean caldav_calendar_update(CalDAVClient *c, CalDAVCalendar *calendar, const
     return FALSE;
   }
 
-  if (display_name) caldav_calendar_set_display_name(calendar, display_name);
-  if (color) caldav_calendar_set_color(calendar, color);
-  g_autofree gchar *ctag = caldav_pull_ctag(c, url);
-  if (ctag) caldav_calendar_set_ctag(calendar, ctag);
+  if (display_name) caldav_calendar_set_display_name(self, display_name);
+  if (color) caldav_calendar_set_color(self, color);
+  g_autofree gchar *ctag = caldav_util_pull_ctag(self->client, url);
+  if (ctag) caldav_calendar_set_ctag(self, ctag);
 
   return TRUE;
 }
 
-CalDAVSyncResult *caldav_calendar_sync(CalDAVClient *c, CalDAVCalendar *calendar) {
-  g_assert(CALDAV_IS_CLIENT(c));
-  g_assert(CALDAV_IS_CALENDAR(calendar));
+CalDAVSyncResult *caldav_calendar_sync(CalDAVCalendar *self) {
+  g_assert(CALDAV_IS_CALENDAR(self));
 
-  const gchar *calendar_url = caldav_calendar_get_url(calendar);
-  const gchar *sync_token = caldav_calendar_get_sync_token(calendar);
+  const gchar *calendar_url = caldav_calendar_get_url(self);
+  const gchar *sync_token = caldav_calendar_get_sync_token(self);
   g_autofree gchar *escaped_token = g_markup_escape_text(sync_token ? sync_token : "", -1);
   g_autofree gchar *body = g_strdup_printf("<?xml version=\"1.0\" encoding=\"utf-8\" ?>"
                                            "<d:sync-collection xmlns:d=\"" DAV_NS "\" "
@@ -819,7 +819,7 @@ CalDAVSyncResult *caldav_calendar_sync(CalDAVClient *c, CalDAVCalendar *calendar
                                            escaped_token);
   g_autoptr(SoupSession) session = soup_session_new();
   g_autoptr(SoupMessage) message = soup_message_new("REPORT", calendar_url);
-  caldav_util_add_basic_auth(message, c);
+  caldav_util_add_basic_auth(message, self->client);
   soup_message_headers_replace(soup_message_get_request_headers(message), "Depth", "0");
   soup_message_set_request_body(message, "application/xml; charset=utf-8",
                                 g_memory_input_stream_new_from_data(g_strdup(body), strlen(body), g_free), -1);
@@ -889,7 +889,7 @@ CalDAVSyncResult *caldav_calendar_sync(CalDAVClient *c, CalDAVCalendar *calendar
     for (icalcomponent *todo = icalcomponent_get_first_component(vcalendar, ICAL_VTODO_COMPONENT); todo;
          todo = icalcomponent_get_next_component(vcalendar, ICAL_VTODO_COMPONENT)) {
       icalcomponent *clone = icalcomponent_clone(todo);
-      CalDAVTodo *item = caldav_todo_new(clone, url, etag);
+      CalDAVTodo *item = caldav_todo_new(self->client, clone, url, etag);
       if (item) g_ptr_array_add(result->changed, item);
     }
     icalcomponent_free(vcalendar);
@@ -901,14 +901,13 @@ CalDAVSyncResult *caldav_calendar_sync(CalDAVClient *c, CalDAVCalendar *calendar
     return NULL;
   }
 
-  caldav_calendar_set_sync_token(calendar, result->sync_token);
+  caldav_calendar_set_sync_token(self, result->sync_token);
 
   return result;
 }
 
-CalDAVTodo *caldav_calendar_create_todo(CalDAVClient *c, CalDAVCalendar *calendar, icalcomponent *todo) {
-  g_return_val_if_fail(CALDAV_IS_CLIENT(c), NULL);
-  g_return_val_if_fail(CALDAV_IS_CALENDAR(calendar), NULL);
+CalDAVTodo *caldav_calendar_create_todo(CalDAVCalendar *self, icalcomponent *todo) {
+  g_return_val_if_fail(CALDAV_IS_CALENDAR(self), NULL);
   g_return_val_if_fail(todo != NULL, NULL);
   g_return_val_if_fail(icalcomponent_isa(todo) == ICAL_VTODO_COMPONENT, NULL);
 
@@ -918,7 +917,7 @@ CalDAVTodo *caldav_calendar_create_todo(CalDAVClient *c, CalDAVCalendar *calenda
   // Generate resource URL
   g_autofree gchar *escaped_uid = g_uri_escape_string(uid, NULL, FALSE);
   g_autofree gchar *resource_name = g_strconcat(escaped_uid, ".ics", NULL);
-  const gchar *calendar_url = caldav_calendar_get_url(calendar);
+  const gchar *calendar_url = caldav_calendar_get_url(self);
   g_autofree gchar *collection_url =
       g_str_has_suffix(calendar_url, "/") ? g_strdup(calendar_url) : g_strconcat(calendar_url, "/", NULL);
   g_autoptr(GError) error = NULL;
@@ -948,7 +947,7 @@ CalDAVTodo *caldav_calendar_create_todo(CalDAVClient *c, CalDAVCalendar *calenda
   // Do not overwrite an existing resource
   soup_message_headers_replace(soup_message_get_request_headers(message), "If-None-Match", "*");
   soup_message_set_request_body_from_bytes(message, "text/calendar; charset=utf-8", request_body);
-  caldav_util_add_basic_auth(message, c);
+  caldav_util_add_basic_auth(message, self->client);
   g_autoptr(GBytes) response = soup_session_send_and_read(session, message, NULL, &error);
   if (!response) {
     g_warning("CalDAV: Create VTODO request failed: %s", error->message);
@@ -963,9 +962,9 @@ CalDAVTodo *caldav_calendar_create_todo(CalDAVClient *c, CalDAVCalendar *calenda
 
   const gchar *etag = soup_message_headers_get_one(soup_message_get_response_headers(message), "ETag");
   g_autofree gchar *new_etag = g_strdup(etag);
-  if (!new_etag) new_etag = caldav_util_pull_etag(c, session, todo_url);
+  if (!new_etag) new_etag = caldav_util_pull_etag(self->client, session, todo_url);
 
-  return caldav_todo_new(icalcomponent_clone(todo), todo_url, etag);
+  return caldav_todo_new(self->client, icalcomponent_clone(todo), todo_url, etag);
 }
 
 CalDAVCalendarChanges *caldav_calendar_compare(GPtrArray *old_calendars, GPtrArray *new_calendars) {
@@ -1046,6 +1045,8 @@ void caldav_calendar_set_sync_token(CalDAVCalendar *self, const gchar *sync_toke
 
 struct _CalDAVTodo {
   GObject parent_instance;
+
+  CalDAVClient *client;
 
   icalcomponent *ical;
   gchar *url;
@@ -1128,12 +1129,13 @@ static void caldav_todo_class_init(CalDAVTodoClass *klass) {
 
 static void caldav_todo_init(CalDAVTodo *self) {}
 
-CalDAVTodo *caldav_todo_new(icalcomponent *ical, const gchar *url, const gchar *etag) {
+CalDAVTodo *caldav_todo_new(CalDAVClient *client, icalcomponent *ical, const gchar *url, const gchar *etag) {
   g_return_val_if_fail(ical != NULL, NULL);
   g_return_val_if_fail(icalcomponent_isa(ical) == ICAL_VTODO_COMPONENT, NULL);
 
   CalDAVTodo *self = g_object_new(CALDAV_TYPE_TODO, NULL);
 
+  self->client = client;
   self->ical = ical;
   self->url = g_strdup(url);
   self->etag = g_strdup(etag);
@@ -1141,8 +1143,7 @@ CalDAVTodo *caldav_todo_new(icalcomponent *ical, const gchar *url, const gchar *
   return self;
 }
 
-gboolean caldav_todo_delete(CalDAVClient *c, CalDAVTodo *self) {
-  g_return_val_if_fail(CALDAV_IS_CLIENT(c), FALSE);
+gboolean caldav_todo_delete(CalDAVTodo *self) {
   g_return_val_if_fail(CALDAV_IS_TODO(self), FALSE);
 
   const gchar *url = caldav_todo_get_url(self);
@@ -1161,7 +1162,7 @@ gboolean caldav_todo_delete(CalDAVClient *c, CalDAVTodo *self) {
   if (!message) return FALSE;
 
   // soup_message_headers_replace(soup_message_get_request_headers(message), "If-Match", etag);
-  caldav_util_add_basic_auth(message, c);
+  caldav_util_add_basic_auth(message, self->client);
   g_autoptr(GBytes) response = soup_session_send_and_read(session, message, NULL, &error);
   if (!response) {
     g_warning("CalDAV: Delete VTODO request failed: %s", error->message);
@@ -1182,57 +1183,6 @@ gboolean caldav_todo_delete(CalDAVClient *c, CalDAVTodo *self) {
   return TRUE;
 }
 
-CalDAVTodo *caldav_todo_update(CalDAVClient *c, CalDAVTodo *self, icalcomponent *todo) {
-  const gchar *url = caldav_todo_get_url(self);
-  const gchar *etag = caldav_todo_get_etag(self);
-
-  // Create VCALENDAR wrapper
-  icalcomponent *vcalendar = icalcomponent_new_vcalendar();
-  icalcomponent_add_property(vcalendar, icalproperty_new_version("2.0"));
-  icalcomponent_add_property(vcalendar, icalproperty_new_prodid("-//libcaldav//EN"));
-  icalcomponent_add_component(vcalendar, icalcomponent_clone(todo));
-  gchar *ical_data = icalcomponent_as_ical_string_r(vcalendar);
-  icalcomponent_free(vcalendar);
-  if (!ical_data) return NULL;
-
-  g_autoptr(GBytes) request_body = g_bytes_new(ical_data, strlen(ical_data));
-  icalmemory_free_buffer(ical_data);
-  // Update request
-  g_autoptr(SoupSession) session = soup_session_new();
-  g_autoptr(SoupMessage) message = soup_message_new("PUT", url);
-  g_autoptr(GError) error = NULL;
-  if (!message) return NULL;
-
-  soup_message_headers_replace(soup_message_get_request_headers(message), "Content-Type", "text/calendar; charset=utf-8");
-  // Only update if the server version hasn't changed
-  soup_message_headers_replace(soup_message_get_request_headers(message), "If-Match", etag);
-  soup_message_set_request_body_from_bytes(message, "text/calendar; charset=utf-8", request_body);
-  caldav_util_add_basic_auth(message, c);
-  g_autoptr(GBytes) response = soup_session_send_and_read(session, message, NULL, &error);
-  if (!response) {
-    g_warning("CalDAV: Update VTODO request failed: %s", error->message);
-    return NULL;
-  }
-
-  guint status = soup_message_get_status(message);
-  if (status == SOUP_STATUS_PRECONDITION_FAILED) {
-    g_warning("CalDAV: VTODO was modified remotely (ETag mismatch)");
-    return NULL;
-  }
-
-  if (status != SOUP_STATUS_OK && status != SOUP_STATUS_NO_CONTENT) {
-    g_warning("CalDAV: Update VTODO returned HTTP %u", status);
-    return NULL;
-  }
-
-  // Get updated ETag
-  const gchar *response_etag = soup_message_headers_get_one(soup_message_get_response_headers(message), "ETag");
-  g_autofree gchar *new_etag = g_strdup(response_etag);
-  if (!new_etag) new_etag = caldav_util_pull_etag(c, session, url);
-
-  return caldav_todo_new(icalcomponent_clone(todo), url, new_etag);
-}
-
 // ---------- PROPERTIES ---------- //
 
 icalcomponent *caldav_todo_get_ical(CalDAVTodo *self) {
@@ -1250,14 +1200,14 @@ const gchar *caldav_todo_get_etag(CalDAVTodo *self) {
   return self->etag;
 }
 
-gboolean caldav_todo_set_ical(CalDAVTodo *self, CalDAVClient *c, icalcomponent *ical) {
+gboolean caldav_todo_set_ical(CalDAVTodo *self, icalcomponent *ical) {
   const gchar *url = caldav_todo_get_url(self);
   const gchar *etag = caldav_todo_get_etag(self);
 
   // Create VCALENDAR wrapper
   icalcomponent *vcalendar = icalcomponent_new_vcalendar();
   icalcomponent_add_property(vcalendar, icalproperty_new_version("2.0"));
-  icalcomponent_add_property(vcalendar, icalproperty_new_prodid("-//libcaldav//EN"));
+  icalcomponent_add_property(vcalendar, icalproperty_new_prodid("-//Errands//EN"));
   icalcomponent_add_component(vcalendar, icalcomponent_clone(ical));
   gchar *ical_data = icalcomponent_as_ical_string_r(vcalendar);
   icalcomponent_free(vcalendar);
@@ -1275,7 +1225,7 @@ gboolean caldav_todo_set_ical(CalDAVTodo *self, CalDAVClient *c, icalcomponent *
   // Only update if the server version hasn't changed
   soup_message_headers_replace(soup_message_get_request_headers(message), "If-Match", etag);
   soup_message_set_request_body_from_bytes(message, "text/calendar; charset=utf-8", request_body);
-  caldav_util_add_basic_auth(message, c);
+  caldav_util_add_basic_auth(message, self->client);
   g_autoptr(GBytes) response = soup_session_send_and_read(session, message, NULL, &error);
   if (!response) {
     g_warning("CalDAV: Update VTODO request failed: %s", error->message);
@@ -1296,7 +1246,7 @@ gboolean caldav_todo_set_ical(CalDAVTodo *self, CalDAVClient *c, icalcomponent *
   // Get updated ETag
   const gchar *response_etag = soup_message_headers_get_one(soup_message_get_response_headers(message), "ETag");
   g_autofree gchar *new_etag = g_strdup(response_etag);
-  if (!new_etag) new_etag = caldav_util_pull_etag(c, session, url);
+  if (!new_etag) new_etag = caldav_util_pull_etag(self->client, session, url);
 
   g_object_set(self, "ical", ical, NULL);
   g_object_set(self, "etag", new_etag, NULL);

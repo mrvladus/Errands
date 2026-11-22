@@ -9,13 +9,22 @@
 
 G_BEGIN_DECLS
 
-// ---------- CalDAVClient ---------- //
+// ---------- Types Definitions ---------- //
+
+#define CALDAV_TYPE_CALENDAR (caldav_calendar_get_type())
+G_DECLARE_FINAL_TYPE(CalDAVCalendar, caldav_calendar, CALDAV, CALENDAR, GObject)
+
+#define CALDAV_TYPE_TODO (caldav_todo_get_type())
+G_DECLARE_FINAL_TYPE(CalDAVTodo, caldav_todo, CALDAV, TODO, GObject)
 
 #define CALDAV_TYPE_CLIENT (caldav_client_get_type())
 G_DECLARE_FINAL_TYPE(CalDAVClient, caldav_client, CALDAV, CLIENT, GObject)
 
+// ---------- CalDAVClient ---------- //
+
 CalDAVClient *caldav_client_new(const gchar *base_url, const gchar *username, const gchar *password);
 GPtrArray *caldav_client_pull_calendars(CalDAVClient *self);
+CalDAVCalendar *caldav_client_create_calendar(CalDAVClient *self, const gchar *display_name, const gchar *color);
 
 const gchar *caldav_client_get_url(CalDAVClient *self);
 const gchar *caldav_client_get_username(CalDAVClient *self);
@@ -31,13 +40,14 @@ typedef struct {
   gchar *sync_token;
 } CalDAVSyncResult;
 
-CalDAVSyncResult *caldav_sync_result_new(void);
 void caldav_sync_result_free(CalDAVSyncResult *self);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(CalDAVSyncResult, caldav_sync_result_free)
 
 // ---------- CalDAVCalendarChanges ---------- //
 
+// This struct is returned by `caldav_calendar_compare()` and used to get all of the changes that happened between two calendars
+// arrays.
 typedef struct {
   GPtrArray *added;              // CalDAVCalendar *
   GPtrArray *deleted;            // CalDAVCalendar *
@@ -51,15 +61,13 @@ G_DEFINE_AUTOPTR_CLEANUP_FUNC(CalDAVCalendarChanges, caldav_calendar_changes_fre
 
 // ---------- CalDAVCalendar ---------- //
 
-#define CALDAV_TYPE_CALENDAR (caldav_calendar_get_type())
-G_DECLARE_FINAL_TYPE(CalDAVCalendar, caldav_calendar, CALDAV, CALENDAR, GObject)
-
-CalDAVCalendar *caldav_calendar_new(const gchar *url, const gchar *display_name, const gchar *color, const gchar *ctag);
-CalDAVCalendar *caldav_calendar_create(CalDAVClient *c, const gchar *display_name, const gchar *color);
-CalDAVSyncResult *caldav_calendar_sync(CalDAVClient *c, CalDAVCalendar *calendar);
-gboolean caldav_calendar_delete(CalDAVClient *c, CalDAVCalendar *self);
-gboolean caldav_calendar_update(CalDAVClient *c, CalDAVCalendar *self, const gchar *display_name, const gchar *color);
+CalDAVCalendar *caldav_calendar_new(CalDAVClient *client, const gchar *url, const gchar *display_name, const gchar *color,
+                                    const gchar *ctag);
+CalDAVSyncResult *caldav_calendar_sync(CalDAVCalendar *self);
+gboolean caldav_calendar_delete(CalDAVCalendar *self);
+gboolean caldav_calendar_update(CalDAVCalendar *self, const gchar *display_name, const gchar *color);
 CalDAVCalendarChanges *caldav_calendar_compare(GPtrArray *old_calendars, GPtrArray *new_calendars);
+CalDAVTodo *caldav_calendar_create_todo(CalDAVCalendar *self, icalcomponent *todo);
 
 const gchar *caldav_calendar_get_url(CalDAVCalendar *self);
 const gchar *caldav_calendar_get_ctag(CalDAVCalendar *self);
@@ -74,18 +82,15 @@ void caldav_calendar_set_ctag(CalDAVCalendar *self, const gchar *ctag);
 
 // ---------- CalDAVTodo ---------- //
 
-#define CALDAV_TYPE_TODO (caldav_todo_get_type())
-G_DECLARE_FINAL_TYPE(CalDAVTodo, caldav_todo, CALDAV, TODO, GObject)
-
-CalDAVTodo *caldav_todo_new(icalcomponent *ical, const gchar *url, const gchar *etag);
-gboolean caldav_todo_delete(CalDAVClient *c, CalDAVTodo *self);
+CalDAVTodo *caldav_todo_new(CalDAVClient *client, icalcomponent *ical, const gchar *url, const gchar *etag);
+gboolean caldav_todo_delete(CalDAVTodo *self);
 
 icalcomponent *caldav_todo_get_ical(CalDAVTodo *self);
 const gchar *caldav_todo_get_url(CalDAVTodo *self);
 const gchar *caldav_todo_get_etag(CalDAVTodo *self);
 
-gboolean caldav_todo_set_ical(CalDAVTodo *self, CalDAVClient *c, icalcomponent *ical);
-void caldav_todo_set_etag(CalDAVTodo *self, const gchar *etag);
+gboolean caldav_todo_set_ical(CalDAVTodo *self, icalcomponent *ical);
 void caldav_todo_set_url(CalDAVTodo *self, const gchar *url);
+void caldav_todo_set_etag(CalDAVTodo *self, const gchar *etag);
 
 G_END_DECLS
