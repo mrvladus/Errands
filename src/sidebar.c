@@ -23,7 +23,6 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
-#include <math.h>
 
 static gint sort_func(gconstpointer a, gconstpointer b, gpointer data);
 
@@ -75,6 +74,7 @@ static gboolean counter_binding_transform_func(GBinding *binding, const GValue *
                                                gpointer user_data) {
   gint count = g_value_get_int(from_value);
   g_value_set_string(to_value, count <= 0 ? "" : g_strdup_printf("%d", count));
+  gtk_widget_set_visible(GTK_WIDGET(user_data), count > 0);
   return true;
 }
 
@@ -83,8 +83,8 @@ static AdwSidebarItem *create_sidebar_task_list_item_create_func(ErrandsTaskList
   g_object_set_data(G_OBJECT(self), "item", item);
   g_object_bind_property(item, "title", self, "title", G_BINDING_SYNC_CREATE);
   GtkWidget *counter = gtk_label_new(NULL);
-  g_object_bind_property_full(item, "count", counter, "label", G_BINDING_SYNC_CREATE, counter_binding_transform_func, NULL, NULL,
-                              NULL);
+  g_object_bind_property_full(item, "count", counter, "label", G_BINDING_SYNC_CREATE, counter_binding_transform_func, NULL,
+                              counter, NULL);
   gtk_widget_add_css_class(counter, "dim-label");
   gtk_widget_add_css_class(counter, "caption");
   gtk_widget_add_css_class(counter, "counter");
@@ -197,6 +197,8 @@ void errands_sidebar_update_filter_rows(void) {
   }
   gtk_label_set_label(self->all_counter, total - completed > 0 ? tmp_str_printf("%d", total - completed) : "");
   gtk_label_set_label(self->today_counter, today - today_completed > 0 ? tmp_str_printf("%d", today - today_completed) : "");
+  gtk_widget_set_visible(GTK_WIDGET(self->all_counter), total - completed > 0);
+  gtk_widget_set_visible(GTK_WIDGET(self->today_counter), today - today_completed > 0);
   gtk_widget_set_visible(self->sidebar, n_lists > 0);
 }
 
