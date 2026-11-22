@@ -358,6 +358,7 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
       GListModel *child_model = errands_task_item_get_children_model(parent_task_item);
       task_item = errands_task_item_new(data->ical, list, parent_task_item);
       g_list_store_append(G_LIST_STORE(child_model), task_item);
+      errands_task_item_update(parent_task_item);
     }
 
     icalcomponent *ical = errands_task_item_get_ical(task_item);
