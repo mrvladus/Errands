@@ -60,6 +60,19 @@
     <display_length compare="ge">360</display_length>
   </requires>
   <releases>
+    <release version="51.2.3" date="2026-11-22">
+        <description translate="no">
+            <ul>
+                <li
+                    >Fixed couple of UI bugs with counters and expander indicators</li>
+            </ul>
+            <p>Added / Updated translations:</p>
+            <ul>
+                <li>Ukrainian</li>
+            </ul>
+            <p>Thanks to everyone on Damned Lies!</p>
+        </description>
+    </release>
     <release version="51.2.2" date="2026-11-20">
         <description translate="no">
             <ul>
