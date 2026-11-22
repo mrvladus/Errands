@@ -48,10 +48,6 @@ template $ErrandsTask: Box {
       labelled-by: title;
     }
 
-    EventControllerKey {
-      key-pressed => $on_key_pressed_cb(template) not-swapped;
-    }
-
     CheckButton complete_btn {
       valign: center;
       tooltip-text: _("Toggle Completion");

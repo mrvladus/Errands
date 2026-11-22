@@ -304,11 +304,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   case PROP_SEARCH_MATCHED: self->search_matched = g_value_get_boolean(value); break;
   case PROP_UNCOMPLETED_COUNT: {
     self->uncompleted_count = g_value_get_uint(value);
-    if (self->task_widget) {
-      GtkTreeExpander *expander =
-          GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self->task_widget), GTK_TYPE_TREE_EXPANDER));
-      gtk_tree_expander_set_hide_expander(expander, self->uncompleted_count == 0);
-    }
+
   } break;
 
   case PROP_ICAL: {
@@ -606,7 +602,7 @@ void errands_task_item_update(ErrandsTaskItem *self) {
   bool show_completed = errands_settings_get_show_completed(state.settings);
   bool show_cancelled = errands_settings_get_show_cancelled(state.settings);
   GListModel *children_model = G_LIST_MODEL(self->children_model);
-  guint uncompleted = 0, completed = 0, total = 0;
+  guint visible = 0, uncompleted = 0, completed = 0, total = 0;
   for_range(i, 0, g_list_model_get_n_items(children_model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(children_model, i);
     if (errands_data_get_deleted(item->ical)) continue;
@@ -614,9 +610,14 @@ void errands_task_item_update(ErrandsTaskItem *self) {
     if (item->completed) completed++;
     if (!item->completed && !item->cancelled) uncompleted++;
     if ((!show_completed && item->completed) || (!show_cancelled && item->cancelled)) continue;
+    visible++;
   }
   gfloat percent = total > 0 ? (gfloat)completed / (gfloat)total : 0.0;
   g_object_set(self, "uncompleted-count", uncompleted, "percent-complete", percent, NULL);
+  if (self->task_widget) {
+    GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self->task_widget), GTK_TYPE_TREE_EXPANDER));
+    if (expander) gtk_tree_expander_set_hide_expander(expander, visible == 0);
+  }
 }
 
 void errands_task_item_add_tag(ErrandsTaskItem *self, const char *tag) {

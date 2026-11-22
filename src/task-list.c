@@ -279,7 +279,6 @@ static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_i
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_tree_expander_new());
 
   gtk_tree_expander_set_child(expander, GTK_WIDGET(errands_task_new()));
-  gtk_widget_set_can_target(GTK_WIDGET(expander), FALSE);
   gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
   gtk_list_item_set_focusable(list_item, TRUE);
 }
