@@ -11,14 +11,30 @@ G_BEGIN_DECLS
 
 // ---------- Types Definitions ---------- //
 
+#define CALDAV_TYPE_CLIENT (caldav_client_get_type())
+G_DECLARE_FINAL_TYPE(CalDAVClient, caldav_client, CALDAV, CLIENT, GObject);
+
 #define CALDAV_TYPE_CALENDAR (caldav_calendar_get_type())
-G_DECLARE_FINAL_TYPE(CalDAVCalendar, caldav_calendar, CALDAV, CALENDAR, GObject)
+G_DECLARE_FINAL_TYPE(CalDAVCalendar, caldav_calendar, CALDAV, CALENDAR, GObject);
 
 #define CALDAV_TYPE_TODO (caldav_todo_get_type())
-G_DECLARE_FINAL_TYPE(CalDAVTodo, caldav_todo, CALDAV, TODO, GObject)
+G_DECLARE_FINAL_TYPE(CalDAVTodo, caldav_todo, CALDAV, TODO, GObject);
 
-#define CALDAV_TYPE_CLIENT (caldav_client_get_type())
-G_DECLARE_FINAL_TYPE(CalDAVClient, caldav_client, CALDAV, CLIENT, GObject)
+// This type is returned by `caldav_calendar_sync()` and used to get all of the changes that happened since last sync call.
+typedef struct {
+  GPtrArray *changed;      // CalDAVTodo *
+  GPtrArray *deleted_urls; // gchar *
+  gchar *sync_token;
+} CalDAVSyncResult;
+
+// This type is returned by `caldav_calendar_compare()` and used to get all of the changes that happened between two calendars
+// arrays.
+typedef struct {
+  GPtrArray *added;              // CalDAVCalendar *
+  GPtrArray *deleted;            // CalDAVCalendar *
+  GPtrArray *properties_changed; // CalDAVCalendar *
+  GPtrArray *contents_changed;   // CalDAVCalendar *
+} CalDAVCalendarChanges;
 
 // ---------- CalDAVClient ---------- //
 
@@ -34,26 +50,11 @@ const gchar *caldav_client_get_home_set(CalDAVClient *self);
 
 // ---------- CalDAVSyncResult ---------- //
 
-typedef struct {
-  GPtrArray *changed;      // CalDAVTodo *
-  GPtrArray *deleted_urls; // gchar *
-  gchar *sync_token;
-} CalDAVSyncResult;
-
 void caldav_sync_result_free(CalDAVSyncResult *self);
 
 G_DEFINE_AUTOPTR_CLEANUP_FUNC(CalDAVSyncResult, caldav_sync_result_free)
 
 // ---------- CalDAVCalendarChanges ---------- //
-
-// This struct is returned by `caldav_calendar_compare()` and used to get all of the changes that happened between two calendars
-// arrays.
-typedef struct {
-  GPtrArray *added;              // CalDAVCalendar *
-  GPtrArray *deleted;            // CalDAVCalendar *
-  GPtrArray *properties_changed; // CalDAVCalendar *
-  GPtrArray *contents_changed;   // CalDAVCalendar *
-} CalDAVCalendarChanges;
 
 void caldav_calendar_changes_free(CalDAVCalendarChanges *self);
 
