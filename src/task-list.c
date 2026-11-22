@@ -289,8 +289,6 @@ static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_it
   ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
   g_autoptr(ErrandsTaskItem) item = gtk_tree_list_row_get_item(row);
   errands_task_set_item(task, item);
-  errands_task_add_binding(task,
-                           g_object_bind_property(item, "has-no-children", expander, "hide-expander", G_BINDING_SYNC_CREATE));
 }
 
 static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {

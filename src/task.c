@@ -339,6 +339,7 @@ void errands_task_set_item(ErrandsTask *self, ErrandsTaskItem *item) {
                                                         G_BINDING_SYNC_CREATE | G_BINDING_BIDIRECTIONAL));
   errands_task_add_binding(
       self, g_object_bind_property(item, "percent-complete", self->progress_bar, "fraction", G_BINDING_SYNC_CREATE));
+  errands_task_item_update(item);
 }
 
 // ---------- ACTION CALLBACKS ---------- //

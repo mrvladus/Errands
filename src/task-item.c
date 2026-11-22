@@ -3,6 +3,7 @@
 
 #include "task-item.h"
 #include "data.h"
+#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
@@ -48,8 +49,7 @@ struct _ErrandsTaskItem {
   gchar *search_blob;
   gboolean search_matched;
 
-  guint uncompleted_count;  // The number of uncompleted subtasks
-  gboolean has_no_children; // If the task can be expanded (has any children)
+  guint uncompleted_count; // The number of uncompleted subtasks
 
   icalcomponent *ical;
   ErrandsTaskItem *parent;
@@ -80,7 +80,6 @@ enum {
   PROP_SEARCH_BLOB,
   PROP_SEARCH_MATCHED,
   PROP_UNCOMPLETED_COUNT,
-  PROP_HAS_NO_CHILDREN,
   PROP_ICAL,
   PROP_CHILDREN_MODEL,
   PROP_TASK_WIDGET,
@@ -110,7 +109,6 @@ static void get_property(GObject *object, guint prop_id, GValue *value, GParamSp
   case PROP_SEARCH_BLOB: g_value_set_string(value, self->search_blob); break;
   case PROP_SEARCH_MATCHED: g_value_set_boolean(value, self->search_matched); break;
   case PROP_UNCOMPLETED_COUNT: g_value_set_uint(value, self->uncompleted_count); break;
-  case PROP_HAS_NO_CHILDREN: g_value_set_boolean(value, self->has_no_children); break;
   case PROP_ICAL: g_value_set_pointer(value, self->ical); break;
   case PROP_CHILDREN_MODEL: g_value_set_object(value, self->children_model); break;
   case PROP_TASK_WIDGET: g_value_set_pointer(value, self->task_widget); break;
@@ -304,8 +302,14 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   } break;
 
   case PROP_SEARCH_MATCHED: self->search_matched = g_value_get_boolean(value); break;
-  case PROP_UNCOMPLETED_COUNT: self->uncompleted_count = g_value_get_uint(value); break;
-  case PROP_HAS_NO_CHILDREN: self->has_no_children = g_value_get_boolean(value); break;
+  case PROP_UNCOMPLETED_COUNT: {
+    self->uncompleted_count = g_value_get_uint(value);
+    if (self->task_widget) {
+      GtkTreeExpander *expander =
+          GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self->task_widget), GTK_TYPE_TREE_EXPANDER));
+      gtk_tree_expander_set_hide_expander(expander, self->uncompleted_count == 0);
+    }
+  } break;
 
   case PROP_ICAL: {
     icalcomponent *new_ical = g_value_get_pointer(value);
@@ -391,8 +395,6 @@ static void errands_task_item_class_init(ErrandsTaskItemClass *klass) {
       g_param_spec_boolean("search-matched", "Search Mathed", "Task matched search", true, G_PARAM_READWRITE);
   obj_properties[PROP_UNCOMPLETED_COUNT] = g_param_spec_uint(
       "uncompleted-count", "Uncompleted Count", "Number of uncompleted subtasks", 0, G_MAXUINT, 0, G_PARAM_READWRITE);
-  obj_properties[PROP_HAS_NO_CHILDREN] =
-      g_param_spec_boolean("has-no-children", "Has No Children", "Whether the task has any children", true, G_PARAM_READWRITE);
   obj_properties[PROP_ICAL] =
       g_param_spec_pointer("ical", "ICAL Component", "ICAL component associated with the task.", G_PARAM_READWRITE);
   obj_properties[PROP_CHILDREN_MODEL] = g_param_spec_object("children-model", "Children Model", "Model containing child tasks.",
@@ -604,7 +606,7 @@ void errands_task_item_update(ErrandsTaskItem *self) {
   bool show_completed = errands_settings_get_show_completed(state.settings);
   bool show_cancelled = errands_settings_get_show_cancelled(state.settings);
   GListModel *children_model = G_LIST_MODEL(self->children_model);
-  guint visible = 0, uncompleted = 0, completed = 0, total = 0;
+  guint uncompleted = 0, completed = 0, total = 0;
   for_range(i, 0, g_list_model_get_n_items(children_model)) {
     g_autoptr(ErrandsTaskItem) item = g_list_model_get_item(children_model, i);
     if (errands_data_get_deleted(item->ical)) continue;
@@ -612,10 +614,9 @@ void errands_task_item_update(ErrandsTaskItem *self) {
     if (item->completed) completed++;
     if (!item->completed && !item->cancelled) uncompleted++;
     if ((!show_completed && item->completed) || (!show_cancelled && item->cancelled)) continue;
-    visible++;
   }
   gfloat percent = total > 0 ? (gfloat)completed / (gfloat)total : 0.0;
-  g_object_set(self, "uncompleted-count", uncompleted, "has-no-children", visible == 0, "percent-complete", percent, NULL);
+  g_object_set(self, "uncompleted-count", uncompleted, "percent-complete", percent, NULL);
 }
 
 void errands_task_item_add_tag(ErrandsTaskItem *self, const char *tag) {
