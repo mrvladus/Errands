@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Errands main\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-20 15:14+0000\n"
-"PO-Revision-Date: 2026-11-20 22:52+0100\n"
+"POT-Creation-Date: 2026-11-22 11:10+0000\n"
+"PO-Revision-Date: 2026-11-22 21:57+0100\n"
 "Last-Translator: Martin Srebotnjak <miles@filmsi.net>\n"
 "Language-Team: Slovenian <Slovenian>\n"
 "Language: sl\n"
@@ -28,9 +28,9 @@ msgstr "Opravki"
 msgid "translator-credits"
 msgstr "Martin Srebotnjak <miles@filmsi.net>"
 
-#: ../src/date-chooser.c:101 ../src/date-chooser.blp:7
-msgid "Not Set"
-msgstr "Ni nastavljeno"
+#: ../src/color-button.c:70
+msgid "Select Color"
+msgstr "Izberite barvo"
 
 #: ../src/rrule-row.c:176
 msgctxt "Repeat every ..."
@@ -81,20 +81,20 @@ msgstr "Ponavljaj zavedno"
 msgid "Repeat %zu times"
 msgstr "Ponovi %zu-krat"
 
-#: ../src/sidebar.c:321
+#: ../src/sidebar.c:326
 msgid "Only .ics files are supported"
 msgstr "Podprte so samo datoteke .ics"
 
-#: ../src/sidebar.c:326
+#: ../src/sidebar.c:331
 msgid "Can't load list. It's incorrect or already exists"
 msgstr "Seznama ni moč naložiti. Je nepravilen ali pa že obstaja"
 
-#: ../src/sync.c:303
+#: ../src/sync.c:305
 #, c-format
 msgid "Added remote task list: %s"
 msgstr "Dodan oddaljeni seznam nalog: %s"
 
-#: ../src/sync.c:536
+#: ../src/sync.c:553
 msgid "Sync Failed"
 msgstr "Usklajevanje je spodletelo"
 
@@ -108,43 +108,43 @@ msgctxt "Due date"
 msgid "Due"
 msgstr "Zapade"
 
-#: ../src/task.c:356
+#: ../src/task.c:357
 msgid "Copied to Clipboard"
 msgstr "Kopirano na odložišče"
 
-#: ../src/task.c:388
+#: ../src/task.c:389
 msgid "Failed to Export"
 msgstr "Izvoz ni uspel"
 
-#: ../src/task.c:391 ../src/task-list.c:325
+#: ../src/task.c:392 ../src/task-list.c:323
 msgid "Exported"
 msgstr "izvoženo"
 
-#: ../src/task-item.c:749
+#: ../src/task-item.c:752
 msgid "Can't make task a sub-task of itself."
 msgstr "Naloge ni možno definirati kot podnaloge same sebe."
 
-#: ../src/task-item.c:870
+#: ../src/task-item.c:873
 msgctxt "Priority"
 msgid "High"
 msgstr "Visoka"
 
-#: ../src/task-item.c:871
+#: ../src/task-item.c:874
 msgctxt "Priority"
 msgid "Medium"
 msgstr "Srednja"
 
-#: ../src/task-item.c:872
+#: ../src/task-item.c:875
 msgctxt "Priority"
 msgid "Low"
 msgstr "Nizka"
 
-#: ../src/task-item.c:873
+#: ../src/task-item.c:876
 msgctxt "Priority"
 msgid "None"
 msgstr "Brez"
 
-#: ../src/task-item.c:905
+#: ../src/task-item.c:908
 #, c-format
 msgid "Every second"
 msgid_plural "Every %d seconds"
@@ -153,7 +153,7 @@ msgstr[1] "Vsako %d sekundo"
 msgstr[2] "Vsaki %d sekundi"
 msgstr[3] "Vsake %d sekunde"
 
-#: ../src/task-item.c:906
+#: ../src/task-item.c:909
 #, c-format
 msgid "Every minute"
 msgid_plural "Every %d minutes"
@@ -162,7 +162,7 @@ msgstr[1] "Vsako %d minuto"
 msgstr[2] "Vsaki %d minuti"
 msgstr[3] "Vsake %d minute"
 
-#: ../src/task-item.c:907
+#: ../src/task-item.c:910
 #, c-format
 msgid "Every hour"
 msgid_plural "Every %d hours"
@@ -171,7 +171,7 @@ msgstr[1] "Vsako %d uro"
 msgstr[2] "Vsaki %d uri"
 msgstr[3] "Vsake %d ure"
 
-#: ../src/task-item.c:908
+#: ../src/task-item.c:911
 #, c-format
 msgid "Every day"
 msgid_plural "Every %d days"
@@ -180,7 +180,7 @@ msgstr[1] "Vsak %d dan"
 msgstr[2] "Vsaka %d dneva"
 msgstr[3] "Vsake %d dni"
 
-#: ../src/task-item.c:909
+#: ../src/task-item.c:912
 #, c-format
 msgid "Every week"
 msgid_plural "Every %d weeks"
@@ -189,7 +189,7 @@ msgstr[1] "Vsak %d teden"
 msgstr[2] "Vsaka %d tedna"
 msgstr[3] "Vsake %d tedne"
 
-#: ../src/task-item.c:910
+#: ../src/task-item.c:913
 #, c-format
 msgid "Every month"
 msgid_plural "Every %d months"
@@ -198,7 +198,7 @@ msgstr[1] "Vsak %d mesec"
 msgstr[2] "Vsaka %d meseca"
 msgstr[3] "Vsake %d mesece"
 
-#: ../src/task-item.c:911
+#: ../src/task-item.c:914
 #, c-format
 msgid "Every year"
 msgid_plural "Every %d years"
@@ -207,12 +207,12 @@ msgstr[1] "Vsako %d leto"
 msgstr[2] "Vsaki %d leti"
 msgstr[3] "Vsaka %d leta"
 
-#: ../src/task-item.c:922
+#: ../src/task-item.c:925
 #, c-format
 msgid " until %s"
 msgstr "do %s"
 
-#: ../src/task-item.c:923
+#: ../src/task-item.c:926
 #, c-format
 msgid " once"
 msgid_plural " %d times"
@@ -221,15 +221,15 @@ msgstr[1] " %d-krat"
 msgstr[2] " %d-krat"
 msgstr[3] " %d-krat"
 
-#: ../src/task-list.c:314 ../src/task-list.c:319
+#: ../src/task-list.c:312 ../src/task-list.c:317
 msgid "Export failed"
 msgstr "Izvoz ni uspel"
 
-#: ../src/task-list.c:345 ../src/task-list.c:357
+#: ../src/task-list.c:343 ../src/task-list.c:355
 msgid "No tasks to delete"
 msgstr "Ni nalog za brisanje"
 
-#: ../src/task-list.c:350 ../src/task-list.c:362
+#: ../src/task-list.c:348 ../src/task-list.c:360
 #, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
@@ -238,51 +238,51 @@ msgstr[1] "Izbrisana %d naloga"
 msgstr[2] "Izbrisani %d nalogi"
 msgstr[3] "Izbrisane %d naloge"
 
-#: ../src/task-list.c:509 ../src/sidebar.blp:137
+#: ../src/task-list.c:507 ../src/sidebar.blp:137
 msgid "All Tasks"
 msgstr "Vse naloge"
 
-#: ../src/task-list.c:513 ../src/sidebar.blp:153
+#: ../src/task-list.c:511 ../src/sidebar.blp:153
 msgid "Tasks for Today"
 msgstr "Naloge za danes"
 
-#: ../src/task-list-item.c:150
+#: ../src/task-list-item.c:151
 msgid "Untitled"
 msgstr "Neimenovano"
 
-#: ../src/date-chooser.blp:13
+#: ../src/date-chooser.blp:11
 msgid "Reset"
 msgstr "Ponastavi"
 
-#: ../src/date-chooser.blp:27 ../src/rrule-row.blp:50
+#: ../src/date-chooser.blp:25 ../src/rrule-row.blp:50
 msgid "Date"
 msgstr "Datum"
 
-#: ../src/date-chooser.blp:36
+#: ../src/date-chooser.blp:34
 msgid "Today"
 msgstr "Danes"
 
-#: ../src/date-chooser.blp:50
+#: ../src/date-chooser.blp:48
 msgid "Tomorrow"
 msgstr "Jutri"
 
-#: ../src/date-chooser.blp:85
+#: ../src/date-chooser.blp:83
 msgid "Time"
 msgstr "Čas"
 
-#: ../src/date-chooser.blp:149
+#: ../src/date-chooser.blp:147
 msgid "9:00"
 msgstr "9:00"
 
-#: ../src/date-chooser.blp:164
+#: ../src/date-chooser.blp:162
 msgid "12:00"
 msgstr "12:00"
 
-#: ../src/date-chooser.blp:179
+#: ../src/date-chooser.blp:177
 msgid "17:00"
 msgstr "17:00"
 
-#: ../src/date-chooser.blp:194
+#: ../src/date-chooser.blp:192
 msgid "20:00"
 msgstr "20:00"
 
@@ -507,7 +507,7 @@ msgstr "Zapri okno"
 msgid "Quit"
 msgstr "Izhod"
 
-#: ../src/shortcuts-dialog.blp:34 ../src/task-list.blp:12
+#: ../src/shortcuts-dialog.blp:34 ../src/task-list.blp:23
 msgid "Task List"
 msgstr "Seznam nalog"
 
@@ -641,7 +641,7 @@ msgstr "Uredi besedilo"
 msgid "Copy Text"
 msgstr "Kopiraj besedilo"
 
-#: ../src/task.blp:152 ../src/task-list.blp:117
+#: ../src/task.blp:152 ../src/task-list.blp:129
 msgid "Export as \".ics\""
 msgstr "Izvozi kot ».ics«"
 
@@ -649,7 +649,7 @@ msgstr "Izvozi kot ».ics«"
 msgid "Cancel / Restore"
 msgstr "Prekliči / obnovi"
 
-#: ../src/task.blp:182 ../src/task-list.blp:88
+#: ../src/task.blp:182 ../src/task-list.blp:100
 msgid "Priority"
 msgstr "Prioriteta"
 
@@ -657,7 +657,7 @@ msgstr "Prioriteta"
 msgid "Start"
 msgstr "Začetek"
 
-#: ../src/task.blp:209 ../src/task-list.blp:76
+#: ../src/task.blp:209 ../src/task-list.blp:88
 msgid "Start Date"
 msgstr "Datum začetka"
 
@@ -665,7 +665,7 @@ msgstr "Datum začetka"
 msgid "Due"
 msgstr "Zapade"
 
-#: ../src/task.blp:225 ../src/task-list.blp:82
+#: ../src/task.blp:225 ../src/task-list.blp:94
 msgid "Due Date"
 msgstr "Datum zapadlosti"
 
@@ -677,87 +677,87 @@ msgstr "Priloge"
 msgid "Add Sub-Task"
 msgstr "Dodaj podnalogo"
 
-#: ../src/task-list.blp:18
+#: ../src/task-list.blp:30
 msgid "Toggle Sidebar (Ctrl+B)"
 msgstr "Preklopi stransko vrstico (krmilka+B)"
 
-#: ../src/task-list.blp:33
+#: ../src/task-list.blp:45
 msgid "Sort / Filter (Ctrl+Shift+F)"
 msgstr "Razvrsti / filtriraj (krmilka+dvigalka+F)"
 
-#: ../src/task-list.blp:37
+#: ../src/task-list.blp:49
 msgid "Show Tasks"
 msgstr "Pokaži naloge"
 
-#: ../src/task-list.blp:40
+#: ../src/task-list.blp:52
 msgid "Completed"
 msgstr "Zaključeno"
 
-#: ../src/task-list.blp:45
+#: ../src/task-list.blp:57
 msgid "Cancelled"
 msgstr "Preklicano"
 
-#: ../src/task-list.blp:51
+#: ../src/task-list.blp:63
 msgid "Sort Order"
 msgstr "Zaporedje razvrščanja"
 
-#: ../src/task-list.blp:54
+#: ../src/task-list.blp:66
 msgid "Descending"
 msgstr "Padajoče"
 
-#: ../src/task-list.blp:60
+#: ../src/task-list.blp:72
 msgid "Ascending"
 msgstr "Naraščajoče"
 
-#: ../src/task-list.blp:67
+#: ../src/task-list.blp:79
 msgid "Sort By"
 msgstr "Razvrsti po"
 
-#: ../src/task-list.blp:70
+#: ../src/task-list.blp:82
 msgid "Created"
 msgstr "Ustvarjeno"
 
-#: ../src/task-list.blp:107
+#: ../src/task-list.blp:119
 msgid "Task List Menu (Ctrl+M)"
 msgstr "Meni seznama nalog (krmilka+M)"
 
-#: ../src/task-list.blp:113
+#: ../src/task-list.blp:125
 msgid "Rename List"
 msgstr "Preimenuj seznam"
 
-#: ../src/task-list.blp:118
+#: ../src/task-list.blp:130
 msgid "Print"
 msgstr "Natisni"
 
-#: ../src/task-list.blp:122
+#: ../src/task-list.blp:134
 msgid "Delete Completed"
 msgstr "Izbriši končane"
 
-#: ../src/task-list.blp:123
+#: ../src/task-list.blp:135
 msgid "Delete Cancelled"
 msgstr "Izbriši preklicane"
 
-#: ../src/task-list.blp:127
+#: ../src/task-list.blp:139
 msgid "Delete List"
 msgstr "Izbriši seznam"
 
-#: ../src/task-list.blp:144
+#: ../src/task-list.blp:156
 msgid "Search (Ctrl+F)"
 msgstr "Iskanje (krmilka+F)"
 
-#: ../src/task-list.blp:183
+#: ../src/task-list.blp:195
 msgid "No Tasks"
 msgstr "Ni nalog"
 
-#: ../src/task-list.blp:215
+#: ../src/task-list.blp:227
 msgid "Add Task"
 msgstr "Dodaj nalogo"
 
-#: ../src/task-list.blp:216
+#: ../src/task-list.blp:228
 msgid "Add Task (Ctrl+N)"
 msgstr "Dodaj nalogo (krmilka+N)"
 
-#: ../src/task-list.blp:220
+#: ../src/task-list.blp:232
 msgid ""
 "<b>Inline properties syntax:</b>\n"
 "\n"
@@ -770,11 +770,11 @@ msgstr ""
 "<b>#pN</b>    Nastavi prioriteto. <b>N</b> je število v obsegu <b>od 0 do 9</"
 "b>."
 
-#: ../src/task-list.blp:238
+#: ../src/task-list.blp:250
 msgid "Add Task (Ctrl+Return)"
 msgstr "Dodaj nalogo (krmilka+vnašalka)"
 
-#: ../src/task-list.blp:266
+#: ../src/task-list.blp:278
 msgid "Loading Tasks"
 msgstr "Nalaganje nalog"
 
