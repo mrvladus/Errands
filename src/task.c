@@ -38,6 +38,8 @@ static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self);
 static void on_drop_motion_ctrl_enter_cb(ErrandsTask *self);
 static void on_progressbar_fraction_changed_cb(ErrandsTask *self);
 static void on_click_released_cb(ErrandsTask *self, gint n_press);
+static gboolean on_key_pressed_cb(GtkEventControllerKey *ctrl, guint keyval, guint keycode, GdkModifierType state,
+                                  ErrandsTask *self);
 
 static GdkContentProvider *on_drag_prepare_cb(GtkDragSource *source, double x, double y, ErrandsTask *self);
 static void on_drag_begin_cb(GtkDragSource *source, GdkDrag *drag, ErrandsTask *self);
@@ -233,11 +235,14 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, progress_bar);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, counter);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, cancel_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, sub_toggle_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, menu_btn);
 
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_title_edit_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_sub_task_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_progressbar_fraction_changed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_click_released_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_key_pressed_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drop_motion_ctrl_enter_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_prepare_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_drag_begin_cb);
@@ -397,6 +402,38 @@ static void on_export_action_cb(GSimpleAction *action, GVariant *param, ErrandsT
   const char *filename = tmp_str_printf("%s.ics", errands_task_item_get_uid(self->item));
   g_object_set(dialog, "initial-name", filename, NULL);
   gtk_file_dialog_save(dialog, GTK_WINDOW(state.main_window), NULL, (GAsyncReadyCallback)on_export_finish_cb, self->item);
+}
+
+static gboolean on_key_pressed_cb(GtkEventControllerKey *ctrl, guint keyval, guint keycode, GdkModifierType state,
+                                  ErrandsTask *self) {
+  if (keyval != GDK_KEY_Tab) return FALSE;
+
+  GtkWidget *focus = gtk_root_get_focus(GTK_ROOT(gtk_widget_get_root(GTK_WIDGET(self))));
+  gboolean shift = (state & GDK_SHIFT_MASK) != 0;
+
+  // Order of inner focusables
+  GtkWidget *order[] = {
+      self->complete_btn,
+      self->sub_toggle_btn,
+      self->menu_btn,
+  };
+
+  // find current
+  int idx = -1;
+  for (int i = 0; i < 3; i++)
+    if (order[i] == focus) idx = i;
+
+  if (idx == -1) return FALSE;
+
+  if (!shift && idx < 2) {
+    gtk_widget_grab_focus(order[idx + 1]);
+    return TRUE;
+  }
+  if (shift && idx > 0) {
+    gtk_widget_grab_focus(order[idx - 1]);
+    return TRUE;
+  }
+  return FALSE;
 }
 
 // ---------- CALLBACKS ---------- //

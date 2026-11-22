@@ -48,6 +48,10 @@ template $ErrandsTask: Box {
       labelled-by: title;
     }
 
+    EventControllerKey {
+      key-pressed => $on_key_pressed_cb(template) not-swapped;
+    }
+
     CheckButton complete_btn {
       valign: center;
       tooltip-text: _("Toggle Completion");
@@ -127,7 +131,7 @@ template $ErrandsTask: Box {
       }
 
       // Properties menu
-      MenuButton {
+      MenuButton menu_btn {
         icon-name: "errands-more-symbolic";
         tooltip-text: _("Task Menu");
         valign: center;
