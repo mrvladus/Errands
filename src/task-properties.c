@@ -5,11 +5,6 @@
 #include "color-button.h"
 #include "config.h"
 #include "date-chooser.h"
-#include "gdk/gdk.h"
-#include "glib-object.h"
-#include "glib.h"
-#include "glib/gi18n.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
@@ -18,6 +13,11 @@
 #include "window.h"
 
 #include <adwaita.h>
+#include <gdk/gdk.h>
+#include <glib-object.h>
+#include <glib.h>
+#include <glib/gi18n.h>
+#include <gtk/gtk.h>
 
 #define ATTACHMENTS_LIST_BOX                                                                                                     \
   gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->attachments))))
@@ -169,7 +169,11 @@ static inline void set_item(ErrandsTaskProperties *self, ErrandsTaskItem *item) 
   if (rrule) icalrecurrencetype_unref(rrule);
 
   // Priority
-  adw_combo_row_set_selected(self->priority, errands_task_item_get_priority(self->item));
+  guint priority = errands_task_item_get_priority(self->item); // low 0..9 high
+  if (priority == 1 || priority == 2 || priority == 3) priority = 1;
+  else if (priority == 4 || priority == 5 || priority == 6 || priority == 7) priority = 2;
+  else if (priority == 8 || priority == 9) priority = 3;
+  adw_combo_row_set_selected(self->priority, priority);
 
   // Color
   const char *curr_color = errands_task_item_get_color(self->item);
@@ -303,9 +307,9 @@ void errands_task_properties_close(ErrandsTaskProperties *self) {
 
   // Priority
   guint priority = adw_combo_row_get_selected(self->priority);
-  if (priority == 1) priority = 9;
+  if (priority == 3) priority = 9;
   else if (priority == 2) priority = 6;
-  else if (priority == 3) priority = 1;
+  else if (priority == 1) priority = 1;
   errands_task_item_set_priority(self->item, priority);
 
   // Color

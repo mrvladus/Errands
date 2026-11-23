@@ -871,9 +871,9 @@ const char *errands_task_item_get_priority_as_string(ErrandsTaskItem *self) {
 
 const char *errands_task_item_get_priority_as_tstring(ErrandsTaskItem *self) {
   gint priority = self->priority;
-  if (priority > 0 && priority <= 3) return C_("Priority", "High");
-  if (priority > 3 && priority <= 6) return C_("Priority", "Medium");
-  if (priority > 6) return C_("Priority", "Low");
+  if (priority > 0 && priority <= 3) return C_("Priority", "Low");
+  if (priority > 3 && priority <= 7) return C_("Priority", "Medium");
+  if (priority > 7) return C_("Priority", "High");
   return C_("Priority", "None");
 }
 
