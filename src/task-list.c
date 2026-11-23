@@ -276,24 +276,20 @@ static void __expand_all_visible_rows(ErrandsTaskList *self) {
 // ---------- TASKS LIST ---------- //
 
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
-  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_tree_expander_new());
-  gtk_tree_expander_set_child(expander, GTK_WIDGET(errands_task_new()));
-  gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
-  gtk_list_item_set_selectable(list_item, FALSE);
+  ErrandsTask *task = errands_task_new();
+  gtk_list_item_set_child(list_item, GTK_WIDGET(task));
 }
 
 static void on_bind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
   GtkTreeListRow *row = gtk_list_item_get_item(list_item);
-  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
-  gtk_tree_expander_set_list_row(expander, row);
-  ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
+  ErrandsTask *task = ERRANDS_TASK(gtk_list_item_get_child(list_item));
+  gtk_tree_expander_set_list_row(GTK_TREE_EXPANDER(task->expander), row);
   g_autoptr(ErrandsTaskItem) item = gtk_tree_list_row_get_item(row);
   errands_task_set_item(task, item);
 }
 
 static void on_unbind_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
-  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_list_item_get_child(list_item));
-  ErrandsTask *task = ERRANDS_TASK(gtk_tree_expander_get_child(expander));
+  ErrandsTask *task = ERRANDS_TASK(gtk_list_item_get_child(list_item));
   errands_task_unbind_item(task);
 }
 

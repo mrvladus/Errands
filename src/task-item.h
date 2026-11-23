@@ -54,7 +54,7 @@ gchar *errands_task_item_get_rrule_as_string(ErrandsTaskItem *self);
 ErrandsTaskItem *errands_task_item_get_parent(ErrandsTaskItem *self);
 GListModel *errands_task_item_get_children_model(ErrandsTaskItem *self);
 gboolean errands_task_item_get_search_matched(ErrandsTaskItem *self);
-int errands_task_item_get_indent_level(ErrandsTaskItem *self);
+guint errands_task_item_get_indent_level(ErrandsTaskItem *self);
 GListStore *errands_task_item_get_parent_model(ErrandsTaskItem *self);
 gboolean errands_task_item_get_synced(ErrandsTaskItem *self);
 gfloat errands_task_item_get_percent_complete(ErrandsTaskItem *self);

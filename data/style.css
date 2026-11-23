@@ -1,6 +1,28 @@
 /* Copyright (c) 2026 Vlad Krupinskii <vladkrupinskii@gmail.com> */
 /* SPDX-License-Identifier: Zlib */
 
+/*listview > row {
+    transition: 0ms;
+}
+*/
+
+listview > row:focus-visible .task {
+    border-radius: 12px;
+    outline-width: 2px;
+    outline-style: solid;
+    outline-color: alpha(var(--accent-color), 0.2);
+    background-color: alpha(var(--accent-color), 0.2);
+}
+
+/*treeexpander:focus {
+    border-radius: 32px;
+    outline: 2px solid @focus_border_color;
+    transition:
+        outline-width 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        outline-offset 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        outline-color 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}*/
+
 .sub-entry {
     background-color: var(--border-color);
 }

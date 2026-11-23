@@ -615,7 +615,7 @@ void errands_task_item_update(ErrandsTaskItem *self) {
   gfloat percent = total > 0 ? (gfloat)completed / (gfloat)total : 0.0;
   g_object_set(self, "uncompleted-count", uncompleted, "percent-complete", percent, NULL);
   if (self->task_widget) {
-    GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self->task_widget), GTK_TYPE_TREE_EXPANDER));
+    GtkTreeExpander *expander = GTK_TREE_EXPANDER(self->task_widget->expander);
     if (expander) gtk_tree_expander_set_hide_expander(expander, visible == 0);
   }
 }
@@ -887,8 +887,8 @@ gboolean errands_task_item_get_synced(ErrandsTaskItem *self) { return errands_da
 
 gfloat errands_task_item_get_percent_complete(ErrandsTaskItem *self) { return self->percent_complete; }
 
-int errands_task_item_get_indent_level(ErrandsTaskItem *self) {
-  int level = 0;
+guint errands_task_item_get_indent_level(ErrandsTaskItem *self) {
+  guint level = 0;
   ErrandsTaskItem *parent = self->parent;
   while (parent) {
     level++;

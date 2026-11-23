@@ -18,6 +18,8 @@ struct _ErrandsTask {
 
   GSimpleActionGroup *ag;
 
+  GtkWidget *expander;
+  GtkWidget *card;
   GtkWidget *complete_btn;
   GtkWidget *title;
   GtkWidget *edit_title;

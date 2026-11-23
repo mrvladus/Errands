@@ -4,12 +4,10 @@ using Gtk 4.0;
 using Adw 1;
 
 template $ErrandsTask: Box {
-  orientation: vertical;
-  tooltip-text: _("Open Properties");
-  focusable: true;
+  spacing: 6;
 
   styles [
-    "card",
+    "task",
   ]
 
   accessibility {
@@ -37,274 +35,289 @@ template $ErrandsTask: Box {
     released => $on_click_released_cb(template);
   }
 
-  // Title Box
-  Box {
-    spacing: 6;
-    margin-start: 6;
-    margin-end: 6;
-    margin-top: 6;
-    margin-bottom: 6;
-
-    accessibility {
-      labelled-by: title;
-    }
-
-    CheckButton complete_btn {
-      valign: center;
-      tooltip-text: _("Toggle Completion");
-      visible: bind cancel_btn.visible inverted;
-
-      styles [
-        "selection-mode",
-      ]
-    }
-
-    // Cancelled
-    Button cancel_btn {
-      icon-name: "errands-cancel-symbolic";
-      tooltip-text: _("Restore");
-      valign: center;
-      action-name: "task.cancel";
-
-      styles [
-        "flat",
-        "error",
-        "circular",
-      ]
-    }
-
-    // Title
-    Box {
-      orientation: vertical;
-      valign: center;
-      spacing: 0;
-
-      Label title {
-        hexpand: true;
-        halign: fill;
-        valign: center;
-        wrap: true;
-        wrap-mode: char;
-        xalign: 0;
-      }
-
-      EditableLabel edit_title {
-        hexpand: true;
-        vexpand: true;
-        halign: fill;
-        valign: center;
-        xalign: 0;
-        max-width-chars: 50;
-        visible: bind title.visible bidirectional inverted;
-        notify::editing => $on_title_edit_cb();
-      }
-    }
-
-    Box {
-      Label counter {
-        valign: center;
-        margin-end: 12;
-        tooltip-text: _("Uncompleted Sub-Tasks");
-
-        styles [
-          "dimmed",
-          "caption",
-          "counter",
-        ]
-      }
-
-      ToggleButton sub_toggle_btn {
-        tooltip-text: _("Toggle Sub-Tasks Entry");
-        icon-name: "errands-add-small-symbolic";
-        valign: center;
-        visible: bind edit_title.editing inverted;
-        opacity: 0.8;
-
-        styles [
-          "flat",
-          "circular",
-        ]
-      }
-
-      // Properties menu
-      MenuButton menu_btn {
-        icon-name: "errands-more-symbolic";
-        tooltip-text: _("Task Menu");
-        valign: center;
-
-        popover: PopoverMenu popover_menu {
-          has-arrow: false;
-          position: bottom;
-
-          menu-model: menu {
-            section {
-              item (_("Properties"), "task.properties")
-              item (_("Notes"), "task.notes")
-              item (_("Tags"), "task.tags")
-            }
-
-            section {
-              item (_("Edit Text"), "task.edit")
-              item (_("Copy Text"), "task.copy")
-            }
-
-            section {
-              item (_("Export as \".ics\""), "task.export")
-            }
-
-            section {
-              item (_("Cancel / Restore"), "task.cancel")
-              item (_("Delete"), "task.delete")
-            }
-          };
-        };
-
-        styles [
-          "circular",
-          "flat",
-        ]
-      }
-    }
-  }
-
-  // Toolbar
-  Adw.WrapBox toolbar {
-    child-spacing: 3;
-    line-spacing: 3;
-    margin-start: 6;
-    margin-end: 6;
-    margin-bottom: 6;
+  TreeExpander expander {
     valign: center;
-    visible: false;
-
-    Box priority_box {
-      spacing: 3;
-      tooltip-text: _("Priority");
-      valign: center;
-
-      styles [
-        "caption-heading",
-        "priority-label",
-      ]
-
-      Image {
-        icon-name: "errands-priority-symbolic";
-      }
-
-      Label priority_label {}
-    }
-
-    Button dtstart_btn {
-      valign: center;
-      action-name: "task.properties";
-
-      styles [
-        "caption",
-        "task-toolbar-btn",
-      ]
-
-      Adw.ButtonContent dtstart_btn_content {
-        icon-name: "errands-calendar-symbolic";
-        label: _("Start");
-        tooltip-text: _("Start Date");
-      }
-    }
-
-    Button dtend_btn {
-      valign: center;
-      action-name: "task.properties";
-
-      styles [
-        "caption",
-        "task-toolbar-btn",
-      ]
-
-      Adw.ButtonContent dtend_btn_content {
-        icon-name: "errands-calendar-symbolic";
-        label: _("Due");
-        tooltip-text: _("Due Date");
-      }
-    }
-
-    Button rrule_btn {
-      valign: center;
-      action-name: "task.properties";
-
-      styles [
-        "caption",
-        "task-toolbar-btn",
-      ]
-
-      Adw.ButtonContent rrule_btn_content {
-        icon-name: "errands-repeat-symbolic";
-        tooltip-text: _("Repeat");
-      }
-    }
-
-    Button notes_btn {
-      icon-name: "errands-notes-symbolic";
-      tooltip-text: _("Notes");
-      valign: center;
-      action-name: "task.notes";
-
-      styles [
-        "task-toolbar-btn",
-      ]
-    }
-
-    Button attachments_btn {
-      tooltip-text: _("Attachments");
-      valign: center;
-      action-name: "task.properties";
-
-      Adw.ButtonContent attachments_btn_content {
-        icon-name: "errands-attachment-symbolic";
-        tooltip-text: _("Attachments");
-      }
-
-      styles [
-        "caption",
-        "task-toolbar-btn",
-      ]
-    }
-
-    // Tags box
-    Adw.WrapBox tags_box {
-      child-spacing: 3;
-      line-spacing: 3;
-      halign: end;
-      hexpand: true;
-    }
+    tooltip-text: _("Expand Sub-Tasks");
+    focusable: false;
   }
 
-  ProgressBar progress_bar {
-    valign: end;
-    margin-start: 12;
-    margin-end: 12;
-    margin-bottom: 6;
-    opacity: 0.5;
-    notify::fraction => $on_progressbar_fraction_changed_cb(template);
+  Box card {
+    orientation: vertical;
+    tooltip-text: _("Open Properties");
 
     styles [
-      "osd",
-      "accent",
+      "card",
     ]
-  }
 
-  // Sub Entry
-  Revealer sub_entry_revealer {
-    reveal-child: bind sub_toggle_btn.active;
-    // Sub-Tasks Entry
-    Entry sub_entry {
+    // Title Box
+    Box {
+      spacing: 6;
+      margin-start: 6;
+      margin-end: 6;
+      margin-top: 6;
+      margin-bottom: 6;
+
+      accessibility {
+        labelled-by: title;
+      }
+
+      CheckButton complete_btn {
+        valign: center;
+        tooltip-text: _("Toggle Completion");
+        visible: bind cancel_btn.visible inverted;
+
+        styles [
+          "selection-mode",
+        ]
+      }
+
+      // Cancelled
+      Button cancel_btn {
+        icon-name: "errands-cancel-symbolic";
+        tooltip-text: _("Restore");
+        valign: center;
+        action-name: "task.cancel";
+
+        styles [
+          "flat",
+          "error",
+          "circular",
+        ]
+      }
+
+      // Title
+      Box {
+        orientation: vertical;
+        valign: center;
+        spacing: 0;
+
+        Label title {
+          hexpand: true;
+          halign: fill;
+          valign: center;
+          wrap: true;
+          wrap-mode: char;
+          xalign: 0;
+        }
+
+        EditableLabel edit_title {
+          hexpand: true;
+          vexpand: true;
+          halign: fill;
+          valign: center;
+          xalign: 0;
+          max-width-chars: 50;
+          visible: bind title.visible bidirectional inverted;
+          notify::editing => $on_title_edit_cb();
+        }
+      }
+
+      Box {
+        Label counter {
+          valign: center;
+          margin-end: 12;
+          tooltip-text: _("Uncompleted Sub-Tasks");
+
+          styles [
+            "dimmed",
+            "caption",
+            "counter",
+          ]
+        }
+
+        ToggleButton sub_toggle_btn {
+          tooltip-text: _("Toggle Sub-Tasks Entry");
+          icon-name: "errands-add-small-symbolic";
+          valign: center;
+          visible: bind edit_title.editing inverted;
+          opacity: 0.8;
+
+          styles [
+            "flat",
+            "circular",
+          ]
+        }
+
+        // Properties menu
+        MenuButton menu_btn {
+          icon-name: "errands-more-symbolic";
+          tooltip-text: _("Task Menu");
+          valign: center;
+
+          popover: PopoverMenu popover_menu {
+            has-arrow: false;
+            position: bottom;
+
+            menu-model: menu {
+              section {
+                item (_("Properties"), "task.properties")
+                item (_("Notes"), "task.notes")
+                item (_("Tags"), "task.tags")
+              }
+
+              section {
+                item (_("Edit Text"), "task.edit")
+                item (_("Copy Text"), "task.copy")
+              }
+
+              section {
+                item (_("Export as \".ics\""), "task.export")
+              }
+
+              section {
+                item (_("Cancel / Restore"), "task.cancel")
+                item (_("Delete"), "task.delete")
+              }
+            };
+          };
+
+          styles [
+            "circular",
+            "flat",
+          ]
+        }
+      }
+    }
+
+    // Toolbar
+    Adw.WrapBox toolbar {
+      child-spacing: 3;
+      line-spacing: 3;
       margin-start: 6;
       margin-end: 6;
       margin-bottom: 6;
-      placeholder-text: _("Add Sub-Task");
-      activate => $on_sub_task_entry_activated_cb(template) not-swapped;
+      valign: center;
+      visible: false;
+
+      Box priority_box {
+        spacing: 3;
+        tooltip-text: _("Priority");
+        valign: center;
+
+        styles [
+          "caption-heading",
+          "priority-label",
+        ]
+
+        Image {
+          icon-name: "errands-priority-symbolic";
+        }
+
+        Label priority_label {}
+      }
+
+      Button dtstart_btn {
+        valign: center;
+        action-name: "task.properties";
+
+        styles [
+          "caption",
+          "task-toolbar-btn",
+        ]
+
+        Adw.ButtonContent dtstart_btn_content {
+          icon-name: "errands-calendar-symbolic";
+          label: _("Start");
+          tooltip-text: _("Start Date");
+        }
+      }
+
+      Button dtend_btn {
+        valign: center;
+        action-name: "task.properties";
+
+        styles [
+          "caption",
+          "task-toolbar-btn",
+        ]
+
+        Adw.ButtonContent dtend_btn_content {
+          icon-name: "errands-calendar-symbolic";
+          label: _("Due");
+          tooltip-text: _("Due Date");
+        }
+      }
+
+      Button rrule_btn {
+        valign: center;
+        action-name: "task.properties";
+
+        styles [
+          "caption",
+          "task-toolbar-btn",
+        ]
+
+        Adw.ButtonContent rrule_btn_content {
+          icon-name: "errands-repeat-symbolic";
+          tooltip-text: _("Repeat");
+        }
+      }
+
+      Button notes_btn {
+        icon-name: "errands-notes-symbolic";
+        tooltip-text: _("Notes");
+        valign: center;
+        action-name: "task.notes";
+
+        styles [
+          "task-toolbar-btn",
+        ]
+      }
+
+      Button attachments_btn {
+        tooltip-text: _("Attachments");
+        valign: center;
+        action-name: "task.properties";
+
+        Adw.ButtonContent attachments_btn_content {
+          icon-name: "errands-attachment-symbolic";
+          tooltip-text: _("Attachments");
+        }
+
+        styles [
+          "caption",
+          "task-toolbar-btn",
+        ]
+      }
+
+      // Tags box
+      Adw.WrapBox tags_box {
+        child-spacing: 3;
+        line-spacing: 3;
+        halign: end;
+        hexpand: true;
+      }
+    }
+
+    ProgressBar progress_bar {
+      valign: end;
+      margin-start: 12;
+      margin-end: 12;
+      margin-bottom: 6;
+      opacity: 0.5;
+      notify::fraction => $on_progressbar_fraction_changed_cb(template);
 
       styles [
-        "sub-entry",
+        "osd",
+        "accent",
       ]
+    }
+
+    // Sub Entry
+    Revealer sub_entry_revealer {
+      reveal-child: bind sub_toggle_btn.active;
+      // Sub-Tasks Entry
+      Entry sub_entry {
+        margin-start: 6;
+        margin-end: 6;
+        margin-bottom: 6;
+        placeholder-text: _("Add Sub-Task");
+        activate => $on_sub_task_entry_activated_cb(template) not-swapped;
+
+        styles [
+          "sub-entry",
+        ]
+      }
     }
   }
 }
