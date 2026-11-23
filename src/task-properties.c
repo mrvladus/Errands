@@ -18,6 +18,7 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
+#include <string.h>
 
 #define ATTACHMENTS_LIST_BOX                                                                                                     \
   gtk_widget_get_first_child(gtk_widget_get_last_child(gtk_widget_get_first_child(GTK_WIDGET(self->attachments))))
@@ -25,8 +26,10 @@
 
 static void on_add_attachment_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskProperties *self);
 static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskProperties *self);
+static void on_undo_description_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskProperties *self);
 
 static void on_tag_entry_activated_cb(ErrandsTaskProperties *self, AdwEntryRow *entry);
+static void on_description_changed_cb(GtkTextBuffer *buffer, ErrandsTaskProperties *self);
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, ErrandsTaskProperties *self);
 static void on_rgba_changed_cb(ErrandsTaskProperties *self, GParamSpec *pspec, ErrandsColorButton *btn);
 
@@ -45,6 +48,9 @@ struct _ErrandsTaskProperties {
   AdwComboRow *priority;
   ErrandsColorButton *color;
   GtkWidget *reset_color_btn;
+  GtkTextView *text_view;
+  GtkTextBuffer *buffer;
+  GtkWidget *undo_btn;
 
   ErrandsTaskItem *item;
 };
@@ -72,8 +78,12 @@ static void errands_task_properties_class_init(ErrandsTaskPropertiesClass *klass
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, priority);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, color);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, reset_color_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, text_view);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, buffer);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTaskProperties, undo_btn);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_tag_entry_activated_cb);
   gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_rgba_changed_cb);
+  gtk_widget_class_bind_template_callback(GTK_WIDGET_CLASS(klass), on_description_changed_cb);
 }
 
 static void errands_task_properties_init(ErrandsTaskProperties *self) {
@@ -81,6 +91,7 @@ static void errands_task_properties_init(ErrandsTaskProperties *self) {
   GSimpleActionGroup *ag = errands_add_action_group(self, "task-properties");
   errands_add_action(ag, "add-attachment", on_add_attachment_action_cb, self, NULL);
   errands_add_action(ag, "clear-color", on_clear_color_action_cb, self, NULL);
+  errands_add_action(ag, "undo-description", on_undo_description_action_cb, self, NULL);
 
   // Notes
   gtk_source_init();
@@ -156,6 +167,10 @@ static inline void set_item(ErrandsTaskProperties *self, ErrandsTaskItem *item) 
   adw_overlay_split_view_set_show_sidebar(state.main_window->task_list->overlay_split_view, true);
 
   self->item = item;
+
+  // Text
+  gtk_text_buffer_set_text(self->buffer, errands_task_item_get_title(item), -1);
+  gtk_widget_set_sensitive(self->undo_btn, FALSE);
 
   // Date
   errands_date_chooser_reset(self->start_date_chooser);
@@ -275,6 +290,12 @@ void errands_task_properties_show_tags(ErrandsTaskProperties *self, ErrandsTaskI
 void errands_task_properties_close(ErrandsTaskProperties *self) {
   g_message("Task Properties: Close");
 
+  // Text
+  const char *new_text = NULL;
+  g_object_get(self->buffer, "text", &new_text, NULL);
+  g_autofree gchar *stripped = g_strstrip(g_strdup(new_text));
+  errands_task_item_set_title(self->item, stripped);
+
   // Date
   icaltimetype new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
   icaltimetype old_sdt = errands_task_item_get_dtstart(self->item);
@@ -364,6 +385,10 @@ static void on_clear_color_action_cb(GSimpleAction *action, GVariant *param, Err
   gtk_widget_set_visible(GTK_WIDGET(self->reset_color_btn), FALSE);
 }
 
+static void on_undo_description_action_cb(GSimpleAction *action, GVariant *param, ErrandsTaskProperties *self) {
+  gtk_text_buffer_set_text(self->buffer, errands_task_item_get_title(self->item), -1);
+}
+
 // ---------- CALLBACKS ---------- //
 
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, ErrandsTaskProperties *self) {
@@ -392,4 +417,12 @@ static void on_rgba_changed_cb(ErrandsTaskProperties *self, GParamSpec *pspec, E
   GdkRGBA rgba = errands_color_button_get_rgba(btn);
   gboolean is_null = rgba.red == 0 && rgba.green == 0 && rgba.blue == 0 && rgba.alpha == 0;
   gtk_widget_set_visible(GTK_WIDGET(self->reset_color_btn), !is_null);
+}
+
+static void on_description_changed_cb(GtkTextBuffer *buffer, ErrandsTaskProperties *self) {
+  const char *old = errands_task_item_get_title(self->item);
+  const char *new = NULL;
+  g_object_get(buffer, "text", &new, NULL);
+  g_autofree gchar *stripped = g_strstrip(g_strdup(new));
+  gtk_widget_set_sensitive(self->undo_btn, g_strcmp0(old, stripped) != 0);
 }

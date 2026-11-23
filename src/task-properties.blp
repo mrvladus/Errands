@@ -23,6 +23,36 @@ template $ErrandsTaskProperties: Adw.Bin {
 
         child: Adw.PreferencesPage {
           Adw.PreferencesGroup {
+            title: _("Description");
+
+            header-suffix: Button undo_btn {
+              icon-name: "errands-reset-symbolic";
+              tooltip-text: _("Undo Changes");
+              sensitive: false;
+              action-name: "task-properties.undo-description";
+
+              styles [
+                "flat",
+              ]
+            };
+
+            TextView text_view {
+              top-margin: 12;
+              bottom-margin: 12;
+              left-margin: 6;
+              right-margin: 6;
+
+              styles [
+                "card",
+              ]
+
+              buffer: TextBuffer buffer {
+                changed => $on_description_changed_cb(template) not-swapped;
+              };
+            }
+          }
+
+          Adw.PreferencesGroup {
             title: _("Date and Time");
 
             $ErrandsDateChooser start_date_chooser {
