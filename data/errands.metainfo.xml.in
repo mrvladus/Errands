@@ -60,6 +60,22 @@
     <display_length compare="ge">360</display_length>
   </requires>
   <releases>
+    <release version="51.2.5" date="2026-11-23">
+        <description translate="no">
+            <ul>
+                <li>Fixed keyboard navigation</li>
+                <li>Fixed priority UI</li>
+            </ul>
+            <p>Added / Updated translations:</p>
+            <ul>
+                <li>Chinese</li>
+                <li>Persian</li>
+                <li>Slovenian</li>
+                <li>Russian</li>
+            </ul>
+            <p>Thanks to everyone on Damned Lies!</p>
+        </description>
+    </release>
     <release version="51.2.4" date="2026-11-22">
         <description translate="no">
             <ul>
