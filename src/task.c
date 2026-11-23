@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Zlib
 
 #include "task.h"
+#include "adwaita.h"
 #include "config.h"
 #include "sidebar.h"
 #include "state.h"
@@ -88,8 +89,9 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
 
   case PROP_PRIORITY: {
     self->priority = g_value_get_uint(value);
-    gtk_label_set_label(GTK_LABEL(self->priority_label), errands_task_item_get_priority_as_tstring(self->item));
-    gtk_widget_set_visible(self->priority_box, self->priority > 0);
+    adw_button_content_set_label(ADW_BUTTON_CONTENT(self->priority_btn_content),
+                                 errands_task_item_get_priority_as_tstring(self->item));
+    gtk_widget_set_visible(self->priority_btn, self->priority > 0);
     errands_task_update_toolbar(self);
   } break;
 
@@ -218,8 +220,8 @@ static void errands_task_class_init(ErrandsTaskClass *klass) {
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, edit_title);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, popover_menu);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, toolbar);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_box);
-  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_label);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_btn);
+  gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, priority_btn_content);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, tags_box);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, dtstart_btn);
   gtk_widget_class_bind_template_child(GTK_WIDGET_CLASS(klass), ErrandsTask, dtstart_btn_content);

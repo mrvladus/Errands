@@ -27,8 +27,8 @@ struct _ErrandsTask {
   GtkWidget *menu_btn;
   GtkWidget *popover_menu;
   GtkWidget *toolbar;
-  GtkWidget *priority_box;
-  GtkWidget *priority_label;
+  GtkWidget *priority_btn;
+  GtkWidget *priority_btn_content;
   GtkWidget *tags_box;
   GtkWidget *dtstart_btn;
   GtkWidget *dtstart_btn_content;

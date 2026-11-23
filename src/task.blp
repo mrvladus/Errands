@@ -189,21 +189,19 @@ template $ErrandsTask: Box {
       valign: center;
       visible: false;
 
-      Box priority_box {
-        spacing: 3;
-        tooltip-text: _("Priority");
+      Button priority_btn {
         valign: center;
+        action-name: "task.properties";
 
         styles [
-          "caption-heading",
-          "priority-label",
+          "caption",
+          "task-toolbar-btn",
         ]
 
-        Image {
+        Adw.ButtonContent priority_btn_content {
           icon-name: "errands-priority-symbolic";
+          tooltip-text: _("Priority");
         }
-
-        Label priority_label {}
       }
 
       Button dtstart_btn {
