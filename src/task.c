@@ -299,53 +299,26 @@ static void errands_task_update_toolbar(ErrandsTask *self) {
   self->toolbar_update_id = g_idle_add_full(G_PRIORITY_HIGH_IDLE, (GSourceFunc)update_toolbar_cb, self, NULL);
 }
 
-static gboolean errands_task_focus (GtkWidget         *widget,
-                                    GtkDirectionType   direction)
-{
-  gboolean had_focus = FALSE;
-  GtkWidget *focus_child = gtk_widget_get_focus_child (widget);
-
-  g_object_get (widget, "has-focus", &had_focus, NULL);
-
-  /* Otherwise, decide based on the direction. */
-  if (direction == GTK_DIR_RIGHT || direction == GTK_DIR_TAB_FORWARD || direction == GTK_DIR_DOWN)
-    {
-      GtkWidget *child = gtk_widget_get_first_child (widget);
-
-      /* If a child was focused and focus couldn't be moved within that (see
-       * above), let focus leave. */
-      if (focus_child != NULL)
-        return FALSE;
-
-      /* If the row is not focused, try to focus it. */
-      if (!had_focus && gtk_widget_grab_focus (widget))
-        return TRUE;
-
-      /* Finally, try to move focus into the child. */
-      if (child != NULL && gtk_widget_child_focus (child, direction))
-        return TRUE;
-
-      return FALSE;
-    }
-  else if (direction == GTK_DIR_LEFT || direction == GTK_DIR_TAB_BACKWARD || direction == GTK_DIR_UP)
-    {
-      GtkWidget *child = gtk_widget_get_last_child (widget);
-
-      /* If the row itself is focused, let focus leave it. */
-      if (had_focus)
-        return FALSE;
-
-      /* Otherwise, let focus enter the child widget, if possible. */
-      if (child != NULL && gtk_widget_child_focus (child, direction))
-        return TRUE;
-
-      /* If that didn't work, try to focus the row itself. */
-      if (gtk_widget_grab_focus (widget))
-        return TRUE;
-
-      return FALSE;
-    }
-
+static gboolean errands_task_focus(GtkWidget *widget, GtkDirectionType direction) {
+  gboolean had_focus = gtk_widget_has_focus(widget);
+  GtkWidget *focus_child = gtk_widget_get_focus_child(widget);
+  if (direction == GTK_DIR_RIGHT || direction == GTK_DIR_TAB_FORWARD || direction == GTK_DIR_DOWN) {
+    // If a child was focused and focus couldn't be moved within that, let focus leave.
+    if (focus_child != NULL) return FALSE;
+    // If the row is not focused, try to focus it.
+    if (!had_focus && gtk_widget_grab_focus(widget)) return TRUE;
+    // Finally, try to move focus into the child.
+    GtkWidget *child = gtk_widget_get_first_child(widget);
+    if (child != NULL && gtk_widget_child_focus(child, direction)) return TRUE;
+  } else if (direction == GTK_DIR_LEFT || direction == GTK_DIR_TAB_BACKWARD || direction == GTK_DIR_UP) {
+    // If the row itself is focused, let focus leave it.
+    if (had_focus) return FALSE;
+    GtkWidget *child = gtk_widget_get_last_child(widget);
+    // Otherwise, let focus enter the child widget, if possible.
+    if (child != NULL && gtk_widget_child_focus(child, direction)) return TRUE;
+    // If that didn't work, try to focus the row itself.
+    if (gtk_widget_grab_focus(widget)) return TRUE;
+  }
   return FALSE;
 }
 

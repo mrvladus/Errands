@@ -5,7 +5,6 @@
 #include "config.h"
 #include "data.h"
 #include "delete-list-dialog.h"
-#include "glib-object.h"
 #include "rename-list-dialog.h"
 #include "settings.h"
 #include "sidebar.h"
@@ -20,6 +19,7 @@
 
 #include <adwaita.h>
 #include <gio/gio.h>
+#include <glib-object.h>
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gtk/gtk.h>
@@ -277,7 +277,6 @@ static void __expand_all_visible_rows(ErrandsTaskList *self) {
 
 static void on_setup_item_cb(GtkSignalListItemFactory *self, GtkListItem *list_item) {
   GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_tree_expander_new());
-
   gtk_tree_expander_set_child(expander, GTK_WIDGET(errands_task_new()));
   gtk_list_item_set_child(list_item, GTK_WIDGET(expander));
   gtk_list_item_set_selectable(list_item, FALSE);
