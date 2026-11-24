@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-16 19:57+0000\n"
-"PO-Revision-Date: 2026-11-18 10:00+0100\n"
+"POT-Creation-Date: 2026-11-23 17:30+0000\n"
+"PO-Revision-Date: 2026-11-24 08:22+0100\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <(nothing)>\n"
 "Language: ka\n"
@@ -26,9 +26,9 @@ msgstr "Errands"
 msgid "translator-credits"
 msgstr "ეკატერინე პაპავა"
 
-#: ../src/date-chooser.c:101 ../src/date-chooser.blp:7
-msgid "Not Set"
-msgstr "არ არის დაყენებული"
+#: ../src/color-button.c:70
+msgid "Select Color"
+msgstr "ფერის არჩევა"
 
 #: ../src/rrule-row.c:176
 msgctxt "Repeat every ..."
@@ -79,190 +79,190 @@ msgstr "უსასრულოდ გამეორება"
 msgid "Repeat %zu times"
 msgstr "გამეორება %zu-ჯერ"
 
-#: ../src/sidebar.c:319
+#: ../src/sidebar.c:326
 msgid "Only .ics files are supported"
 msgstr "მხარდაჭერილია, მხოლოდ, .ics ფაილები"
 
-#: ../src/sidebar.c:324
+#: ../src/sidebar.c:331
 msgid "Can't load list. It's incorrect or already exists"
 msgstr "სიის ჩატვირთვა შეუძლებელია. ის არასწორია ან უკვე არსებობს"
 
-#: ../src/sync.c:303
+#: ../src/sync.c:305
 #, c-format
 msgid "Added remote task list: %s"
 msgstr "დაშორებული ამოცანების სია დაემატა: %s"
 
-#: ../src/sync.c:536
+#: ../src/sync.c:553
 msgid "Sync Failed"
 msgstr "სინქრონიზაცია ჩავარდა"
 
-#: ../src/task.c:123
+#: ../src/task.c:118
 msgctxt "Start date"
 msgid "Start"
 msgstr "დაწყება"
 
-#: ../src/task.c:141
+#: ../src/task.c:136
 msgctxt "Due date"
 msgid "Due"
 msgstr "ვადა"
 
-#: ../src/task.c:324
+#: ../src/task.c:363
 msgid "Copied to Clipboard"
 msgstr "დაკოპირდა გაცვლის ბაფერში"
 
-#: ../src/task.c:361
+#: ../src/task.c:395
 msgid "Failed to Export"
 msgstr "გატანა ვერ მოხერხდა"
 
-#: ../src/task.c:364 ../src/task-list.c:314
+#: ../src/task.c:398 ../src/task-list.c:319
 msgid "Exported"
 msgstr "გატანილია"
 
-#: ../src/task-item.c:752
+#: ../src/task-item.c:753
 msgid "Can't make task a sub-task of itself."
 msgstr "ამოცანას თავისი თავის ქვეამოცანად ვერ დააყენებთ."
 
-#: ../src/task-item.c:873
-msgctxt "Priority"
-msgid "High"
-msgstr "მაღალი"
-
 #: ../src/task-item.c:874
-msgctxt "Priority"
-msgid "Medium"
-msgstr "საშუალო"
-
-#: ../src/task-item.c:875
 msgctxt "Priority"
 msgid "Low"
 msgstr "დაბალი"
 
+#: ../src/task-item.c:875
+msgctxt "Priority"
+msgid "Medium"
+msgstr "საშუალო"
+
 #: ../src/task-item.c:876
+msgctxt "Priority"
+msgid "High"
+msgstr "მაღალი"
+
+#: ../src/task-item.c:877
 msgctxt "Priority"
 msgid "None"
 msgstr "არცერთი"
 
-#: ../src/task-item.c:908
+#: ../src/task-item.c:909
 #, c-format
 msgid "Every second"
 msgid_plural "Every %d seconds"
 msgstr[0] "ყოველ წამში"
 msgstr[1] "ყოველ %d წამში"
 
-#: ../src/task-item.c:909
+#: ../src/task-item.c:910
 #, c-format
 msgid "Every minute"
 msgid_plural "Every %d minutes"
 msgstr[0] "ყოველ წუთში"
 msgstr[1] "ყოველ %d წუთში"
 
-#: ../src/task-item.c:910
+#: ../src/task-item.c:911
 #, c-format
 msgid "Every hour"
 msgid_plural "Every %d hours"
 msgstr[0] "ყოველ საათში"
 msgstr[1] "ყოველ %d საათში"
 
-#: ../src/task-item.c:911
+#: ../src/task-item.c:912
 #, c-format
 msgid "Every day"
 msgid_plural "Every %d days"
 msgstr[0] "ყოველდღე"
 msgstr[1] "ყოველ %d დღეში"
 
-#: ../src/task-item.c:912
+#: ../src/task-item.c:913
 #, c-format
 msgid "Every week"
 msgid_plural "Every %d weeks"
 msgstr[0] "ყოველ კვირაში"
 msgstr[1] "ყოველ %d კვირაში"
 
-#: ../src/task-item.c:913
+#: ../src/task-item.c:914
 #, c-format
 msgid "Every month"
 msgid_plural "Every %d months"
 msgstr[0] "ყოველ თვეში"
 msgstr[1] "ყოველ %d თვეში"
 
-#: ../src/task-item.c:914
+#: ../src/task-item.c:915
 #, c-format
 msgid "Every year"
 msgid_plural "Every %d years"
 msgstr[0] "ყოველ წელს"
 msgstr[1] "ყოველ %d წელში"
 
-#: ../src/task-item.c:925
+#: ../src/task-item.c:926
 #, c-format
 msgid " until %s"
 msgstr " %s-მდე"
 
-#: ../src/task-item.c:926
+#: ../src/task-item.c:927
 #, c-format
 msgid " once"
 msgid_plural " %d times"
 msgstr[0] " ერთხელ"
 msgstr[1] " %d-ჯერ"
 
-#: ../src/task-list.c:303 ../src/task-list.c:308
+#: ../src/task-list.c:308 ../src/task-list.c:313
 msgid "Export failed"
 msgstr "გატანის შეცდომა"
 
-#: ../src/task-list.c:334 ../src/task-list.c:346
+#: ../src/task-list.c:339 ../src/task-list.c:351
 msgid "No tasks to delete"
 msgstr "წასაშლელი ამოცანები არ არის"
 
-#: ../src/task-list.c:339 ../src/task-list.c:351
+#: ../src/task-list.c:344 ../src/task-list.c:356
 #, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
 msgstr[0] "წაიშალა %d ამოცანა"
 msgstr[1] "წაიშალა %d ამოცანა"
 
-#: ../src/task-list.c:498 ../src/sidebar.blp:137
+#: ../src/task-list.c:503 ../src/sidebar.blp:137
 msgid "All Tasks"
 msgstr "ყველა ამოცანა"
 
-#: ../src/task-list.c:502 ../src/sidebar.blp:150
+#: ../src/task-list.c:507 ../src/sidebar.blp:153
 msgid "Tasks for Today"
 msgstr "დღევანდელი ამოცანები"
 
-#: ../src/task-list-item.c:150
+#: ../src/task-list-item.c:151
 msgid "Untitled"
 msgstr "უსათაურო"
 
-#: ../src/date-chooser.blp:13
+#: ../src/date-chooser.blp:11
 msgid "Reset"
 msgstr "განულება"
 
-#: ../src/date-chooser.blp:27 ../src/rrule-row.blp:50
+#: ../src/date-chooser.blp:25 ../src/rrule-row.blp:50
 msgid "Date"
 msgstr "თარიღი"
 
-#: ../src/date-chooser.blp:36
+#: ../src/date-chooser.blp:34
 msgid "Today"
 msgstr "დღეს"
 
-#: ../src/date-chooser.blp:50
+#: ../src/date-chooser.blp:48
 msgid "Tomorrow"
 msgstr "ხვალ"
 
-#: ../src/date-chooser.blp:85
+#: ../src/date-chooser.blp:83
 msgid "Time"
 msgstr "დრო"
 
-#: ../src/date-chooser.blp:149
+#: ../src/date-chooser.blp:147
 msgid "9:00"
 msgstr "9:00"
 
-#: ../src/date-chooser.blp:164
+#: ../src/date-chooser.blp:162
 msgid "12:00"
 msgstr "12:00"
 
-#: ../src/date-chooser.blp:179
+#: ../src/date-chooser.blp:177
 msgid "17:00"
 msgstr "17:00"
 
-#: ../src/date-chooser.blp:194
+#: ../src/date-chooser.blp:192
 msgid "20:00"
 msgstr "20:00"
 
@@ -274,7 +274,7 @@ msgstr "დარწმუნებული ბრძანდებით?"
 msgid "Cancel"
 msgstr "გაუქმება"
 
-#: ../src/delete-list-dialog.blp:13 ../src/task.blp:184
+#: ../src/delete-list-dialog.blp:13 ../src/task.blp:169
 msgid "Delete"
 msgstr "წაშლა"
 
@@ -286,7 +286,7 @@ msgstr "სახელის შეცვლა"
 msgid "New List Name"
 msgstr "ახალი სიის სახელი"
 
-#: ../src/rrule-row.blp:7 ../src/task.blp:267
+#: ../src/rrule-row.blp:7 ../src/task.blp:250
 msgid "Repeat"
 msgstr "გამეორება"
 
@@ -487,7 +487,7 @@ msgstr "ფანჯრის დახურვა"
 msgid "Quit"
 msgstr "გასვლა"
 
-#: ../src/shortcuts-dialog.blp:34 ../src/task-list.blp:12
+#: ../src/shortcuts-dialog.blp:34 ../src/task-list.blp:23
 msgid "Task List"
 msgstr "ამოცანების სია"
 
@@ -560,193 +560,188 @@ msgctxt "All Tasks"
 msgid "All"
 msgstr "ყველა"
 
-#: ../src/sidebar.blp:149
+#: ../src/sidebar.blp:152
 msgctxt "Tasks for Today"
 msgid "Today"
 msgstr "დღეს"
 
-#: ../src/sidebar.blp:163
+#: ../src/sidebar.blp:169
 msgid "Task Lists"
 msgstr "ამოცანების სიები"
 
-#: ../src/sidebar.blp:168
+#: ../src/sidebar.blp:174
 msgid "No Task Lists"
 msgstr "ამოცანების სიები არ არის"
 
-#: ../src/sidebar.blp:169
+#: ../src/sidebar.blp:175
 msgid "Create new or import “.ics”"
 msgstr "ახლის შექმნა ან „.ics“-ის იმპორტი"
 
-#: ../src/task.blp:47
+#: ../src/task.blp:40
+msgid "Expand Sub-Tasks"
+msgstr "ქვეამოცანების ჩამოშლა"
+
+#: ../src/task.blp:46
+msgid "Open Properties"
+msgstr "თვისებების გახსნა"
+
+#: ../src/task.blp:66
 msgid "Toggle Completion"
 msgstr "შესრულების გადართვა"
 
-#: ../src/task.blp:59
+#: ../src/task.blp:77
 msgid "Restore"
 msgstr "აღდგენა"
 
-#: ../src/task.blp:111
+#: ../src/task.blp:119
+msgid "Uncompleted Sub-Tasks"
+msgstr "დაუსრულებელი ქვეამოცანები"
+
+#: ../src/task.blp:129
 msgid "Toggle Sub-Tasks Entry"
 msgstr "ქვეამოცანების შეყვანის გადართვა"
 
-#: ../src/task.blp:134
+#: ../src/task.blp:144
+msgid "Task Menu"
+msgstr "ამოცანების მენიუ"
+
+#: ../src/task.blp:153
 msgid "Properties"
 msgstr "თვისებები"
 
-#: ../src/task.blp:135 ../src/task.blp:273
+#: ../src/task.blp:154 ../src/task.blp:256
 msgid "Notes"
 msgstr "შენიშვნები"
 
-#: ../src/task.blp:139
+#: ../src/task.blp:155
+msgid "Tags"
+msgstr "ჭდეები"
+
+#: ../src/task.blp:159
 msgid "Edit Text"
 msgstr "ტექსტის ჩასწორება"
 
-#: ../src/task.blp:140
+#: ../src/task.blp:160
 msgid "Copy Text"
 msgstr "ტექსტის კოპირება"
 
-#: ../src/task.blp:144
-msgid "Task Color"
-msgstr "ამოცანის ფერი"
-
-#: ../src/task.blp:145
-msgid "Clear Color"
-msgstr "ფერის გასუფთავება"
-
-#: ../src/task.blp:150 ../src/task.blp:209 ../src/task-list.blp:88
-msgid "Priority"
-msgstr "პრიორიტეტი"
-
-#: ../src/task.blp:153
-msgid "None"
-msgstr "არცერთი"
-
-#: ../src/task.blp:159
-msgid "Low"
-msgstr "დაბალი"
-
-#: ../src/task.blp:165
-msgid "Medium"
-msgstr "საშუალო"
-
-#: ../src/task.blp:171
-msgid "High"
-msgstr "მაღალი"
-
-#: ../src/task.blp:179 ../src/task-list.blp:117
+#: ../src/task.blp:164 ../src/task-list.blp:129
 msgid "Export as \".ics\""
 msgstr "ექსპორტი „.ics“ ფორმატში"
 
-#: ../src/task.blp:183
+#: ../src/task.blp:168
 msgid "Cancel / Restore"
 msgstr "გაუქმება / აღდგენა"
 
-#: ../src/task.blp:235
+#: ../src/task.blp:203 ../src/task-list.blp:100
+msgid "Priority"
+msgstr "პრიორიტეტი"
+
+#: ../src/task.blp:218
 msgid "Start"
 msgstr "დაწყება"
 
-#: ../src/task.blp:236 ../src/task-list.blp:76
+#: ../src/task.blp:219 ../src/task-list.blp:88
 msgid "Start Date"
 msgstr "დაწყების თარიღი"
 
-#: ../src/task.blp:251
+#: ../src/task.blp:234
 msgid "Due"
 msgstr "ვადა"
 
-#: ../src/task.blp:252 ../src/task-list.blp:82
+#: ../src/task.blp:235 ../src/task-list.blp:94
 msgid "Due Date"
 msgstr "ვადა"
 
-#: ../src/task.blp:283 ../src/task.blp:289
+#: ../src/task.blp:266 ../src/task.blp:272
 msgid "Attachments"
 msgstr "დანართები"
 
-#: ../src/task.blp:329
+#: ../src/task.blp:312
 msgid "Add Sub-Task"
 msgstr "ახალი ქვეამოცანის დამატება"
 
-#: ../src/task-list.blp:18
-#| msgid "Search (Ctrl+F)"
+#: ../src/task-list.blp:30
 msgid "Toggle Sidebar (Ctrl+B)"
 msgstr "გვერდითი პანელის გადართვა (Ctrl+B)"
 
-#: ../src/task-list.blp:33
+#: ../src/task-list.blp:45
 msgid "Sort / Filter (Ctrl+Shift+F)"
 msgstr "დალაგება / გაფილტვრა (Ctrl+Shift+F)"
 
-#: ../src/task-list.blp:37
+#: ../src/task-list.blp:49
 msgid "Show Tasks"
 msgstr "ამოცანების ჩვენება"
 
-#: ../src/task-list.blp:40
+#: ../src/task-list.blp:52
 msgid "Completed"
 msgstr "შესრულებულია"
 
-#: ../src/task-list.blp:45
+#: ../src/task-list.blp:57
 msgid "Cancelled"
 msgstr "გაუქმებული"
 
-#: ../src/task-list.blp:51
+#: ../src/task-list.blp:63
 msgid "Sort Order"
 msgstr "დალაგების რიგი"
 
-#: ../src/task-list.blp:54
+#: ../src/task-list.blp:66
 msgid "Descending"
 msgstr "დაღმავალი"
 
-#: ../src/task-list.blp:60
+#: ../src/task-list.blp:72
 msgid "Ascending"
 msgstr "აღმავალი"
 
-#: ../src/task-list.blp:67
+#: ../src/task-list.blp:79
 msgid "Sort By"
 msgstr "დალაგება მიხედვით"
 
-#: ../src/task-list.blp:70
+#: ../src/task-list.blp:82
 msgid "Created"
 msgstr "შექმნილია"
 
-#: ../src/task-list.blp:107
+#: ../src/task-list.blp:119
 msgid "Task List Menu (Ctrl+M)"
 msgstr "ამოცანების სიის მენიუ (Ctrl+M)"
 
-#: ../src/task-list.blp:113
+#: ../src/task-list.blp:125
 msgid "Rename List"
 msgstr "სიის სახელის შეცვლა"
 
-#: ../src/task-list.blp:118
+#: ../src/task-list.blp:130
 msgid "Print"
 msgstr "ბეჭდვა"
 
-#: ../src/task-list.blp:122
+#: ../src/task-list.blp:134
 msgid "Delete Completed"
 msgstr "შესრულებული ამოცანების წაშლა"
 
-#: ../src/task-list.blp:123
+#: ../src/task-list.blp:135
 msgid "Delete Cancelled"
 msgstr "გაუქმებული ამოცანების წაშლა"
 
-#: ../src/task-list.blp:127
+#: ../src/task-list.blp:139
 msgid "Delete List"
 msgstr "სიის წაშლა"
 
-#: ../src/task-list.blp:144
+#: ../src/task-list.blp:156
 msgid "Search (Ctrl+F)"
 msgstr "ძებნა (Ctrl+F)"
 
-#: ../src/task-list.blp:183
+#: ../src/task-list.blp:195
 msgid "No Tasks"
 msgstr "ამოცანები არ არის"
 
-#: ../src/task-list.blp:213
+#: ../src/task-list.blp:226
 msgid "Add Task"
 msgstr "ახალი ამოცანის დამატება"
 
-#: ../src/task-list.blp:214
+#: ../src/task-list.blp:227
 msgid "Add Task (Ctrl+N)"
 msgstr "ახალი ამოცანის დამატება (Ctrl+N)"
 
-#: ../src/task-list.blp:239
+#: ../src/task-list.blp:231
 msgid ""
 "<b>Inline properties syntax:</b>\n"
 "\n"
@@ -758,11 +753,11 @@ msgstr ""
 "<b>##tag</b>  ჭდის დამატება.\n"
 "<b>#pN</b>     პრიორიტეტის დაყენება. <b>N</b> რიცხვის შუალედიდან <b>0..9</b>."
 
-#: ../src/task-list.blp:252
+#: ../src/task-list.blp:249
 msgid "Add Task (Ctrl+Return)"
 msgstr "ახალი ამოცანის დამატება (Ctrl+Return)"
 
-#: ../src/task-list.blp:280
+#: ../src/task-list.blp:277
 msgid "Loading Tasks"
 msgstr "ამოცანების ჩატვირთვა"
 
@@ -773,6 +768,24 @@ msgstr "გვერდითი ზოლი"
 #: ../src/window.blp:47
 msgid "Content"
 msgstr "შიგთავსი"
+
+#~ msgid "Not Set"
+#~ msgstr "არ არის დაყენებული"
+
+#~ msgid "Task Color"
+#~ msgstr "ამოცანის ფერი"
+
+#~ msgid "None"
+#~ msgstr "არცერთი"
+
+#~ msgid "Low"
+#~ msgstr "დაბალი"
+
+#~ msgid "Medium"
+#~ msgstr "საშუალო"
+
+#~ msgid "High"
+#~ msgstr "მაღალი"
 
 #~ msgid "Remove Attachment"
 #~ msgstr "დანართის წაშლა"
@@ -788,9 +801,6 @@ msgstr "შიგთავსი"
 
 #~ msgid "Add Attachment"
 #~ msgstr "დანართის დამატება"
-
-#~ msgid "Tags"
-#~ msgstr "ჭდეები"
 
 #~ msgid "New Tag"
 #~ msgstr "ახალი ჭდე"
