@@ -84,7 +84,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
 
   case PROP_COLOR: {
     self->color = g_value_get_string(value);
-    gtk_widget_set_color(GTK_WIDGET(self), self->color);
+    gtk_widget_set_color(GTK_WIDGET(self->card), self->color);
   } break;
 
   case PROP_PRIORITY: {
