@@ -60,6 +60,14 @@
     <display_length compare="ge">360</display_length>
   </requires>
   <releases>
+    <release version="51.2.6" date="2026-11-24">
+        <description translate="no">
+            <ul>
+                <li>Fixed accent color</li>
+                <li>Added text editing in task properties</li>
+            </ul>
+        </description>
+    </release>
     <release version="51.2.5" date="2026-11-23">
         <description translate="no">
             <ul>
