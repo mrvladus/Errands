@@ -1,0 +1,820 @@
+# Swedish translation for Errands.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the errands package.
+# Anders Jonsson <anders.jonsson@norsjovallen.se>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
+"POT-Creation-Date: 2026-11-23 17:30+0000\n"
+"PO-Revision-Date: 2026-11-24 10:24+0100\n"
+"Last-Translator: Anders Jonsson <anders.jonsson@norsjovallen.se>\n"
+"Language-Team: \n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.10\n"
+
+#: ../src/about-dialog.h:15 ../src/sidebar.blp:27 ../src/window.blp:7
+msgid "Errands"
+msgstr "Errands"
+
+#: ../src/about-dialog.h:18
+msgid "translator-credits"
+msgstr "Anders Jonsson <anders.jonsson@norsjovallen.se>"
+
+#: ../src/color-button.c:70
+msgid "Select Color"
+msgstr "Välj färg"
+
+#: ../src/rrule-row.c:176
+msgctxt "Repeat every ..."
+msgid "seconds"
+msgstr "sekund"
+
+#: ../src/rrule-row.c:176
+msgctxt "Repeat every ..."
+msgid "minutes"
+msgstr "minut"
+
+#: ../src/rrule-row.c:177
+msgctxt "Repeat every ..."
+msgid "hours"
+msgstr "timme"
+
+#: ../src/rrule-row.c:177
+msgctxt "Repeat every ..."
+msgid "days"
+msgstr "dag"
+
+#: ../src/rrule-row.c:178
+msgctxt "Repeat every ..."
+msgid "weeks"
+msgstr "vecka"
+
+#: ../src/rrule-row.c:178
+msgctxt "Repeat every ..."
+msgid "months"
+msgstr "månad"
+
+#: ../src/rrule-row.c:179
+msgctxt "Repeat every ..."
+msgid "years"
+msgstr "år"
+
+# TODO: Kan se lite fult ut. 
+# Men "var %d:e" skulle vara fel för siffror som slutar på 1 eller 2.
+# Should be reported
+#: ../src/rrule-row.c:181
+#, c-format
+msgid "Repeat every %d %s"
+msgstr "Upprepa var %d %s"
+
+#: ../src/rrule-row.c:187
+msgid "Repeat forever"
+msgstr "Upprepa för alltid"
+
+#: ../src/rrule-row.c:187
+#, c-format
+msgid "Repeat %zu times"
+msgstr "Upprepa %zu gånger"
+
+#: ../src/sidebar.c:326
+msgid "Only .ics files are supported"
+msgstr "Endast .ics-filer stöds"
+
+#: ../src/sidebar.c:331
+msgid "Can't load list. It's incorrect or already exists"
+msgstr "Det går inte att läsa in listan. Den är felaktig eller finns redan"
+
+#: ../src/sync.c:305
+#, c-format
+msgid "Added remote task list: %s"
+msgstr "La till fjärruppgiftslista: %s"
+
+#: ../src/sync.c:553
+msgid "Sync Failed"
+msgstr "Synkronisering misslyckades"
+
+#: ../src/task.c:118
+msgctxt "Start date"
+msgid "Start"
+msgstr "Startar"
+
+#: ../src/task.c:136
+msgctxt "Due date"
+msgid "Due"
+msgstr "Förfaller"
+
+#: ../src/task.c:363
+msgid "Copied to Clipboard"
+msgstr "Kopierad till urklipp"
+
+#: ../src/task.c:395
+msgid "Failed to Export"
+msgstr "Misslyckades med att exportera"
+
+# Toast om att uppgiften exporterades.
+#: ../src/task.c:398 ../src/task-list.c:319
+msgid "Exported"
+msgstr "Exporterades"
+
+#: ../src/task-item.c:753
+msgid "Can't make task a sub-task of itself."
+msgstr "Kan inte göra en uppgift till en deluppgift av sig själv."
+
+#: ../src/task-item.c:874
+msgctxt "Priority"
+msgid "Low"
+msgstr "Låg"
+
+#: ../src/task-item.c:875
+msgctxt "Priority"
+msgid "Medium"
+msgstr "Medel"
+
+#: ../src/task-item.c:876
+msgctxt "Priority"
+msgid "High"
+msgstr "Hög"
+
+#: ../src/task-item.c:877
+msgctxt "Priority"
+msgid "None"
+msgstr "Ingen"
+
+#: ../src/task-item.c:909
+#, c-format
+msgid "Every second"
+msgid_plural "Every %d seconds"
+msgstr[0] "Varje sekund"
+msgstr[1] "Var %d sekund"
+
+#: ../src/task-item.c:910
+#, c-format
+msgid "Every minute"
+msgid_plural "Every %d minutes"
+msgstr[0] "Varje minut"
+msgstr[1] "Var %d minut"
+
+#: ../src/task-item.c:911
+#, c-format
+msgid "Every hour"
+msgid_plural "Every %d hours"
+msgstr[0] "Varje timme"
+msgstr[1] "Var %d timme"
+
+#: ../src/task-item.c:912
+#, c-format
+msgid "Every day"
+msgid_plural "Every %d days"
+msgstr[0] "Varje dag"
+msgstr[1] "Var %d dag"
+
+#: ../src/task-item.c:913
+#, c-format
+msgid "Every week"
+msgid_plural "Every %d weeks"
+msgstr[0] "Varje vecka"
+msgstr[1] "Var %d vecka"
+
+#: ../src/task-item.c:914
+#, c-format
+msgid "Every month"
+msgid_plural "Every %d months"
+msgstr[0] "Varje månad"
+msgstr[1] "Var %d månad"
+
+#: ../src/task-item.c:915
+#, c-format
+msgid "Every year"
+msgid_plural "Every %d years"
+msgstr[0] "Varje år"
+msgstr[1] "Var %d år"
+
+#: ../src/task-item.c:926
+#, c-format
+msgid " until %s"
+msgstr " till %s"
+
+#: ../src/task-item.c:927
+#, c-format
+msgid " once"
+msgid_plural " %d times"
+msgstr[0] " en gång"
+msgstr[1] " %d gånger"
+
+#: ../src/task-list.c:308 ../src/task-list.c:313
+msgid "Export failed"
+msgstr "Exporten misslyckades"
+
+#: ../src/task-list.c:339 ../src/task-list.c:351
+msgid "No tasks to delete"
+msgstr "Inga uppgifter att ta bort"
+
+#: ../src/task-list.c:344 ../src/task-list.c:356
+#, c-format
+msgid "Deleted %d task"
+msgid_plural "Deleted %d tasks"
+msgstr[0] "Tog bort %d uppgift"
+msgstr[1] "Tog bort %d uppgifter"
+
+#: ../src/task-list.c:503 ../src/sidebar.blp:137
+msgid "All Tasks"
+msgstr "Alla uppgifter"
+
+#: ../src/task-list.c:507 ../src/sidebar.blp:153
+msgid "Tasks for Today"
+msgstr "Uppgifter för i dag"
+
+#: ../src/task-list-item.c:151
+msgid "Untitled"
+msgstr "Namnlös"
+
+#: ../src/date-chooser.blp:11
+msgid "Reset"
+msgstr "Återställ"
+
+#: ../src/date-chooser.blp:25 ../src/rrule-row.blp:50
+msgid "Date"
+msgstr "Datum"
+
+#: ../src/date-chooser.blp:34
+msgid "Today"
+msgstr "I dag"
+
+#: ../src/date-chooser.blp:48
+msgid "Tomorrow"
+msgstr "I morgon"
+
+#: ../src/date-chooser.blp:83
+msgid "Time"
+msgstr "Tid"
+
+#: ../src/date-chooser.blp:147
+msgid "9:00"
+msgstr "9:00"
+
+#: ../src/date-chooser.blp:162
+msgid "12:00"
+msgstr "12:00"
+
+#: ../src/date-chooser.blp:177
+msgid "17:00"
+msgstr "17:00"
+
+#: ../src/date-chooser.blp:192
+msgid "20:00"
+msgstr "20:00"
+
+#: ../src/delete-list-dialog.blp:8
+msgid "Are you sure?"
+msgstr "Är du säker?"
+
+#: ../src/delete-list-dialog.blp:12 ../src/rename-list-dialog.blp:11
+msgid "Cancel"
+msgstr "Avbryt"
+
+#: ../src/delete-list-dialog.blp:13 ../src/task.blp:169
+msgid "Delete"
+msgstr "Ta bort"
+
+#: ../src/rename-list-dialog.blp:12
+msgid "Rename"
+msgstr "Byt namn"
+
+#: ../src/rename-list-dialog.blp:21
+msgid "New List Name"
+msgstr "Nytt listnamn"
+
+#: ../src/rrule-row.blp:7 ../src/task.blp:250
+msgid "Repeat"
+msgstr "Upprepa"
+
+#: ../src/rrule-row.blp:12
+msgid "Frequency"
+msgstr "Frekvens"
+
+#: ../src/rrule-row.blp:13
+msgid "How often task will repeat"
+msgstr "Hur ofta uppgiften ska upprepas"
+
+#: ../src/rrule-row.blp:17
+msgid "Secondly"
+msgstr "Varje sekund"
+
+#: ../src/rrule-row.blp:18
+msgid "Minutely"
+msgstr "Varje minut"
+
+#: ../src/rrule-row.blp:19
+msgid "Hourly"
+msgstr "Varje timme"
+
+#: ../src/rrule-row.blp:20
+msgid "Daily"
+msgstr "Varje dag"
+
+#: ../src/rrule-row.blp:21
+msgid "Weekly"
+msgstr "Varje vecka"
+
+#: ../src/rrule-row.blp:22
+msgid "Monthly"
+msgstr "Varje månad"
+
+#: ../src/rrule-row.blp:23
+msgid "Yearly"
+msgstr "Varje år"
+
+#: ../src/rrule-row.blp:31
+msgid "Interval"
+msgstr "Intervall"
+
+#: ../src/rrule-row.blp:45
+msgid "Repeat Until"
+msgstr "Upprepa till"
+
+#: ../src/rrule-row.blp:49
+msgid "Indefinitely"
+msgstr "För alltid"
+
+#: ../src/rrule-row.blp:51
+msgid "Count"
+msgstr "Antal"
+
+#: ../src/rrule-row.blp:59
+msgid "Repeat Until Date"
+msgstr "Upprepa till datum"
+
+#: ../src/rrule-row.blp:63
+msgid "Repeat Count"
+msgstr "Upprepningsantal"
+
+#: ../src/rrule-row.blp:86
+msgid "Week Days"
+msgstr "Veckodagar"
+
+#: ../src/rrule-row.blp:95
+msgid "Mo"
+msgstr "Må"
+
+#: ../src/rrule-row.blp:96
+msgid "Monday"
+msgstr "Måndag"
+
+#: ../src/rrule-row.blp:105
+msgid "Tu"
+msgstr "Ti"
+
+#: ../src/rrule-row.blp:106
+msgid "Tuesday"
+msgstr "Tisdag"
+
+#: ../src/rrule-row.blp:115
+msgid "We"
+msgstr "On"
+
+#: ../src/rrule-row.blp:116
+msgid "Wednesday"
+msgstr "Onsdag"
+
+#: ../src/rrule-row.blp:125
+msgid "Th"
+msgstr "To"
+
+#: ../src/rrule-row.blp:126
+msgid "Thursday"
+msgstr "Torsdag"
+
+#: ../src/rrule-row.blp:135
+msgid "Fr"
+msgstr "Fr"
+
+#: ../src/rrule-row.blp:136
+msgid "Friday"
+msgstr "Fredag"
+
+#: ../src/rrule-row.blp:145
+msgid "Sa"
+msgstr "Lö"
+
+#: ../src/rrule-row.blp:146
+msgid "Saturday"
+msgstr "Lördag"
+
+#: ../src/rrule-row.blp:155
+msgid "Su"
+msgstr "Sö"
+
+#: ../src/rrule-row.blp:156
+msgid "Sunday"
+msgstr "Söndag"
+
+#: ../src/settings-dialog.blp:11
+msgid "Appearance"
+msgstr "Utseende"
+
+#: ../src/settings-dialog.blp:14
+msgid "Theme"
+msgstr "Tema"
+
+#: ../src/settings-dialog.blp:21
+msgid "System"
+msgstr "System"
+
+#: ../src/settings-dialog.blp:26
+msgid "Light"
+msgstr "Ljust"
+
+#: ../src/settings-dialog.blp:31
+msgid "Dark"
+msgstr "Mörkt"
+
+#: ../src/settings-dialog.blp:43
+msgid "Miscellaneous"
+msgstr "Diverse"
+
+#: ../src/settings-dialog.blp:48
+msgid "Run in the Background"
+msgstr "Kör i bakgrunden"
+
+# TODO: Msgctxt for noun/verb?
+#: ../src/settings-dialog.blp:58 ../src/shortcuts-dialog.blp:79
+#: ../src/sidebar.blp:87 ../src/sidebar.blp:122
+msgid "Sync"
+msgstr "Synkronisering"
+
+#: ../src/settings-dialog.blp:61
+msgid "Enabled"
+msgstr "Aktiverad"
+
+#: ../src/settings-dialog.blp:65
+msgid "Sync Interval"
+msgstr "Synkroniseringsintervall"
+
+#: ../src/settings-dialog.blp:66
+msgid "Seconds between pulling events from the server"
+msgstr "Sekunder mellan hämtning av händelser från servern"
+
+#: ../src/settings-dialog.blp:78
+msgid "CalDAV Server URL"
+msgstr "URL för CalDAV-server"
+
+#: ../src/settings-dialog.blp:84
+msgid "Username"
+msgstr "Användarnamn"
+
+#: ../src/settings-dialog.blp:90
+msgid "Password"
+msgstr "Lösenord"
+
+#: ../src/shortcuts-dialog.blp:9
+msgid "General"
+msgstr "Allmänt"
+
+#: ../src/shortcuts-dialog.blp:12 ../src/sidebar.blp:91
+msgid "Preferences"
+msgstr "Inställningar"
+
+#: ../src/shortcuts-dialog.blp:17
+msgid "Open Menu"
+msgstr "Öppna meny"
+
+#: ../src/shortcuts-dialog.blp:22
+msgid "Close Window"
+msgstr "Stäng fönster"
+
+#: ../src/shortcuts-dialog.blp:27
+msgid "Quit"
+msgstr "Avsluta"
+
+#: ../src/shortcuts-dialog.blp:34 ../src/task-list.blp:23
+msgid "Task List"
+msgstr "Uppgiftslista"
+
+#: ../src/shortcuts-dialog.blp:37
+msgid "Add Task List"
+msgstr "Lägg till uppgiftslista"
+
+#: ../src/shortcuts-dialog.blp:42
+msgid "Toggle Search"
+msgstr "Växla sökning"
+
+#: ../src/shortcuts-dialog.blp:47
+msgid "New Toplevel Task"
+msgstr "Ny huvuduppgift"
+
+#: ../src/shortcuts-dialog.blp:52
+msgid "Switch to the next Task List"
+msgstr "Växla till nästa uppgiftslista"
+
+#: ../src/shortcuts-dialog.blp:57
+msgid "Switch to the previous Task List"
+msgstr "Växla till föregående uppgiftslista"
+
+#: ../src/shortcuts-dialog.blp:62
+msgid "Toggle sidebar"
+msgstr "Växla sidopanel"
+
+#: ../src/shortcuts-dialog.blp:67
+msgid "Open Task List Menu"
+msgstr "Öppna meny för uppgiftslista"
+
+#: ../src/shortcuts-dialog.blp:72
+msgid "Open \"Sort / Filter\" Menu"
+msgstr "Öppna menyn ”Sortera / Filtrera”"
+
+#: ../src/shortcuts-dialog.blp:82
+msgid "Sync Now"
+msgstr "Synkronisera nu"
+
+#: ../src/sidebar.blp:33
+msgid "Add Task List (Ctrl+L)"
+msgstr "Lägg till uppgiftslista (Ctrl+L)"
+
+#: ../src/sidebar.blp:42
+msgid "Import \".ics\" file"
+msgstr "Importera ”.ics”-fil"
+
+#: ../src/sidebar.blp:51
+msgid "New list name"
+msgstr "Nytt listnamn"
+
+#: ../src/sidebar.blp:57
+msgid "Create"
+msgstr "Skapa"
+
+#: ../src/sidebar.blp:83
+msgid "Main Menu (F10)"
+msgstr "Huvudmeny (F10)"
+
+#: ../src/sidebar.blp:92
+msgid "Shortcuts"
+msgstr "Kortkommandon"
+
+#: ../src/sidebar.blp:93
+msgid "About Errands"
+msgstr "Om Errands"
+
+#: ../src/sidebar.blp:136
+msgctxt "All Tasks"
+msgid "All"
+msgstr "Alla"
+
+#: ../src/sidebar.blp:152
+msgctxt "Tasks for Today"
+msgid "Today"
+msgstr "I dag"
+
+#: ../src/sidebar.blp:169
+msgid "Task Lists"
+msgstr "Uppgiftslistor"
+
+#: ../src/sidebar.blp:174
+msgid "No Task Lists"
+msgstr "Inga uppgiftslistor"
+
+#: ../src/sidebar.blp:175
+msgid "Create new or import “.ics”"
+msgstr "Skapa ny eller importera ”.ics”"
+
+#: ../src/task.blp:40
+msgid "Expand Sub-Tasks"
+msgstr "Expandera deluppgifter"
+
+#: ../src/task.blp:46
+msgid "Open Properties"
+msgstr "Öppna egenskaper"
+
+#: ../src/task.blp:66
+msgid "Toggle Completion"
+msgstr "Växla färdigmarkering"
+
+#: ../src/task.blp:77
+msgid "Restore"
+msgstr "Återställ"
+
+#: ../src/task.blp:119
+msgid "Uncompleted Sub-Tasks"
+msgstr "Ej slutförda deluppgifter"
+
+#: ../src/task.blp:129
+msgid "Toggle Sub-Tasks Entry"
+msgstr "Växla fält för deluppgifter"
+
+#: ../src/task.blp:144
+msgid "Task Menu"
+msgstr "Uppgiftsmeny"
+
+#: ../src/task.blp:153
+msgid "Properties"
+msgstr "Egenskaper"
+
+#: ../src/task.blp:154 ../src/task.blp:256
+msgid "Notes"
+msgstr "Anteckningar"
+
+#: ../src/task.blp:155
+msgid "Tags"
+msgstr "Taggar"
+
+#: ../src/task.blp:159
+msgid "Edit Text"
+msgstr "Redigera text"
+
+#: ../src/task.blp:160
+msgid "Copy Text"
+msgstr "Kopiera text"
+
+#: ../src/task.blp:164 ../src/task-list.blp:129
+msgid "Export as \".ics\""
+msgstr "Exportera som ”.ics”"
+
+#: ../src/task.blp:168
+msgid "Cancel / Restore"
+msgstr "Avbryt / Återställ"
+
+#: ../src/task.blp:203 ../src/task-list.blp:100
+msgid "Priority"
+msgstr "Prioritet"
+
+#: ../src/task.blp:218
+msgid "Start"
+msgstr "Start"
+
+#: ../src/task.blp:219 ../src/task-list.blp:88
+msgid "Start Date"
+msgstr "Startdatum"
+
+#: ../src/task.blp:234
+msgid "Due"
+msgstr "Förfaller"
+
+#: ../src/task.blp:235 ../src/task-list.blp:94
+msgid "Due Date"
+msgstr "Förfallodatum"
+
+#: ../src/task.blp:266 ../src/task.blp:272
+msgid "Attachments"
+msgstr "Bilagor"
+
+#: ../src/task.blp:312
+msgid "Add Sub-Task"
+msgstr "Lägg till deluppgift"
+
+#: ../src/task-list.blp:30
+msgid "Toggle Sidebar (Ctrl+B)"
+msgstr "Växla sidopanel (Ctrl+B)"
+
+#: ../src/task-list.blp:45
+msgid "Sort / Filter (Ctrl+Shift+F)"
+msgstr "Sortera / Filtrera (Ctrl+Skift+F)"
+
+#: ../src/task-list.blp:49
+msgid "Show Tasks"
+msgstr "Visa uppgifter"
+
+#: ../src/task-list.blp:52
+msgid "Completed"
+msgstr "Slutförda"
+
+#: ../src/task-list.blp:57
+msgid "Cancelled"
+msgstr "Avbrutna"
+
+#: ../src/task-list.blp:63
+msgid "Sort Order"
+msgstr "Sorteringsordning"
+
+#: ../src/task-list.blp:66
+msgid "Descending"
+msgstr "Fallande"
+
+#: ../src/task-list.blp:72
+msgid "Ascending"
+msgstr "Stigande"
+
+#: ../src/task-list.blp:79
+msgid "Sort By"
+msgstr "Sortera efter"
+
+#: ../src/task-list.blp:82
+msgid "Created"
+msgstr "Skapad"
+
+#: ../src/task-list.blp:119
+msgid "Task List Menu (Ctrl+M)"
+msgstr "Uppgiftslistans meny (Ctrl+M)"
+
+#: ../src/task-list.blp:125
+msgid "Rename List"
+msgstr "Byt namn på lista"
+
+#: ../src/task-list.blp:130
+msgid "Print"
+msgstr "Skriv ut"
+
+#: ../src/task-list.blp:134
+msgid "Delete Completed"
+msgstr "Ta bort slutförda"
+
+#: ../src/task-list.blp:135
+msgid "Delete Cancelled"
+msgstr "Ta bort avbrutna"
+
+#: ../src/task-list.blp:139
+msgid "Delete List"
+msgstr "Ta bort lista"
+
+#: ../src/task-list.blp:156
+msgid "Search (Ctrl+F)"
+msgstr "Sök (Ctrl+F)"
+
+#: ../src/task-list.blp:195
+msgid "No Tasks"
+msgstr "Inga uppgifter"
+
+#: ../src/task-list.blp:226
+msgid "Add Task"
+msgstr "Lägg till uppgift"
+
+#: ../src/task-list.blp:227
+msgid "Add Task (Ctrl+N)"
+msgstr "Lägg till uppgift (Ctrl+N)"
+
+#: ../src/task-list.blp:231
+msgid ""
+"<b>Inline properties syntax:</b>\n"
+"\n"
+"<b>##tag</b>  Add tag.\n"
+"<b>#pN</b>     Set priority. <b>N</b> is number in range <b>0..9</b>."
+msgstr ""
+"<b>Syntax för infogade egenskaper:</b>\n"
+"\n"
+"<b>##tag</b>  Lägg till tagg.\n"
+"<b>#pN</b>     Ange prioritet. <b>N</b> är en siffra i intervallet <b>0..9</b>."
+
+#: ../src/task-list.blp:249
+msgid "Add Task (Ctrl+Return)"
+msgstr "Lägg till uppgift (Ctrl+Retur)"
+
+#: ../src/task-list.blp:277
+msgid "Loading Tasks"
+msgstr "Läser in uppgifter"
+
+#: ../src/window.blp:40
+msgid "Sidebar"
+msgstr "Sidopanel"
+
+#: ../src/window.blp:47
+msgid "Content"
+msgstr "Innehåll"
+
+#~ msgid "Not Set"
+#~ msgstr "Inte inställd"
+
+#~ msgid "Remove Attachment"
+#~ msgstr "Ta bort bilaga"
+
+#~ msgid "Enable Tag"
+#~ msgstr "Aktivera tagg"
+
+#~ msgid "Remove Tag"
+#~ msgstr "Ta bort tagg"
+
+#~ msgid "Task Color"
+#~ msgstr "Uppgiftsfärg"
+
+#~ msgid "None"
+#~ msgstr "Ingen"
+
+#~ msgid "Low"
+#~ msgstr "Låg"
+
+#~ msgid "Medium"
+#~ msgstr "Medel"
+
+#~ msgid "High"
+#~ msgstr "Hög"
+
+#~ msgid "Date and Time"
+#~ msgstr "Datum och tid"
+
+#~ msgid "Add Attachment"
+#~ msgstr "Lägg till bilaga"
+
+#~ msgid "New Tag"
+#~ msgstr "Ny tagg"
+
+#~ msgid "Close Properties"
+#~ msgstr "Stäng egenskaper"
+
+#~ msgid "Manage your tasks"
+#~ msgstr "Hantera dina uppgifter"
+
+#~ msgid "errands;task;tasks;list;todo;todos;caldav;nextcloud;radicale;ownclowd;sync;"
+#~ msgstr "errands;ärenden;uppgift;uppgifter;lista;todo;todos;attgöra;caldav;nextcloud;radicale;ownclowd;sync;synkronisering;"
