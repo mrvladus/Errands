@@ -452,11 +452,10 @@ static void on_sub_task_entry_activated_cb(GtkEntry *entry, ErrandsTask *self) {
     errands_task_item_add_tag(task, tag);
   }
 
-  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
-  gtk_tree_list_row_set_expanded(gtk_tree_expander_get_list_row(expander), true);
-  // Reset text
+  gtk_tree_list_row_set_expanded(gtk_tree_expander_get_list_row(GTK_TREE_EXPANDER(self->expander)), true);
   gtk_editable_set_text(GTK_EDITABLE(entry), "");
   errands_sidebar_update_filter_rows();
+  errands_sidebar_task_list_update_counter(errands_task_item_get_list(self->item)->uid);
 }
 
 static void on_progressbar_fraction_changed_cb(ErrandsTask *self) {
@@ -474,8 +473,7 @@ static void on_click_released_cb(ErrandsTask *self, gint n_press) {
 static guint on_drop_motion_ctrl_enter_timeout_cb(ErrandsTask *self) {
   if (!self || !GTK_IS_WIDGET(self)) return G_SOURCE_REMOVE;
 
-  GtkTreeExpander *expander = GTK_TREE_EXPANDER(gtk_widget_get_ancestor(GTK_WIDGET(self), GTK_TYPE_TREE_EXPANDER));
-  GtkTreeListRow *row = gtk_tree_expander_get_list_row(expander);
+  GtkTreeListRow *row = gtk_tree_expander_get_list_row(GTK_TREE_EXPANDER(self->expander));
   bool expanded = gtk_tree_list_row_get_expanded(row);
   if (!expanded && gtk_drop_controller_motion_contains_pointer(self->drop_motion_ctrl)) gtk_tree_list_row_set_expanded(row, true);
 
