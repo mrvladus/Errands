@@ -20,6 +20,7 @@ src/shortcuts-dialog.blp
 src/sidebar.blp
 src/task.blp
 src/task-list.blp
+src/task-properties.blp
 src/window.blp
 
 data/errands.desktop.in

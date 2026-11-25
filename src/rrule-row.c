@@ -173,12 +173,14 @@ static void on_freq_changed_cb(ErrandsRruleRow *self, GParamSpec *param, AdwComb
 }
 
 static void on_interval_changed_cb(ErrandsRruleRow *self, GParamSpec *param, AdwSpinRow *row) {
-  const char *const intervals[] = {C_("Repeat every ...", "seconds"), C_("Repeat every ...", "minutes"),
-                                   C_("Repeat every ...", "hours"),   C_("Repeat every ...", "days"),
-                                   C_("Repeat every ...", "weeks"),   C_("Repeat every ...", "months"),
-                                   C_("Repeat every ...", "years")};
-  const guint selected_freq = adw_combo_row_get_selected(self->freq_row);
-  const char *subtitle = tmp_str_printf(_("Repeat every %d %s"), (int)adw_spin_row_get_value(row), intervals[selected_freq]);
+  unsigned long n = (unsigned long)adw_spin_row_get_value(row);
+  const char *const intervals[] = {
+      ngettext("Every second", "Every %d seconds", n), ngettext("Every minute", "Every %d minutes", n),
+      ngettext("Every hour", "Every %d hours", n),     ngettext("Every day", "Every %d days", n),
+      ngettext("Every week", "Every %d weeks", n),     ngettext("Every month", "Every %d months", n),
+      ngettext("Every year", "Every %d years", n),
+  };
+  const char *subtitle = tmp_str_printf(intervals[adw_combo_row_get_selected(self->freq_row)], n);
   g_object_set(row, "subtitle", subtitle, NULL);
 }
 
