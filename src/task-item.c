@@ -3,7 +3,6 @@
 
 #include "task-item.h"
 #include "data.h"
-#include "gtk/gtk.h"
 #include "settings.h"
 #include "state.h"
 #include "sync.h"
@@ -17,6 +16,7 @@
 #include <glib-object.h>
 #include <glib.h>
 #include <glib/gi18n.h>
+#include <gtk/gtk.h>
 #include <libical/ical.h>
 
 static inline void save_and_push(ErrandsTaskItem *self);
@@ -156,8 +156,11 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     save_and_push(self);
     errands_sidebar_update_filter_rows();
     errands_sidebar_task_list_update_counter(self->list->uid);
-    if (state.main_window) errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
-    if (state.main_window) errands_task_list_filter(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
+    if (state.main_window) {
+      errands_task_list_sort(state.main_window->task_list, GTK_SORTER_CHANGE_MORE_STRICT);
+      errands_task_list_filter(state.main_window->task_list, GTK_FILTER_CHANGE_MORE_STRICT);
+      errands_task_list_update(state.main_window->task_list);
+    }
   } break;
 
   case PROP_CANCELLED: {
