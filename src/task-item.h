@@ -75,5 +75,7 @@ void errands_task_item_set_dtend(ErrandsTaskItem *self, const icaltimetype *dten
 void errands_task_item_set_tags(ErrandsTaskItem *self, const GStrv tags);
 void errands_task_item_set_attachments(ErrandsTaskItem *self, const GStrv attachments);
 void errands_task_item_set_rrule(ErrandsTaskItem *self, const struct icalrecurrencetype *rrule);
+// Re-run the check that reopens a finished repeating task, for this task and its sub-tasks
+void errands_task_item_schedule_rrule_check(ErrandsTaskItem *self);
 void errands_task_item_set_search_matched(ErrandsTaskItem *self, gboolean matched);
 void errands_task_item_set_percent_complete(ErrandsTaskItem *self, gfloat value);

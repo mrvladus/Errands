@@ -29,6 +29,7 @@ static void obj_pushed_idle_cb(gpointer user_data);
 // ---------- GLOBAL ---------- //
 
 static gboolean sync_in_progress = false;
+static gboolean first_pull_done = false;
 static CalDAVClient *client = NULL;
 static GPtrArray *objects_to_push = NULL;
 static GHashTable *pushed_objs = NULL;
@@ -221,7 +222,17 @@ static inline bool merge_tasks(icalcomponent *old, icalcomponent *new) {
   icaltimetype old_changed = errands_data_get_changed(old);
   icaltimetype new_changed = errands_data_get_changed(new);
   if (!icaltime_is_valid_time(new_changed) || icaltime_is_null_time(new_changed)) return false;
-  if (icaltime_compare(new_changed, old_changed) <= 0) return false;
+  // Instances of a repeating task only move forward. When another client finished an instance and
+  // advanced the task, take its version even if the local copy was touched later (e.g. reopened).
+  bool remote_is_later_instance = false;
+  if (errands_data_get_rrule(old) && errands_data_get_rrule(new)) {
+    icaltimetype old_due = errands_data_get_due(old), new_due = errands_data_get_due(new);
+    if (icaltime_is_null_time(old_due)) old_due = errands_data_get_start(old);
+    if (icaltime_is_null_time(new_due)) new_due = errands_data_get_start(new);
+    remote_is_later_instance = !icaltime_is_null_time(old_due) && !icaltime_is_null_time(new_due) &&
+                               icaltime_compare(new_due, old_due) > 0;
+  }
+  if (!remote_is_later_instance && icaltime_compare(new_changed, old_changed) <= 0) return false;
 
   // Snapshot new's properties so we can safely mutate old
   g_autoptr(GPtrArray) props = g_ptr_array_new();
@@ -498,6 +509,26 @@ static void cancel_queued_push(const char *uid, enum PushObjOP op) {
   if (o) o->cancelled = TRUE;
 }
 
+static void schedule_rrule_checks(void) {
+  GListModel *lists = G_LIST_MODEL(task_lists_model);
+  for_range(i, 0, g_list_model_get_n_items(lists)) {
+    g_autoptr(ErrandsTaskListItem) list = g_list_model_get_item(lists, i);
+    GListModel *tasks = G_LIST_MODEL(list->tasks);
+    for_range(j, 0, g_list_model_get_n_items(tasks)) {
+      g_autoptr(ErrandsTaskItem) task = g_list_model_get_item(tasks, j);
+      errands_task_item_schedule_rrule_check(task);
+    }
+  }
+}
+
+// Runs once, after the first sync has pulled the server's state (or failed: then local data is all there is)
+static gboolean first_pull_done_cb(gpointer user_data) {
+  if (first_pull_done) return G_SOURCE_REMOVE;
+  first_pull_done = true;
+  schedule_rrule_checks();
+  return G_SOURCE_REMOVE;
+}
+
 // ---------- CALDAV CALLBACKS ---------- //
 
 static void cal_added_cb(CalDAVCalendar *c) {
@@ -594,6 +625,8 @@ static void sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer
   sync_in_progress = FALSE;
   errands_sidebar_toggle_sync_indicator(FALSE);
   g_hash_table_remove_all(pushed_objs);
+  // EDS delivers the refreshed objects asynchronously, so give them a moment to be merged first
+  if (!first_pull_done) g_timeout_add_seconds(5, first_pull_done_cb, NULL);
   gboolean success = g_task_propagate_boolean(G_TASK(res), NULL);
   if (!success) {
     g_warning("Sync: Error");
@@ -629,6 +662,8 @@ static inline bool ensure_client_connected(void) {
 }
 
 // ---------- PUBLIC ---------- //
+
+bool errands_sync_first_pull_done(void) { return first_pull_done; }
 
 void errands_sync_init(void) {
   if (!objects_to_push) objects_to_push = g_ptr_array_new_with_free_func((GDestroyNotify)obj_free);
