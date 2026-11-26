@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-23 17:30+0000\n"
-"PO-Revision-Date: 2026-11-24 08:22+0100\n"
+"POT-Creation-Date: 2026-11-25 10:24+0000\n"
+"PO-Revision-Date: 2026-11-26 08:03+0100\n"
 "Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
 "Language-Team: Georgian <(nothing)>\n"
 "Language: ka\n"
@@ -30,51 +30,60 @@ msgstr "ეკატერინე პაპავა"
 msgid "Select Color"
 msgstr "ფერის არჩევა"
 
-#: ../src/rrule-row.c:176
-msgctxt "Repeat every ..."
-msgid "seconds"
-msgstr "წამი"
-
-#: ../src/rrule-row.c:176
-msgctxt "Repeat every ..."
-msgid "minutes"
-msgstr "წუთი"
-
-#: ../src/rrule-row.c:177
-msgctxt "Repeat every ..."
-msgid "hours"
-msgstr "საათი"
-
-#: ../src/rrule-row.c:177
-msgctxt "Repeat every ..."
-msgid "days"
-msgstr "დღე"
-
-#: ../src/rrule-row.c:178
-msgctxt "Repeat every ..."
-msgid "weeks"
-msgstr "კვირა"
-
-#: ../src/rrule-row.c:178
-msgctxt "Repeat every ..."
-msgid "months"
-msgstr "თვე"
-
-#: ../src/rrule-row.c:179
-msgctxt "Repeat every ..."
-msgid "years"
-msgstr "წელი"
-
-#: ../src/rrule-row.c:181
+#: ../src/rrule-row.c:178 ../src/task-item.c:912
 #, c-format
-msgid "Repeat every %d %s"
-msgstr "გამეორება ყოველ %d %s-ში"
+msgid "Every second"
+msgid_plural "Every %d seconds"
+msgstr[0] "ყოველ წამში"
+msgstr[1] "ყოველ %d წამში"
 
-#: ../src/rrule-row.c:187
+#: ../src/rrule-row.c:178 ../src/task-item.c:913
+#, c-format
+msgid "Every minute"
+msgid_plural "Every %d minutes"
+msgstr[0] "ყოველ წუთში"
+msgstr[1] "ყოველ %d წუთში"
+
+#: ../src/rrule-row.c:179 ../src/task-item.c:914
+#, c-format
+msgid "Every hour"
+msgid_plural "Every %d hours"
+msgstr[0] "ყოველ საათში"
+msgstr[1] "ყოველ %d საათში"
+
+#: ../src/rrule-row.c:179 ../src/task-item.c:915
+#, c-format
+msgid "Every day"
+msgid_plural "Every %d days"
+msgstr[0] "ყოველდღე"
+msgstr[1] "ყოველ %d დღეში"
+
+#: ../src/rrule-row.c:180 ../src/task-item.c:916
+#, c-format
+msgid "Every week"
+msgid_plural "Every %d weeks"
+msgstr[0] "ყოველ კვირაში"
+msgstr[1] "ყოველ %d კვირაში"
+
+#: ../src/rrule-row.c:180 ../src/task-item.c:917
+#, c-format
+msgid "Every month"
+msgid_plural "Every %d months"
+msgstr[0] "ყოველ თვეში"
+msgstr[1] "ყოველ %d თვეში"
+
+#: ../src/rrule-row.c:181 ../src/task-item.c:918
+#, c-format
+msgid "Every year"
+msgid_plural "Every %d years"
+msgstr[0] "ყოველ წელს"
+msgstr[1] "ყოველ %d წელში"
+
+#: ../src/rrule-row.c:189
 msgid "Repeat forever"
 msgstr "უსასრულოდ გამეორება"
 
-#: ../src/rrule-row.c:187
+#: ../src/rrule-row.c:189
 #, c-format
 msgid "Repeat %zu times"
 msgstr "გამეორება %zu-ჯერ"
@@ -118,85 +127,36 @@ msgstr "გატანა ვერ მოხერხდა"
 msgid "Exported"
 msgstr "გატანილია"
 
-#: ../src/task-item.c:753
+#: ../src/task-item.c:756
 msgid "Can't make task a sub-task of itself."
 msgstr "ამოცანას თავისი თავის ქვეამოცანად ვერ დააყენებთ."
 
-#: ../src/task-item.c:874
+#: ../src/task-item.c:877
 msgctxt "Priority"
 msgid "Low"
 msgstr "დაბალი"
 
-#: ../src/task-item.c:875
+#: ../src/task-item.c:878
 msgctxt "Priority"
 msgid "Medium"
 msgstr "საშუალო"
 
-#: ../src/task-item.c:876
+#: ../src/task-item.c:879
 msgctxt "Priority"
 msgid "High"
 msgstr "მაღალი"
 
-#: ../src/task-item.c:877
+#: ../src/task-item.c:880
 msgctxt "Priority"
 msgid "None"
 msgstr "არცერთი"
 
-#: ../src/task-item.c:909
-#, c-format
-msgid "Every second"
-msgid_plural "Every %d seconds"
-msgstr[0] "ყოველ წამში"
-msgstr[1] "ყოველ %d წამში"
-
-#: ../src/task-item.c:910
-#, c-format
-msgid "Every minute"
-msgid_plural "Every %d minutes"
-msgstr[0] "ყოველ წუთში"
-msgstr[1] "ყოველ %d წუთში"
-
-#: ../src/task-item.c:911
-#, c-format
-msgid "Every hour"
-msgid_plural "Every %d hours"
-msgstr[0] "ყოველ საათში"
-msgstr[1] "ყოველ %d საათში"
-
-#: ../src/task-item.c:912
-#, c-format
-msgid "Every day"
-msgid_plural "Every %d days"
-msgstr[0] "ყოველდღე"
-msgstr[1] "ყოველ %d დღეში"
-
-#: ../src/task-item.c:913
-#, c-format
-msgid "Every week"
-msgid_plural "Every %d weeks"
-msgstr[0] "ყოველ კვირაში"
-msgstr[1] "ყოველ %d კვირაში"
-
-#: ../src/task-item.c:914
-#, c-format
-msgid "Every month"
-msgid_plural "Every %d months"
-msgstr[0] "ყოველ თვეში"
-msgstr[1] "ყოველ %d თვეში"
-
-#: ../src/task-item.c:915
-#, c-format
-msgid "Every year"
-msgid_plural "Every %d years"
-msgstr[0] "ყოველ წელს"
-msgstr[1] "ყოველ %d წელში"
-
-#: ../src/task-item.c:926
+#: ../src/task-item.c:929
 #, c-format
 msgid " until %s"
 msgstr " %s-მდე"
 
-#: ../src/task-item.c:927
+#: ../src/task-item.c:930
 #, c-format
 msgid " once"
 msgid_plural " %d times"
@@ -605,15 +565,15 @@ msgstr "ქვეამოცანების შეყვანის გა�
 msgid "Task Menu"
 msgstr "ამოცანების მენიუ"
 
-#: ../src/task.blp:153
+#: ../src/task.blp:153 ../src/task-properties.blp:21
 msgid "Properties"
 msgstr "თვისებები"
 
-#: ../src/task.blp:154 ../src/task.blp:256
+#: ../src/task.blp:154 ../src/task.blp:256 ../src/task-properties.blp:131
 msgid "Notes"
 msgstr "შენიშვნები"
 
-#: ../src/task.blp:155
+#: ../src/task.blp:155 ../src/task-properties.blp:158
 msgid "Tags"
 msgstr "ჭდეები"
 
@@ -633,7 +593,7 @@ msgstr "ექსპორტი „.ics“ ფორმატში"
 msgid "Cancel / Restore"
 msgstr "გაუქმება / აღდგენა"
 
-#: ../src/task.blp:203 ../src/task-list.blp:100
+#: ../src/task.blp:203 ../src/task-list.blp:100 ../src/task-properties.blp:71
 msgid "Priority"
 msgstr "პრიორიტეტი"
 
@@ -641,7 +601,7 @@ msgstr "პრიორიტეტი"
 msgid "Start"
 msgstr "დაწყება"
 
-#: ../src/task.blp:219 ../src/task-list.blp:88
+#: ../src/task.blp:219 ../src/task-list.blp:88 ../src/task-properties.blp:59
 msgid "Start Date"
 msgstr "დაწყების თარიღი"
 
@@ -649,11 +609,11 @@ msgstr "დაწყების თარიღი"
 msgid "Due"
 msgstr "ვადა"
 
-#: ../src/task.blp:235 ../src/task-list.blp:94
+#: ../src/task.blp:235 ../src/task-list.blp:94 ../src/task-properties.blp:63
 msgid "Due Date"
 msgstr "ვადა"
 
-#: ../src/task.blp:266 ../src/task.blp:272
+#: ../src/task.blp:266 ../src/task.blp:272 ../src/task-properties.blp:116
 msgid "Attachments"
 msgstr "დანართები"
 
@@ -761,6 +721,58 @@ msgstr "ახალი ამოცანის დამატება (Ctrl+
 msgid "Loading Tasks"
 msgstr "ამოცანების ჩატვირთვა"
 
+#: ../src/task-properties.blp:26
+msgid "Description"
+msgstr "აღწერა"
+
+#: ../src/task-properties.blp:30
+msgid "Undo Changes"
+msgstr "ცვლილებების გაუქმება"
+
+#: ../src/task-properties.blp:56
+msgid "Date and Time"
+msgstr "თარიღი და დრო"
+
+#: ../src/task-properties.blp:74
+msgid "Level"
+msgstr "დონე"
+
+#: ../src/task-properties.blp:78
+msgid "None"
+msgstr "არცერთი"
+
+#: ../src/task-properties.blp:79
+msgid "Low"
+msgstr "დაბალი"
+
+#: ../src/task-properties.blp:80
+msgid "Medium"
+msgstr "საშუალო"
+
+#: ../src/task-properties.blp:81
+msgid "High"
+msgstr "მაღალი"
+
+#: ../src/task-properties.blp:88
+msgid "Color"
+msgstr "ფერი"
+
+#: ../src/task-properties.blp:91
+msgid "Task Accent Color"
+msgstr "ამოცანის აქცენტის ფერი"
+
+#: ../src/task-properties.blp:104
+msgid "Clear Color"
+msgstr "ფერის გასუფთავება"
+
+#: ../src/task-properties.blp:121
+msgid "Add Attachment"
+msgstr "დანართის დამატება"
+
+#: ../src/task-properties.blp:164
+msgid "New Tag"
+msgstr "ახალი ჭდე"
+
 #: ../src/window.blp:40
 msgid "Sidebar"
 msgstr "გვერდითი ზოლი"
@@ -769,23 +781,40 @@ msgstr "გვერდითი ზოლი"
 msgid "Content"
 msgstr "შიგთავსი"
 
+#~ msgctxt "Repeat every ..."
+#~ msgid "seconds"
+#~ msgstr "წამი"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "minutes"
+#~ msgstr "წუთი"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "hours"
+#~ msgstr "საათი"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "days"
+#~ msgstr "დღე"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "weeks"
+#~ msgstr "კვირა"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "months"
+#~ msgstr "თვე"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "years"
+#~ msgstr "წელი"
+
+#, c-format
+#~ msgid "Repeat every %d %s"
+#~ msgstr "გამეორება ყოველ %d %s-ში"
+
 #~ msgid "Not Set"
 #~ msgstr "არ არის დაყენებული"
-
-#~ msgid "Task Color"
-#~ msgstr "ამოცანის ფერი"
-
-#~ msgid "None"
-#~ msgstr "არცერთი"
-
-#~ msgid "Low"
-#~ msgstr "დაბალი"
-
-#~ msgid "Medium"
-#~ msgstr "საშუალო"
-
-#~ msgid "High"
-#~ msgstr "მაღალი"
 
 #~ msgid "Remove Attachment"
 #~ msgstr "დანართის წაშლა"
@@ -795,15 +824,6 @@ msgstr "შიგთავსი"
 
 #~ msgid "Remove Tag"
 #~ msgstr "ჭდის წაშლა"
-
-#~ msgid "Date and Time"
-#~ msgstr "თარიღი და დრო"
-
-#~ msgid "Add Attachment"
-#~ msgstr "დანართის დამატება"
-
-#~ msgid "New Tag"
-#~ msgstr "ახალი ჭდე"
 
 #, c-format
 #~ msgid "Removed remote task list: %s"
