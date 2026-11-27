@@ -385,6 +385,10 @@ static inline icaltimetype local_to_utc(icaltimetype value) {
 
 static inline icaltimetype utc_to_local(icaltimetype value) {
   if (icaltime_is_null_time(value) || icaltime_is_date(value)) return value;
+  // A time with a TZID (e.g. DUE;TZID=America/New_York from Tasks.org) holds wall-clock fields of that
+  // zone, not UTC fields. Convert it to UTC first, otherwise it is shifted by the zone's UTC offset.
+  icaltimezone *utc_zone = icaltimezone_get_utc_timezone();
+  if (value.zone && value.zone != utc_zone) value = icaltime_convert_to_zone(value, utc_zone);
   g_autoptr(GDateTime) utc = g_date_time_new_utc(value.year, value.month, value.day, value.hour, value.minute, value.second);
   if (!utc) return icaltime_null_time();
   g_autoptr(GDateTime) local = g_date_time_to_local(utc);
@@ -462,7 +466,15 @@ static inline bool errands_match_dtstart_to_due(icaltimetype *start, const icalt
   return changed;
 }
 
+// Compare two rules by value. memcmp() doesn't work with libical 4: the struct holds a refcount and
+// pointers to the BYDAY/BYMONTH/... arrays, so two copies of the same rule never compared equal.
 static inline bool icalrecurrence_compare(const struct icalrecurrencetype *a, const struct icalrecurrencetype *b) {
   if (!a || !b) return false;
-  return memcmp(a, b, sizeof(*a)) == 0;
+  if (a == b) return true;
+  char *sa = icalrecurrencetype_as_string_r((struct icalrecurrencetype *)a);
+  char *sb = icalrecurrencetype_as_string_r((struct icalrecurrencetype *)b);
+  bool equal = g_strcmp0(sa, sb) == 0;
+  icalmemory_free_buffer(sa);
+  icalmemory_free_buffer(sb);
+  return equal;
 }
