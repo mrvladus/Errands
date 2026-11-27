@@ -13,8 +13,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: errands\n"
 "Report-Msgid-Bugs-To: https://github.com/mrvladus/Errands/issues\n"
-"POT-Creation-Date: 2026-11-20 16:43+0000\n"
-"PO-Revision-Date: 2026-11-21 08:25-0300\n"
+"POT-Creation-Date: 2026-11-25 10:24+0000\n"
+"PO-Revision-Date: 2026-11-27 08:17-0300\n"
 "Last-Translator: Juliano de Souza Camargo <julianosc@pm.me>\n"
 "Language-Team: Brazilian Portuguese <https://br.gnome.org/traducao/>\n"
 "Language: pt_BR\n"
@@ -37,203 +37,167 @@ msgstr ""
 "Vitor Gabriel Gomes <vitorgabrielgomesro9090@gmail.com>\n"
 "Juliano de Souza Camargo <julianosc@pm.me>"
 
-#: ../src/rrule-row.c:176
-msgctxt "Repeat every ..."
-msgid "seconds"
-msgstr "segundos"
+#: ../src/color-button.c:70
+msgid "Select Color"
+msgstr "Selecionar cor"
 
-#: ../src/rrule-row.c:176
-msgctxt "Repeat every ..."
-msgid "minutes"
-msgstr "minutos"
-
-#: ../src/rrule-row.c:177
-msgctxt "Repeat every ..."
-msgid "hours"
-msgstr "horas"
-
-#: ../src/rrule-row.c:177
-msgctxt "Repeat every ..."
-msgid "days"
-msgstr "dias"
-
-#: ../src/rrule-row.c:178
-msgctxt "Repeat every ..."
-msgid "weeks"
-msgstr "semanas"
-
-#: ../src/rrule-row.c:178
-msgctxt "Repeat every ..."
-msgid "months"
-msgstr "meses"
-
-#: ../src/rrule-row.c:179
-msgctxt "Repeat every ..."
-msgid "years"
-msgstr "anos"
-
-#: ../src/rrule-row.c:181
-#, c-format
-msgid "Repeat every %d %s"
-msgstr "Repetir a cada %d %s"
-
-#: ../src/rrule-row.c:187
-msgid "Repeat forever"
-msgstr "Repetir para sempre"
-
-#: ../src/rrule-row.c:187
-#, c-format
-msgid "Repeat %zu times"
-msgstr "Repetir %zu vezes"
-
-#: ../src/sidebar.c:324
-msgid "Only .ics files are supported"
-msgstr "Apenas arquivos .ics são suportados"
-
-#: ../src/sidebar.c:329
-msgid "Can't load list. It's incorrect or already exists"
-msgstr "Não pode carregar lista. Está incorreta ou já existe"
-
-#: ../src/sync.c:303
-#, c-format
-msgid "Added remote task list: %s"
-msgstr "Lista de tarefas remota adicionada: %s"
-
-#: ../src/sync.c:536
-msgid "Sync Failed"
-msgstr "Falha ao sincronizar"
-
-#: ../src/task.c:116
-msgctxt "Start date"
-msgid "Start"
-msgstr "Início"
-
-#: ../src/task.c:134
-msgctxt "Due date"
-msgid "Due"
-msgstr "Vencimento"
-
-#: ../src/task.c:356
-msgid "Copied to Clipboard"
-msgstr "Copiado para a área de transferência"
-
-#: ../src/task.c:388
-msgid "Failed to Export"
-msgstr "Falha ao exportar"
-
-#: ../src/task.c:391 ../src/task-list.c:325
-msgid "Exported"
-msgstr "Exportado"
-
-#: ../src/task-item.c:749
-msgid "Can't make task a sub-task of itself."
-msgstr "Não pode fazer da tarefa uma subtarefa de si mesma."
-
-#: ../src/task-item.c:870
-msgctxt "Priority"
-msgid "High"
-msgstr "Alta"
-
-#: ../src/task-item.c:871
-msgctxt "Priority"
-msgid "Medium"
-msgstr "Média"
-
-#: ../src/task-item.c:872
-msgctxt "Priority"
-msgid "Low"
-msgstr "Baixa"
-
-#: ../src/task-item.c:873
-msgctxt "Priority"
-msgid "None"
-msgstr "Nenhum"
-
-#: ../src/task-item.c:905
+#: ../src/rrule-row.c:178 ../src/task-item.c:912
 #, c-format
 msgid "Every second"
 msgid_plural "Every %d seconds"
 msgstr[0] "A cada segundo"
 msgstr[1] "A cada %d segundos"
 
-#: ../src/task-item.c:906
+#: ../src/rrule-row.c:178 ../src/task-item.c:913
 #, c-format
 msgid "Every minute"
 msgid_plural "Every %d minutes"
 msgstr[0] "A cada minuto"
 msgstr[1] "A cada %d minutos"
 
-#: ../src/task-item.c:907
+#: ../src/rrule-row.c:179 ../src/task-item.c:914
 #, c-format
 msgid "Every hour"
 msgid_plural "Every %d hours"
 msgstr[0] "A cada hora"
 msgstr[1] "A cada %d horas"
 
-#: ../src/task-item.c:908
+#: ../src/rrule-row.c:179 ../src/task-item.c:915
 #, c-format
 msgid "Every day"
 msgid_plural "Every %d days"
 msgstr[0] "A cada dia"
 msgstr[1] "A cada %d dias"
 
-#: ../src/task-item.c:909
+#: ../src/rrule-row.c:180 ../src/task-item.c:916
 #, c-format
 msgid "Every week"
 msgid_plural "Every %d weeks"
 msgstr[0] "A cada semana"
 msgstr[1] "A cada %d semanas"
 
-#: ../src/task-item.c:910
+#: ../src/rrule-row.c:180 ../src/task-item.c:917
 #, c-format
 msgid "Every month"
 msgid_plural "Every %d months"
 msgstr[0] "A cada mês"
 msgstr[1] "A cada %d meses"
 
-#: ../src/task-item.c:911
+#: ../src/rrule-row.c:181 ../src/task-item.c:918
 #, c-format
 msgid "Every year"
 msgid_plural "Every %d years"
 msgstr[0] "A cada ano"
 msgstr[1] "A cada %d anos"
 
-#: ../src/task-item.c:922
+#: ../src/rrule-row.c:189
+msgid "Repeat forever"
+msgstr "Repetir para sempre"
+
+#: ../src/rrule-row.c:189
+#, c-format
+msgid "Repeat %zu times"
+msgstr "Repetir %zu vezes"
+
+#: ../src/sidebar.c:326
+msgid "Only .ics files are supported"
+msgstr "Apenas arquivos .ics são suportados"
+
+#: ../src/sidebar.c:331
+msgid "Can't load list. It's incorrect or already exists"
+msgstr "Não pode carregar lista. Está incorreta ou já existe"
+
+#: ../src/sync.c:305
+#, c-format
+msgid "Added remote task list: %s"
+msgstr "Lista de tarefas remota adicionada: %s"
+
+#: ../src/sync.c:553
+msgid "Sync Failed"
+msgstr "Falha ao sincronizar"
+
+#: ../src/task.c:118
+msgctxt "Start date"
+msgid "Start"
+msgstr "Início"
+
+#: ../src/task.c:136
+msgctxt "Due date"
+msgid "Due"
+msgstr "Vencimento"
+
+#: ../src/task.c:363
+msgid "Copied to Clipboard"
+msgstr "Copiado para a área de transferência"
+
+#: ../src/task.c:395
+msgid "Failed to Export"
+msgstr "Falha ao exportar"
+
+#: ../src/task.c:398 ../src/task-list.c:319
+msgid "Exported"
+msgstr "Exportado"
+
+#: ../src/task-item.c:756
+msgid "Can't make task a sub-task of itself."
+msgstr "Não pode fazer da tarefa uma subtarefa de si mesma."
+
+#: ../src/task-item.c:877
+msgctxt "Priority"
+msgid "Low"
+msgstr "Baixa"
+
+#: ../src/task-item.c:878
+msgctxt "Priority"
+msgid "Medium"
+msgstr "Média"
+
+#: ../src/task-item.c:879
+msgctxt "Priority"
+msgid "High"
+msgstr "Alta"
+
+#: ../src/task-item.c:880
+msgctxt "Priority"
+msgid "None"
+msgstr "Nenhum"
+
+#: ../src/task-item.c:929
 #, c-format
 msgid " until %s"
 msgstr "até %s"
 
-#: ../src/task-item.c:923
+#: ../src/task-item.c:930
 #, c-format
 msgid " once"
 msgid_plural " %d times"
 msgstr[0] "uma vez"
 msgstr[1] "%d vezes"
 
-#: ../src/task-list.c:314 ../src/task-list.c:319
+#: ../src/task-list.c:308 ../src/task-list.c:313
 msgid "Export failed"
 msgstr "Falha na exportação"
 
-#: ../src/task-list.c:345 ../src/task-list.c:357
+#: ../src/task-list.c:339 ../src/task-list.c:351
 msgid "No tasks to delete"
 msgstr "Não há tarefas para excluir"
 
-#: ../src/task-list.c:350 ../src/task-list.c:362
+#: ../src/task-list.c:344 ../src/task-list.c:356
 #, c-format
 msgid "Deleted %d task"
 msgid_plural "Deleted %d tasks"
 msgstr[0] "%d tarefa excluída"
 msgstr[1] "%d tarefas excluídas"
 
-#: ../src/task-list.c:509 ../src/sidebar.blp:137
+#: ../src/task-list.c:503 ../src/sidebar.blp:137
 msgid "All Tasks"
 msgstr "Todas as tarefas"
 
-#: ../src/task-list.c:513 ../src/sidebar.blp:153
+#: ../src/task-list.c:507 ../src/sidebar.blp:153
 msgid "Tasks for Today"
 msgstr "Tarefas de hoje"
 
-#: ../src/task-list-item.c:150
+#: ../src/task-list-item.c:151
 msgid "Untitled"
 msgstr "Sem título"
 
@@ -281,7 +245,7 @@ msgstr "Tem certeza?"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../src/delete-list-dialog.blp:13 ../src/task.blp:157
+#: ../src/delete-list-dialog.blp:13 ../src/task.blp:169
 msgid "Delete"
 msgstr "Deletar"
 
@@ -293,7 +257,7 @@ msgstr "Renomear"
 msgid "New List Name"
 msgstr "Nome da nova lista"
 
-#: ../src/rrule-row.blp:7 ../src/task.blp:240
+#: ../src/rrule-row.blp:7 ../src/task.blp:250
 msgid "Repeat"
 msgstr "Repetir"
 
@@ -584,83 +548,87 @@ msgstr "Nenhuma lista de tarefas"
 msgid "Create new or import “.ics”"
 msgstr "Criar nova ou importar “.ics”"
 
-#: ../src/task.blp:8
+#: ../src/task.blp:40
+msgid "Expand Sub-Tasks"
+msgstr "Expandir sub-tarefa"
+
+#: ../src/task.blp:46
 msgid "Open Properties"
 msgstr "Abrir propriedades"
 
-#: ../src/task.blp:53
+#: ../src/task.blp:66
 msgid "Toggle Completion"
 msgstr "Alternar conclusão"
 
-#: ../src/task.blp:65
+#: ../src/task.blp:77
 msgid "Restore"
 msgstr "Restaurar"
 
-#: ../src/task.blp:107
+#: ../src/task.blp:119
 msgid "Uncompleted Sub-Tasks"
 msgstr "Sub-tarefa incompletas"
 
-#: ../src/task.blp:117
+#: ../src/task.blp:129
 msgid "Toggle Sub-Tasks Entry"
 msgstr "Alternar entrada de subtarefas"
 
-#: ../src/task.blp:132
+#: ../src/task.blp:144
 msgid "Task Menu"
 msgstr "Lista de tarefa"
 
-#: ../src/task.blp:141
+#: ../src/task.blp:153 ../src/task-properties.blp:21
 msgid "Properties"
 msgstr "Propriedades"
 
-#: ../src/task.blp:142 ../src/task.blp:246
+#: ../src/task.blp:154 ../src/task.blp:256 ../src/task-properties.blp:131
 msgid "Notes"
 msgstr "Notas"
 
-#: ../src/task.blp:143
+#: ../src/task.blp:155 ../src/task-properties.blp:158
 msgid "Tags"
 msgstr "Etiquetas"
 
-#: ../src/task.blp:147
+#: ../src/task.blp:159
 msgid "Edit Text"
 msgstr "Editar texto"
 
-#: ../src/task.blp:148
+#: ../src/task.blp:160
 msgid "Copy Text"
 msgstr "Copiar texto"
 
-#: ../src/task.blp:152 ../src/task-list.blp:129
+#: ../src/task.blp:164 ../src/task-list.blp:129
 msgid "Export as \".ics\""
 msgstr "Exportar como \".ics\""
 
-#: ../src/task.blp:156
+#: ../src/task.blp:168
 msgid "Cancel / Restore"
 msgstr "Cancelar / restaurar"
 
-#: ../src/task.blp:182 ../src/task-list.blp:100
+#: ../src/task.blp:203 ../src/task-list.blp:100 ../src/task-properties.blp:71
 msgid "Priority"
 msgstr "Prioridade"
 
-#: ../src/task.blp:208
+#: ../src/task.blp:218
 msgid "Start"
 msgstr "Início"
 
-#: ../src/task.blp:209 ../src/task-list.blp:88
+#: ../src/task.blp:219 ../src/task-list.blp:88 ../src/task-properties.blp:59
 msgid "Start Date"
 msgstr "Data de início"
 
-#: ../src/task.blp:224
+#: ../src/task.blp:234
 msgid "Due"
 msgstr "Vencimento"
 
-#: ../src/task.blp:225 ../src/task-list.blp:94
+#: ../src/task.blp:235 ../src/task-list.blp:94 ../src/task-properties.blp:63
 msgid "Due Date"
 msgstr "Data de vencimento"
 
-#: ../src/task.blp:256 ../src/task.blp:262
+#: ../src/task.blp:266 ../src/task.blp:272 ../src/task-properties.blp:116
 msgid "Attachments"
 msgstr "Anexos"
 
-#: ../src/task.blp:302
+#: ../src/task.blp:312
 msgid "Add Sub-Task"
 msgstr "Adicionar nova sub-tarefa"
 
@@ -736,15 +704,15 @@ msgstr "Pesquisar (Ctrl+F)"
 msgid "No Tasks"
 msgstr "Nenhuma tarefa"
 
-#: ../src/task-list.blp:227
+#: ../src/task-list.blp:226
 msgid "Add Task"
 msgstr "Adicionar nova tarefa"
 
-#: ../src/task-list.blp:228
+#: ../src/task-list.blp:227
 msgid "Add Task (Ctrl+N)"
 msgstr "Adicionar nova tarefa (Ctrl+N)"
 
-#: ../src/task-list.blp:232
+#: ../src/task-list.blp:231
 msgid ""
 "<b>Inline properties syntax:</b>\n"
 "\n"
@@ -757,13 +725,65 @@ msgstr ""
 "<b>#pN</b>     Define propriedade. <b>N</b> é um número no raio entre "
 "<b>0..9</b>."
 
-#: ../src/task-list.blp:250
+#: ../src/task-list.blp:249
 msgid "Add Task (Ctrl+Return)"
 msgstr "Adicionar nova tarefa (Ctrl+Return)"
 
-#: ../src/task-list.blp:278
+#: ../src/task-list.blp:277
 msgid "Loading Tasks"
 msgstr "Carregando tarefas"
+
+#: ../src/task-properties.blp:26
+msgid "Description"
+msgstr "Descrição"
+
+#: ../src/task-properties.blp:30
+msgid "Undo Changes"
+msgstr "Desfazer mudanças"
+
+#: ../src/task-properties.blp:56
+msgid "Date and Time"
+msgstr "Data e hora"
+
+#: ../src/task-properties.blp:74
+msgid "Level"
+msgstr "Nível"
+
+#: ../src/task-properties.blp:78
+msgid "None"
+msgstr "Nenhum"
+
+#: ../src/task-properties.blp:79
+msgid "Low"
+msgstr "Baixa"
+
+#: ../src/task-properties.blp:80
+msgid "Medium"
+msgstr "Média"
+
+#: ../src/task-properties.blp:81
+msgid "High"
+msgstr "Alta"
+
+#: ../src/task-properties.blp:88
+msgid "Color"
+msgstr "Cor"
+
+#: ../src/task-properties.blp:91
+msgid "Task Accent Color"
+msgstr "Cor de realce da tarefa"
+
+#: ../src/task-properties.blp:104
+msgid "Clear Color"
+msgstr "Limpar cor"
+
+#: ../src/task-properties.blp:121
+msgid "Add Attachment"
+msgstr "Adicionar anexo"
+
+#: ../src/task-properties.blp:164
+msgid "New Tag"
+msgstr "Nova etiqueta"
 
 #: ../src/window.blp:40
 msgid "Sidebar"
@@ -772,6 +792,38 @@ msgstr "Barra lateral"
 #: ../src/window.blp:47
 msgid "Content"
 msgstr "Conteúdo"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "seconds"
+#~ msgstr "segundos"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "minutes"
+#~ msgstr "minutos"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "hours"
+#~ msgstr "horas"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "days"
+#~ msgstr "dias"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "weeks"
+#~ msgstr "semanas"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "months"
+#~ msgstr "meses"
+
+#~ msgctxt "Repeat every ..."
+#~ msgid "years"
+#~ msgstr "anos"
+
+#, c-format
+#~ msgid "Repeat every %d %s"
+#~ msgstr "Repetir a cada %d %s"
 
 #~ msgid "Not Set"
 #~ msgstr "Não definido"
@@ -784,33 +836,6 @@ msgstr "Conteúdo"
 
 #~ msgid "Remove Tag"
 #~ msgstr "Remover etiqueta"
-
-#~ msgid "Task Color"
-#~ msgstr "Cor da tarefa"
-
-#~ msgid "Clear Color"
-#~ msgstr "Limpar cor"
-
-#~ msgid "None"
-#~ msgstr "Nenhum"
-
-#~ msgid "Low"
-#~ msgstr "Baixa"
-
-#~ msgid "Medium"
-#~ msgstr "Média"
-
-#~ msgid "High"
-#~ msgstr "Alta"
-
-#~ msgid "Date and Time"
-#~ msgstr "Data e hora"
-
-#~ msgid "Add Attachment"
-#~ msgstr "Adicionar anexo"
-
-#~ msgid "New Tag"
-#~ msgstr "Nova etiqueta"
 
 #, c-format
 #~ msgid "Removed remote task list: %s"
