@@ -73,7 +73,7 @@ static void errands_sidebar_class_init(ErrandsSidebarClass *klass) {
 static gboolean counter_binding_transform_func(GBinding *binding, const GValue *from_value, GValue *to_value,
                                                gpointer user_data) {
   gint count = g_value_get_int(from_value);
-  g_value_set_string(to_value, count <= 0 ? "" : g_strdup_printf("%d", count));
+  g_value_set_string(to_value, count <= 0 ? "" : tmp_str_printf("%d", count));
   gtk_widget_set_visible(GTK_WIDGET(user_data), count > 0);
   return true;
 }
