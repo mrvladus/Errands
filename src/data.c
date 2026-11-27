@@ -532,10 +532,10 @@ icaltimetype errands_data_get_changed(icalcomponent *ical) {
   if (property) result = icalproperty_get_lastmodified(property);
   else {
     property = icalcomponent_get_first_property(ical, ICAL_DTSTAMP_PROPERTY);
-    // Some clients (e.g. Tasks.org) don't write LAST-MODIFIED; fall back to DTSTAMP, then to now
+    // Some clients (e.g. Tasks.org) don't write LAST-MODIFIED; fall back to DTSTAMP.
+    // Don't write anything back: a getter that stamps the task makes it look locally changed.
     if (property) result = icalproperty_get_dtstamp(property);
-    else result = local_to_utc(icaltime_now());
-    errands_data_set_changed(ical, utc_to_local(result));
+    else return icaltime_null_time();
   }
   return utc_to_local(result);
 }
@@ -551,10 +551,11 @@ icaltimetype errands_data_get_created(icalcomponent *ical) {
   icalproperty *property = icalcomponent_get_first_property(ical, ICAL_CREATED_PROPERTY);
   if (property) result = icalproperty_get_created(property);
   else {
+    // Read-only fallback. This runs in the sort comparator: writing CREATED here marked tasks unsynced,
+    // gave them LAST-MODIFIED = now and re-uploaded them just because the list was sorted.
     property = icalcomponent_get_first_property(ical, ICAL_DTSTAMP_PROPERTY);
     if (property) result = icalproperty_get_dtstamp(property);
-    else result = local_to_utc(icaltime_now());
-    errands_data_set_created(ical, utc_to_local(result));
+    else return icaltime_null_time();
   }
   return utc_to_local(result);
 }

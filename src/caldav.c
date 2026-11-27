@@ -398,6 +398,12 @@ gboolean caldav_calendar_remove_task(CalDAVCalendar *calendar, const char *uid) 
   g_autoptr(GError) error = NULL;
   if (!e_cal_client_remove_object_sync(calendar->e_cal_client, uid, NULL, E_CAL_OBJ_MOD_ALL, E_CAL_OPERATION_FLAG_NONE, NULL,
                                        &error)) {
+    // Deleting is idempotent: if another client already removed it, the task is where we want it.
+    // Reporting a failure here left the local copy marked deleted-but-unsynced forever.
+    if (g_error_matches(error, E_CAL_CLIENT_ERROR, E_CAL_CLIENT_ERROR_OBJECT_NOT_FOUND)) {
+      g_message("CalDAV: Task '%s' was already removed", uid);
+      return TRUE;
+    }
     g_warning("CalDAV: Failed to remove task '%s': %s", uid, error->message);
     return FALSE;
   }

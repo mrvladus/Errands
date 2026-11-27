@@ -277,8 +277,13 @@ static void apply_remote_change(ErrandsTaskListItem *list, _CBData *data) {
   ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), data->uid);
   if (!task) return;
   icalcomponent *old_ical = errands_task_item_get_ical(task);
+  icaltimetype remote_changed = errands_data_get_changed(data->ical);
   if (!merge_tasks(old_ical, data->ical)) return;
   errands_task_item_set_ical(task, old_ical);
+  // Refreshing the item from the merged ical goes through the property setters, which stamp
+  // LAST-MODIFIED/DTSTAMP with the current time. Keep the server's, so the local copy doesn't look
+  // newer than the server and swallow the next remote change.
+  errands_data_set_changed(old_ical, remote_changed);
   errands_data_set_synced(old_ical, true);
   errands_task_list_item_save(list);
   errands_task_list_item_update_count(list);
@@ -384,8 +389,10 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), data->uid);
     if (!task) break;
     g_message("Sync: Task '%s' removed from remote list '%s'", data->uid, list_uid);
-    errands_task_item_delete(task);
-    icalcomponent *ical = errands_task_item_get_ical(task);
+    // Hold a reference: errands_task_item_delete() removes the item from its model
+    g_autoptr(ErrandsTaskItem) removed = g_object_ref(task);
+    errands_task_item_delete(removed);
+    icalcomponent *ical = errands_task_item_get_ical(removed);
     errands_data_set_synced(ical, true);
     errands_task_list_item_save(list);
     errands_task_list_item_update_count(list);
