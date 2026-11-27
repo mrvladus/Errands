@@ -305,9 +305,14 @@ int errands_data_get_priority(icalcomponent *ical) {
 }
 
 void errands_data_set_percent(icalcomponent *ical, int value) {
-  icalproperty *property = icalcomponent_get_first_property(ical, ICAL_PERCENTCOMPLETE_PROPERTY);
-  if (property) icalproperty_set_percentcomplete(property, value);
-  else icalcomponent_add_property(ical, icalproperty_new_percentcomplete(value));
+  // PERCENT-COMPLETE may occur only once. Drop every copy instead of updating the first: a task that arrived
+  // with two kept the stale one (e.g. 100 next to 0 after reopening a repeating task).
+  icalproperty *property;
+  while ((property = icalcomponent_get_first_property(ical, ICAL_PERCENTCOMPLETE_PROPERTY))) {
+    icalcomponent_remove_property(ical, property);
+    icalproperty_free(property);
+  }
+  icalcomponent_add_property(ical, icalproperty_new_percentcomplete(value));
   errands_data_set_synced(ical, false);
   errands_data_set_changed(ical, icaltime_now());
 }
