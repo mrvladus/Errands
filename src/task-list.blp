@@ -222,6 +222,29 @@ template $ErrandsTaskList: Adw.BreakpointBin {
               "toolbar",
             ]
 
+            //             ToggleButton multiline_toggle_btn {
+            //               icon-name: "errands-multiline-symbolic";
+            //               tooltip-text: _("Toggle Multiline Input");
+            //               valign: end;
+            //             }
+            //
+            //             TextView {
+            //               visible: bind multiline_toggle_btn.active;
+            //               hexpand: true;
+            //               top-margin: 6;
+            //               bottom-margin: 6;
+            //               left-margin: 6;
+            //               right-margin: 6;
+            //               height-request: 100;
+            //
+            //               buffer: TextBuffer {
+            //                 text: bind entry.text bidirectional;
+            //               };
+            //
+            //               styles [
+            //                 "card",
+            //               ]
+            //             }
             Entry entry {
               placeholder-text: _("Add Task");
               tooltip-text: _("Add Task (Ctrl+N)");
@@ -230,6 +253,7 @@ template $ErrandsTaskList: Adw.BreakpointBin {
               secondary-icon-tooltip-markup: _(
                 "<b>Inline properties syntax:</b>\n\n<b>##tag</b>  Add tag.\n<b>#pN</b>     Set priority. <b>N</b> is number in range <b>0..9</b>."
               );
+              // visible: bind multiline_toggle_btn.active inverted;
               activate => $on_task_list_entry_activated_cb(template);
               changed => $on_task_list_entry_text_changed_cb(template);
 
