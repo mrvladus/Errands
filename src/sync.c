@@ -29,6 +29,7 @@ static void obj_pushed_idle_cb(gpointer user_data);
 // ---------- GLOBAL ---------- //
 
 static gboolean sync_in_progress = false;
+static gboolean first_pull_done = false;
 static CalDAVClient *client = NULL;
 static GPtrArray *objects_to_push = NULL;
 static GHashTable *pushed_objs = NULL;
@@ -72,10 +73,12 @@ typedef struct {
   icalcomponent *ical;
 
   gboolean pushed;
+  gboolean cancelled; // Superseded while queued (task deleted or replaced by a newer server version): don't upload
   gint count;
 } PushObj;
 
 static inline void refresh_queued_task_copy(PushObj *o);
+static void cancel_queued_push(const char *uid, enum PushObjOP op);
 
 static inline PushObj *push_obj_new(enum PushObjOP op, const char *uid) {
   g_assert_nonnull(uid);
@@ -103,6 +106,7 @@ static inline PushObj *objects_to_push_has(const char *uid, enum PushObjOP op) {
 
   for_range(i, 0, objects_to_push->len) {
     PushObj *o = g_ptr_array_index(objects_to_push, i);
+    if (o->cancelled) continue; // Never reuse a superseded object, or a later change isn't uploaded
     if (g_str_equal(uid, o->uid) && o->op == op) return o;
   }
   return FALSE;
@@ -111,6 +115,11 @@ static inline PushObj *objects_to_push_has(const char *uid, enum PushObjOP op) {
 static void obj_push(PushObj *o) {
   g_assert_nonnull(o);
   g_assert_nonnull(o->uid);
+
+  if (o->cancelled) {
+    g_idle_add_once(obj_pushed_idle_cb, o);
+    return;
+  }
 
   switch (o->op) {
   case PUSH_OBJ_LIST_PUSH: {
@@ -213,7 +222,17 @@ static inline bool merge_tasks(icalcomponent *old, icalcomponent *new) {
   icaltimetype old_changed = errands_data_get_changed(old);
   icaltimetype new_changed = errands_data_get_changed(new);
   if (!icaltime_is_valid_time(new_changed) || icaltime_is_null_time(new_changed)) return false;
-  if (icaltime_compare(new_changed, old_changed) <= 0) return false;
+  // Instances of a repeating task only move forward. When another client finished an instance and
+  // advanced the task, take its version even if the local copy was touched later (e.g. reopened).
+  bool remote_is_later_instance = false;
+  if (errands_data_get_rrule(old) && errands_data_get_rrule(new)) {
+    icaltimetype old_due = errands_data_get_due(old), new_due = errands_data_get_due(new);
+    if (icaltime_is_null_time(old_due)) old_due = errands_data_get_start(old);
+    if (icaltime_is_null_time(new_due)) new_due = errands_data_get_start(new);
+    remote_is_later_instance = !icaltime_is_null_time(old_due) && !icaltime_is_null_time(new_due) &&
+                               icaltime_compare(new_due, old_due) > 0;
+  }
+  if (!remote_is_later_instance && icaltime_compare(new_changed, old_changed) <= 0) return false;
 
   // Snapshot new's properties so we can safely mutate old
   g_autoptr(GPtrArray) props = g_ptr_array_new();
@@ -277,9 +296,16 @@ static void apply_remote_change(ErrandsTaskListItem *list, _CBData *data) {
   ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), data->uid);
   if (!task) return;
   icalcomponent *old_ical = errands_task_item_get_ical(task);
+  icaltimetype remote_changed = errands_data_get_changed(data->ical);
   if (!merge_tasks(old_ical, data->ical)) return;
   errands_task_item_set_ical(task, old_ical);
+  // Refreshing the item from the merged ical goes through the property setters, which stamp
+  // LAST-MODIFIED/DTSTAMP with the current time. Keep the server's, so the local copy doesn't look
+  // newer than the server and swallow the next remote change.
+  errands_data_set_changed(old_ical, remote_changed);
   errands_data_set_synced(old_ical, true);
+  // A local copy still queued for upload is older than what was just merged: drop it
+  cancel_queued_push(data->uid, PUSH_OBJ_TASK_PUSH);
   errands_task_list_item_save(list);
   errands_task_list_item_update_count(list);
   errands_sidebar_update_filter_rows();
@@ -384,9 +410,14 @@ static gboolean remote_event_idle_cb(gpointer user_data) {
     ErrandsTaskItem *task = find_task_item(G_LIST_MODEL(list->tasks), data->uid);
     if (!task) break;
     g_message("Sync: Task '%s' removed from remote list '%s'", data->uid, list_uid);
-    errands_task_item_delete(task);
-    icalcomponent *ical = errands_task_item_get_ical(task);
+    // Hold a reference: errands_task_item_delete() removes the item from its model
+    g_autoptr(ErrandsTaskItem) removed = g_object_ref(task);
+    errands_task_item_delete(removed);
+    // Already gone on the server: a DELETE of our own would fail with "not found"
+    cancel_queued_push(data->uid, PUSH_OBJ_TASK_DELETE);
+    icalcomponent *ical = errands_task_item_get_ical(removed);
     errands_data_set_synced(ical, true);
+    errands_task_list_item_remove_deleted_tasks(list);
     errands_task_list_item_save(list);
     errands_task_list_item_update_count(list);
     errands_sidebar_update_filter_rows();
@@ -401,6 +432,13 @@ static void obj_pushed_idle_cb(gpointer user_data) {
   PushObj *o = user_data;
 
   g_assert_nonnull(o->uid);
+
+  // Superseded while queued: nothing was uploaded, so leave the sync state alone
+  if (o->cancelled) {
+    g_message("Sync: Skipped superseded upload of '%s'", o->uid);
+    g_ptr_array_remove(objects_to_push, o);
+    return;
+  }
 
   switch (o->op) {
   case PUSH_OBJ_LIST_PUSH: {
@@ -431,6 +469,12 @@ static void obj_pushed_idle_cb(gpointer user_data) {
     icalcomponent *ical = errands_task_item_get_ical(o->task);
     errands_data_set_synced(ical, o->pushed);
     ErrandsTaskListItem *list = errands_task_item_get_list(o->task);
+    if (o->pushed) {
+      // Gone from the server: drop the local tombstone. The item was already removed from the task model
+      // by errands_task_item_delete(), so nothing else would ever purge it from the list's ical.
+      errands_task_list_item_remove_deleted_tasks(list);
+      o->count = 0; // A deleted task has nothing left to upload
+    }
     errands_task_list_item_save(list);
     errands_task_list_item_update_count(list);
     errands_sidebar_update_filter_rows();
@@ -453,6 +497,36 @@ static inline void refresh_queued_task_copy(PushObj *o) {
   o->ical = icalcomponent_clone(ical);
   // One upload of the current version is enough
   o->count = 1;
+}
+
+// Stop a queued object from being uploaded. Main thread only. The object is only flagged, never removed here:
+// the worker thread may be iterating a snapshot of the queue, and an obj_pushed_idle_cb() for it may still be
+// pending after sync_finished_cb() (idle callbacks run at a lower priority). obj_push() skips it at the next sync
+// and obj_pushed_idle_cb() removes it.
+static void cancel_queued_push(const char *uid, enum PushObjOP op) {
+  if (!objects_to_push || !uid) return;
+  PushObj *o = objects_to_push_has(uid, op);
+  if (o) o->cancelled = TRUE;
+}
+
+static void schedule_rrule_checks(void) {
+  GListModel *lists = G_LIST_MODEL(task_lists_model);
+  for_range(i, 0, g_list_model_get_n_items(lists)) {
+    g_autoptr(ErrandsTaskListItem) list = g_list_model_get_item(lists, i);
+    GListModel *tasks = G_LIST_MODEL(list->tasks);
+    for_range(j, 0, g_list_model_get_n_items(tasks)) {
+      g_autoptr(ErrandsTaskItem) task = g_list_model_get_item(tasks, j);
+      errands_task_item_schedule_rrule_check(task);
+    }
+  }
+}
+
+// Runs once, after the first sync has pulled the server's state (or failed: then local data is all there is)
+static gboolean first_pull_done_cb(gpointer user_data) {
+  if (first_pull_done) return G_SOURCE_REMOVE;
+  first_pull_done = true;
+  schedule_rrule_checks();
+  return G_SOURCE_REMOVE;
 }
 
 // ---------- CALDAV CALLBACKS ---------- //
@@ -533,12 +607,16 @@ static void task_removed_cb(CalDAVCalendar *c, const char *uid) {
 
 // Runs on separate thread
 static void sync_thread_cb(GTask *task, gpointer source_object, gpointer task_data, GCancellable *cancellable) {
+  // Snapshot of the queue taken on the main thread. objects_to_push itself must not be iterated here:
+  // obj_pushed_idle_cb() removes finished objects from it on the main thread while this loop runs,
+  // which shifted the array under the loop and skipped objects (and raced with g_ptr_array_add()).
+  g_autoptr(GPtrArray) snapshot = task_data;
   if (!ensure_client_connected()) {
     g_warning("Sync: Client is not connected");
     g_task_return_boolean(task, FALSE);
     return;
   }
-  for_range(i, 0, objects_to_push->len) obj_push(g_ptr_array_index(objects_to_push, i));
+  for_range(i, 0, snapshot->len) obj_push(g_ptr_array_index(snapshot, i));
   g_task_return_boolean(task, caldav_client_poll(client));
 }
 
@@ -547,6 +625,8 @@ static void sync_finished_cb(GObject *source_object, GAsyncResult *res, gpointer
   sync_in_progress = FALSE;
   errands_sidebar_toggle_sync_indicator(FALSE);
   g_hash_table_remove_all(pushed_objs);
+  // EDS delivers the refreshed objects asynchronously, so give them a moment to be merged first
+  if (!first_pull_done) g_timeout_add_seconds(5, first_pull_done_cb, NULL);
   gboolean success = g_task_propagate_boolean(G_TASK(res), NULL);
   if (!success) {
     g_warning("Sync: Error");
@@ -583,6 +663,8 @@ static inline bool ensure_client_connected(void) {
 
 // ---------- PUBLIC ---------- //
 
+bool errands_sync_first_pull_done(void) { return first_pull_done; }
+
 void errands_sync_init(void) {
   if (!objects_to_push) objects_to_push = g_ptr_array_new_with_free_func((GDestroyNotify)obj_free);
   if (!pushed_objs) pushed_objs = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
@@ -609,7 +691,11 @@ void errands_sync(void) {
   g_message("Sync: Start");
   sync_in_progress = true;
   errands_sidebar_toggle_sync_indicator(TRUE);
-  run_in_thread(sync_thread_cb, NULL, sync_finished_cb, NULL);
+  // Objects queued from now on go out with the next sync. The snapshot only borrows the objects: g_ptr_array_copy()
+  // keeps the free function, and dropping the snapshot would free objects that are still queued.
+  GPtrArray *snapshot = g_ptr_array_copy(objects_to_push, NULL, NULL);
+  g_ptr_array_set_free_func(snapshot, NULL);
+  run_in_thread(sync_thread_cb, snapshot, sync_finished_cb, NULL);
 }
 
 void errands_sync_push_list(ErrandsTaskListItem *list) {
@@ -643,6 +729,9 @@ void errands_sync_push_task(ErrandsTaskItem *task) {
   icalcomponent *ical = errands_task_item_get_ical(task);
   const char *uid = errands_task_item_get_uid(task);
   enum PushObjOP op = errands_data_get_deleted(ical) ? PUSH_OBJ_TASK_DELETE : PUSH_OBJ_TASK_PUSH;
+  // An upload still queued for a task that is now deleted would re-create it on the server
+  // (the PUT of a missing object falls back to create), after or instead of the delete.
+  if (op == PUSH_OBJ_TASK_DELETE) cancel_queued_push(uid, PUSH_OBJ_TASK_PUSH);
   PushObj *o = objects_to_push_has(uid, op);
   if (o) {
     // The task changed again before its queued copy was uploaded. Refresh the copy, otherwise the

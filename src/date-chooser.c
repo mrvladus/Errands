@@ -143,6 +143,10 @@ void errands_date_chooser_set_dt(ErrandsDateChooser *self, icaltimetype dt) {
     gtk_spin_button_set_value(self->hours, self->dt.hour);
     gtk_spin_button_set_value(self->minutes, self->dt.minute);
   }
+  // Setting the widgets runs the change handlers, which rebuild self->dt from them, one widget at a time and with
+  // the seconds zeroed. Keep the exact value: Tasks.org writes due times as HH:MM:01, and the changed seconds made
+  // closing the properties of such a task look like an edit, which modified and re-uploaded it.
+  self->dt = dt;
   update_title(self);
   g_object_set(self->reset_btn, "visible", true, NULL);
 }

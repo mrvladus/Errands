@@ -129,13 +129,27 @@ ErrandsTaskListItem *errands_task_list_item_new(icalcomponent *ical) {
   else self->color = (GdkRGBA){0, 0, 0, 0};
   self->tasks = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
   g_autoptr(GPtrArray) vtodos = vcalendar_to_array(ical);
+  bool purged = false;
   for (guint i = 0; i < vtodos->len; ++i) {
     icalcomponent *c = g_ptr_array_index(vtodos, i);
-    const char *parent = errands_data_get_parent(c);
-    if (parent || errands_data_get_deleted(c)) continue;
+    if (errands_data_get_deleted(c)) {
+      // Deleted, and the delete has reached the server (or there is no server): drop the tombstone
+      if (errands_data_get_synced(c) || !errands_settings_get_sync_enabled(state.settings)) {
+        icalcomponent_remove_component(ical, c);
+        icalcomponent_free(c);
+        purged = true;
+        continue;
+      }
+      // Delete not uploaded yet (failed, or the app was closed first). Skipping it here meant it was never
+      // retried. errands_task_item_new() queues the delete; the item isn't shown, the queue keeps it alive.
+      g_autoptr(ErrandsTaskItem) pending = errands_task_item_new(c, self, NULL);
+      continue;
+    }
+    if (errands_data_get_parent(c)) continue;
     g_autoptr(ErrandsTaskItem) task = errands_task_item_new(c, self, NULL);
     g_list_store_append(self->tasks, task);
   }
+  if (purged) errands_task_list_item_save(self);
   errands_task_list_item_update_count(self);
 
   if (!errands_data_get_synced(self->ical)) errands_sync_push_list(self);

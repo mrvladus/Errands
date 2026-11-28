@@ -291,7 +291,8 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
   case PROP_RRULE: {
     const struct icalrecurrencetype *new_rrule = g_value_get_pointer(value);
     if (!new_rrule) {
-      errands_data_set_rrule(self->ical, NULL);
+      // Only write if there is a rule to remove: this also runs when a task without one is loaded or merged
+      if (errands_data_get_rrule(self->ical)) errands_data_set_rrule(self->ical, NULL);
       g_clear_pointer(&self->rrule, icalrecurrencetype_unref);
       g_clear_handle_id(&self->rrule_timeout_id, g_source_remove);
       break;
@@ -299,7 +300,7 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     if (icalrecurrence_compare(self->rrule, new_rrule)) break;
     g_clear_pointer(&self->rrule, icalrecurrencetype_unref);
     if (new_rrule->freq != ICAL_NO_RECURRENCE) self->rrule = icalrecurrencetype_clone((struct icalrecurrencetype *)new_rrule);
-    errands_data_set_rrule(self->ical, self->rrule);
+    if (!icalrecurrence_compare(errands_data_get_rrule(self->ical), self->rrule)) errands_data_set_rrule(self->ical, self->rrule);
     schedule_rrule_check(self);
     save_and_push(self);
   } break;
@@ -333,9 +334,10 @@ static void set_property(GObject *object, guint prop_id, const GValue *value, GP
     errands_task_item_set_tags(self, tags);
     g_auto(GStrv) atts = errands_data_get_attachments(self->ical);
     errands_task_item_set_attachments(self, atts);
+    // Borrowed from the RRULE property (icalvalue_get_recur() takes no reference): don't unref it,
+    // that frees the rule the property still points to.
     struct icalrecurrencetype *rrule = errands_data_get_rrule(self->ical);
     errands_task_item_set_rrule(self, rrule);
-    icalrecurrencetype_unref(rrule);
     self->lock = old_lock;
     update_search_blob(self);
     errands_task_item_update(self);
@@ -423,6 +425,10 @@ static inline void save_and_push(ErrandsTaskItem *self) {
 static inline void schedule_rrule_check(ErrandsTaskItem *self) {
   g_clear_handle_id(&self->rrule_timeout_id, g_source_remove);
   if (!self->completed) return;
+  // Until the first sync has pulled the server's state, the local copy may be an instance another device
+  // already finished and advanced. Reopening it now would upload that old instance over the newer one.
+  // sync.c calls errands_task_item_schedule_rrule_check() for every task once that pull is done.
+  if (errands_settings_get_sync_enabled(state.settings) && !errands_sync_first_pull_done()) return;
   if (!self->rrule || self->rrule->freq == ICAL_NO_RECURRENCE) return;
   if (icaltime_is_null_time(errands_data_get_completed(self->ical))) return;
   gint64 period = get_seconds_until_next_occurrence(self);
@@ -431,12 +437,21 @@ static inline void schedule_rrule_check(ErrandsTaskItem *self) {
   g_message("Scheduled RRULE check in %ld seconds for task '%s'", period, self->uid);
 }
 
+// Start of the series: DTSTART, or DUE for tasks from clients that don't write DTSTART (e.g. Tasks.org).
+// Local wall-clock time, as returned by the errands_data_get_*() getters.
+static inline icaltimetype get_rrule_anchor(ErrandsTaskItem *self) {
+  icaltimetype anchor = errands_data_get_start(self->ical);
+  if (icaltime_is_null_time(anchor)) anchor = errands_data_get_due(self->ical);
+  return anchor;
+}
+
+// First occurrence after `after` (local time). Returned in UTC for icaltime_as_timet().
 static inline icaltimetype get_next_occurrence(ErrandsTaskItem *self, icaltimetype after) {
   if (!self->rrule || !self->ical) return icaltime_null_time();
-  icaltimetype dtstart = errands_data_get_start(self->ical);
+  icaltimetype dtstart = get_rrule_anchor(self);
   if (icaltime_is_null_time(dtstart)) return icaltime_null_time();
-  dtstart = local_to_utc(dtstart);
-  after = local_to_utc(after);
+  // Expand in local wall-clock time, not UTC: BYDAY=MO,TH at 21:00 in UTC-5 is TU,FR 02:00 in UTC,
+  // and DST changes would shift every occurrence by an hour.
   icalrecur_iterator *it = icalrecur_iterator_new(self->rrule, dtstart);
   if (!it) return icaltime_null_time();
   icaltimetype next = icaltime_null_time();
@@ -448,13 +463,51 @@ static inline icaltimetype get_next_occurrence(ErrandsTaskItem *self, icaltimety
     }
   }
   icalrecur_iterator_free(it);
-  return next;
+  return local_to_utc(next);
+}
+
+// Move the task to the occurrence it reopens for (`next`, UTC), keeping the distance between DTSTART and
+// DUE. That's what other clients (Tasks.org, DAVx5) do when a repeating task is finished. Without it the
+// reopened task keeps the dates of the finished instance, and uploading it replaces a newer instance.
+// Returns true if the dates changed.
+static bool advance_to_occurrence(ErrandsTaskItem *self, icaltimetype next) {
+  icaltimetype occurrence = utc_to_local(next);
+  icaltimetype start = errands_data_get_start(self->ical);
+  icaltimetype due = errands_data_get_due(self->ical);
+  bool has_start = !icaltime_is_null_time(start);
+  bool has_due = !icaltime_is_null_time(due);
+  if (!has_start && !has_due) return false;
+  icaltimetype anchor = has_start ? start : due;
+  if (icaltime_compare(occurrence, anchor) <= 0) return false;
+  // RRULE;COUNT counts from DTSTART: moving the start forward would extend the series
+  if (self->rrule->count > 0) return false;
+  gboolean old_lock = self->lock;
+  self->lock = TRUE; // Saved and pushed once, by errands_task_item_set_completed() below
+  if (has_start && has_due) {
+    struct icaldurationtype offset = icalduration_from_times(due, start);
+    icaltimetype new_due = icalduration_extend(occurrence, offset);
+    errands_task_item_set_dtstart(self, &occurrence);
+    errands_task_item_set_dtend(self, &new_due);
+  } else if (has_start) errands_task_item_set_dtstart(self, &occurrence);
+  else errands_task_item_set_dtend(self, &occurrence);
+  self->lock = old_lock;
+  return true;
+}
+
+// The occurrence a finished repeating task reopens for (UTC), or a null time.
+// It comes after the completion and after the current instance: when another client finished an instance
+// early and advanced the task to it (Tasks.org completing the Thursday instance on Thursday morning),
+// that instance is done, so it must not reopen for the same Thursday evening.
+static inline icaltimetype get_reopen_occurrence(ErrandsTaskItem *self) {
+  icaltimetype after = errands_data_get_completed(self->ical);
+  if (icaltime_is_null_time(after)) return icaltime_null_time();
+  icaltimetype anchor = get_rrule_anchor(self);
+  if (!icaltime_is_null_time(anchor) && icaltime_compare(anchor, after) > 0) after = anchor;
+  return get_next_occurrence(self, after);
 }
 
 static inline gint64 get_seconds_until_next_occurrence(ErrandsTaskItem *self) {
-  icaltimetype after = errands_data_get_completed(self->ical);
-  if (icaltime_is_null_time(after)) return -1;
-  icaltimetype next = get_next_occurrence(self, after);
+  icaltimetype next = get_reopen_occurrence(self);
   if (icaltime_is_null_time(next)) return -1;
   time_t next_time = icaltime_as_timet(next);
   time_t now = time(NULL);
@@ -465,11 +518,10 @@ static inline gint64 get_seconds_until_next_occurrence(ErrandsTaskItem *self) {
 static gboolean reset_recurring_task_completion_cb(ErrandsTaskItem *self) {
   self->rrule_timeout_id = 0;
   if (!self->completed) return G_SOURCE_REMOVE;
-  icaltimetype completed = errands_data_get_completed(self->ical);
-  if (icaltime_is_null_time(completed)) return G_SOURCE_REMOVE;
-  icaltimetype next = get_next_occurrence(self, completed);
+  icaltimetype next = get_reopen_occurrence(self);
   if (icaltime_is_null_time(next)) return G_SOURCE_REMOVE;
   if (icaltime_as_timet(next) <= time(NULL)) {
+    advance_to_occurrence(self, next);
     errands_task_item_set_completed(self, FALSE);
   } else {
     gint64 period = get_seconds_until_next_occurrence(self);
@@ -569,7 +621,10 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
   self->dtend = errands_data_get_due(ical);
   self->tags = errands_data_get_tags(ical);
   self->attachments = errands_data_get_attachments(ical);
-  errands_task_item_set_rrule(self, errands_data_get_rrule(ical));
+  // Read the rule directly: the "rrule" setter writes it back to the ical, which marks every task
+  // unsynced with LAST-MODIFIED = now on each launch and re-uploads it over the server's version.
+  struct icalrecurrencetype *rrule = errands_data_get_rrule(ical);
+  if (rrule && rrule->freq != ICAL_NO_RECURRENCE) self->rrule = icalrecurrencetype_clone(rrule);
   self->children_model = g_list_store_new(ERRANDS_TYPE_TASK_ITEM);
   g_autoptr(GPtrArray) vtodos = vcalendar_to_array(list->ical);
   for (guint i = 0; i < vtodos->len; ++i) {
@@ -581,15 +636,12 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
   }
   self->lock = FALSE;
 
-  // Set dtstart if rrule is set and no dtstart exists
-  if (icaltime_is_null_date(self->dtstart) && self->rrule && self->rrule->freq != ICAL_NO_RECURRENCE) {
-    icaltimetype start = errands_default_dtstart(self->dtend);
-    errands_task_item_set_dtstart(self, &start);
-  } else {
-    // Repair tasks whose DTSTART and DUE value types differ (rejected by strict CalDAV servers)
-    icaltimetype start = self->dtstart;
-    if (errands_match_dtstart_to_due(&start, self->dtend)) errands_task_item_set_dtstart(self, &start);
-  }
+  // Repair tasks whose DTSTART and DUE value types differ (rejected by strict CalDAV servers).
+  // A repeating task without DTSTART is left alone: get_next_occurrence() uses its DUE instead.
+  // Writing one here would modify (and re-upload) tasks created by other clients on every import.
+  icaltimetype start = self->dtstart;
+  if (errands_match_dtstart_to_due(&start, self->dtend)) errands_task_item_set_dtstart(self, &start);
+  schedule_rrule_check(self);
 
   update_search_blob(self);
   errands_task_item_update(self);
@@ -597,6 +649,16 @@ ErrandsTaskItem *errands_task_item_new(icalcomponent *ical, ErrandsTaskListItem 
   if (!errands_data_get_synced(self->ical)) errands_sync_push_task(self);
 
   return self;
+}
+
+void errands_task_item_schedule_rrule_check(ErrandsTaskItem *self) {
+  g_assert_nonnull(self);
+  schedule_rrule_check(self);
+  GListModel *children = G_LIST_MODEL(self->children_model);
+  for_range(i, 0, g_list_model_get_n_items(children)) {
+    g_autoptr(ErrandsTaskItem) child = g_list_model_get_item(children, i);
+    errands_task_item_schedule_rrule_check(child);
+  }
 }
 
 void errands_task_item_update(ErrandsTaskItem *self) {

@@ -33,6 +33,22 @@ static void on_description_changed_cb(GtkTextBuffer *buffer, ErrandsTaskProperti
 static gboolean on_style_toggled_cb(GBinding *binding, const GValue *from_value, GValue *to_value, ErrandsTaskProperties *self);
 static void on_rgba_changed_cb(ErrandsTaskProperties *self, GParamSpec *pspec, ErrandsColorButton *btn);
 
+// Row of the priority combo for an iCalendar PRIORITY (0 = none, 1..9)
+static guint priority_to_row(guint priority) {
+  if (priority >= 1 && priority <= 3) return 1;
+  if (priority >= 4 && priority <= 7) return 2;
+  if (priority >= 8) return 3;
+  return 0;
+}
+
+// An unset date chooser holds a null DATE, a task without the date a null DATE-TIME, and icaltime_compare() doesn't
+// consider them equal. Treating them as different stamped and re-uploaded tasks without dates when their properties
+// were merely opened.
+static bool same_dt(icaltimetype a, icaltimetype b) {
+  if (icaltime_is_null_time(a) && icaltime_is_null_time(b)) return true;
+  return icaltime_compare(a, b) == 0;
+}
+
 // ---------- WIDGET TEMPLATE ---------- //
 
 struct _ErrandsTaskProperties {
@@ -184,11 +200,7 @@ static inline void set_item(ErrandsTaskProperties *self, ErrandsTaskItem *item) 
   if (rrule) icalrecurrencetype_unref(rrule);
 
   // Priority
-  guint priority = errands_task_item_get_priority(self->item); // low 0..9 high
-  if (priority == 1 || priority == 2 || priority == 3) priority = 1;
-  else if (priority == 4 || priority == 5 || priority == 6 || priority == 7) priority = 2;
-  else if (priority == 8 || priority == 9) priority = 3;
-  adw_combo_row_set_selected(self->priority, priority);
+  adw_combo_row_set_selected(self->priority, priority_to_row(errands_task_item_get_priority(self->item)));
 
   // Color
   const char *curr_color = errands_task_item_get_color(self->item);
@@ -294,15 +306,19 @@ void errands_task_properties_close(ErrandsTaskProperties *self) {
   const char *new_text = NULL;
   g_object_get(self->buffer, "text", &new_text, NULL);
   g_autofree gchar *stripped = g_strstrip(g_strdup(new_text));
-  errands_task_item_set_title(self->item, stripped);
+  // Compare ignoring surrounding whitespace: other clients keep it (e.g. "Another test "), and stripping it here
+  // renamed and re-uploaded such tasks whenever their properties were merely opened
+  const char *old_title = errands_task_item_get_title(self->item);
+  g_autofree gchar *old_stripped = g_strstrip(g_strdup(old_title ? old_title : ""));
+  if (g_strcmp0(stripped, old_stripped) != 0) errands_task_item_set_title(self->item, stripped);
 
   // Date
   icaltimetype new_sdt = errands_date_chooser_get_dt(self->start_date_chooser);
   icaltimetype old_sdt = errands_task_item_get_dtstart(self->item);
-  if (icaltime_compare(new_sdt, old_sdt) != 0) errands_task_item_set_dtstart(self->item, &new_sdt);
+  if (!same_dt(new_sdt, old_sdt)) errands_task_item_set_dtstart(self->item, &new_sdt);
   icaltimetype new_ddt = errands_date_chooser_get_dt(self->due_date_chooser);
   icaltimetype old_ddt = errands_task_item_get_dtend(self->item);
-  if (icaltime_compare(new_ddt, old_ddt) != 0) errands_task_item_set_dtend(self->item, &new_ddt);
+  if (!same_dt(new_ddt, old_ddt)) errands_task_item_set_dtend(self->item, &new_ddt);
   if (errands_task_item_is_due(self->item)) errands_sidebar_update_filter_rows();
 
   // Set rrule
@@ -316,22 +332,24 @@ void errands_task_properties_close(ErrandsTaskProperties *self) {
       errands_task_item_set_dtstart(self->item, &start);
     }
   }
-  if (new_rrule && icaltime_is_null_date(new_sdt)) {
-    icaltimetype start = errands_default_dtstart(new_ddt);
-    errands_task_item_set_dtstart(self->item, &start);
-    icalrecurrencetype_unref(new_rrule);
-  }
+  // Only give a repeating task a DTSTART when its rule was changed here (above). Doing it on every close
+  // modified and re-uploaded repeating tasks from clients that don't write DTSTART (e.g. Tasks.org)
+  // whenever their properties were merely opened. Without DTSTART the recurrence is anchored on DUE.
+  if (new_rrule) icalrecurrencetype_unref(new_rrule);
   // Keep DTSTART and DUE the same value type (DATE vs DATE-TIME)
   icaltimetype cur_sdt = errands_task_item_get_dtstart(self->item);
   if (errands_match_dtstart_to_due(&cur_sdt, errands_task_item_get_dtend(self->item)))
     errands_task_item_set_dtstart(self->item, &cur_sdt);
 
-  // Priority
+  // Priority. The row only has four steps, so only write when a different step was chosen: writing the step's value
+  // back changed e.g. Tasks.org's medium priority 5 to 6 and re-uploaded the task whenever it was merely opened.
   guint priority = adw_combo_row_get_selected(self->priority);
-  if (priority == 3) priority = 9;
-  else if (priority == 2) priority = 6;
-  else if (priority == 1) priority = 1;
-  errands_task_item_set_priority(self->item, priority);
+  if (priority != priority_to_row(errands_task_item_get_priority(self->item))) {
+    if (priority == 3) priority = 9;
+    else if (priority == 2) priority = 6;
+    else if (priority == 1) priority = 1;
+    errands_task_item_set_priority(self->item, priority);
+  }
 
   // Color
   GdkRGBA rgba = errands_color_button_get_rgba(self->color);
