@@ -60,7 +60,7 @@
     <display_length compare="ge">360</display_length>
   </requires>
   <releases>
-    <release version="51.2.7" date="2026-11-24">
+    <release version="51.2.7" date="2026-11-28">
         <description translate="no">
             <ul>
                 <li>Fixed counters</li>
